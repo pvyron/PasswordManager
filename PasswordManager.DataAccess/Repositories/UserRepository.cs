@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.DataAccess.Repositories
 {
-    internal class UserRepository : IUserRepository
+    internal sealed class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
 
@@ -17,27 +17,27 @@ namespace PasswordManager.DataAccess.Repositories
             _context = context;
         }
 
-        public Task<UserDbModel> CreateAsync(UserDbModel entity)
+        public Task<UserDbModel> CreateAsync(UserDbModel entity, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ICollection<UserDbModel>> GetAllAsync()
+        public Task<ICollection<UserDbModel>> GetAllAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UserDbModel?> GetByIdAsync(Guid id)
+        public Task<UserDbModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UserDbModel?> UpdateAsync(UserDbModel entity)
+        public Task<UserDbModel?> UpdateAsync(UserDbModel entity, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

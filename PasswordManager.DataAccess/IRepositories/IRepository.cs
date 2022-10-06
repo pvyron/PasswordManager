@@ -2,12 +2,12 @@
 
 namespace PasswordManager.DataAccess.IRepositories
 {
-    internal interface IRepository<T> where T : IDbModel
+    public interface IRepository<T> where T : IDbModel
     {
-        Task<ICollection<T>> GetAllAsync();
-        Task<T?> GetByIdAsync(Guid id);
-        Task<T> CreateAsync(T entity);
-        Task<T?> UpdateAsync(T entity);
-        Task DeleteAsync(Guid id);
+        Task<ICollection<T>> GetAllAsync(CancellationToken cancellationToken);
+        Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<T> CreateAsync(T entity, CancellationToken cancellationToken);
+        Task<T?> UpdateAsync(T entity, CancellationToken cancellationToken);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     }
 }

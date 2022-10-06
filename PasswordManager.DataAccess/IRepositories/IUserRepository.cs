@@ -2,7 +2,7 @@
 
 namespace PasswordManager.DataAccess.IRepositories
 {
-    internal interface IUserRepository : IRepository<UserDbModel>
+    public interface IUserRepository : IRepository<UserDbModel>
     {
     }
 }

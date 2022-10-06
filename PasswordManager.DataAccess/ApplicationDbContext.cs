@@ -3,7 +3,7 @@ using PasswordManager.DataAccess.DbModels;
 
 namespace PasswordManager.DataAccess
 {
-    public class ApplicationDbContext : DbContext
+    internal sealed class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {

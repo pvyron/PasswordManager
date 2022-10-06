@@ -8,7 +8,7 @@ namespace PasswordManager.Application
     {
         public static IServiceCollection RegisterApplication(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
+            services.RegisterDataAccess(connectionString);
             return services;
         }
     }

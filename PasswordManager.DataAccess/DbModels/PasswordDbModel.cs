@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PasswordManager.DataAccess.DbModels
 {
     [Table("Passwords")]
-    public class PasswordDbModel : IDbModel
+    public sealed class PasswordDbModel : IDbModel
     {
         [Key]
         [Required]
