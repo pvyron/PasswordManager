@@ -7,14 +7,14 @@ namespace PasswordManager.DataAccess
     internal sealed class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _dbContext;
-        public IPasswordRepository PasswordRepository { get; private set; }
-        public IUserRepository UserRepository { get; private set; }
+        public IPasswordRepository Passwords { get; private set; }
+        public IUserRepository Users { get; private set; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-            PasswordRepository = new PasswordRepository(_dbContext);
-            UserRepository = new UserRepository(_dbContext);
+            Passwords = new PasswordRepository(_dbContext);
+            Users = new UserRepository(_dbContext);
         }
 
         public Task BeginTransaction()

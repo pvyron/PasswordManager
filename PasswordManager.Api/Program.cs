@@ -1,19 +1,25 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using PasswordManager.Application;
+using Microsoft.AspNetCore.Identity;
+using PasswordManager.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var configuration = builder.Configuration;
+
+
+services.AddIdentity<UserModel, IdentityRole>().AddDefaultTokenProviders();
 
 // Add services to the container.
-string shopDbConnectionString = builder.Configuration.GetConnectionString("ShopDbConnectionString");
-builder.Services.RegisterApplication(shopDbConnectionString);
+services.AddAuthentication().AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+    googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+});
 
-builder.Services.AddMediatR(typeof(Program));
-
-builder.Services.AddControllers();
+services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
 var app = builder.Build();
 

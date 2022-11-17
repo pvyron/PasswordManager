@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.DataAccess.DbModels
 {
-    public class PasswordDbModel
+    public class PasswordCategoryDbModel
     {
         [BsonId]
         public Guid Id { get; set; }
-        public Guid? CategoryId { get; set; }
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
-        public string Password { get; set; } = null!;
     }
 }
