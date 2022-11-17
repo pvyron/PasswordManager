@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Domain.Models
+namespace PasswordManager.Application.DtObjects.Authorization
 {
-    public class UserModel
+    public class UserRegistrationResponseModel
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
         public required string Email { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }

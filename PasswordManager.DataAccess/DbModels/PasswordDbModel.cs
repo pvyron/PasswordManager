@@ -14,6 +14,7 @@ namespace PasswordManager.DataAccess.DbModels
         public Guid? CategoryId { get; set; }
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
+        public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;
     }
 }

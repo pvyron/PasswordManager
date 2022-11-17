@@ -1,0 +1,53 @@
+﻿using LanguageExt.Common;
+using MediatR;
+using PasswordManager.Application.DtObjects.Authorization;
+using PasswordManager.Application.IServices;
+using PasswordManager.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PasswordManager.Application.Commands.Authorization;
+
+public record RegisterUserCommand(UserRegistrationRequestModel UserRegistrationModel) : IRequest<Result<UserRegistrationResponseModel>>;
+
+public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<UserRegistrationResponseModel>>
+{
+    private readonly IUsersService _usersService;
+
+    public RegisterUserCommandHandler(IUsersService usersService)
+	{
+        _usersService = usersService;
+    }
+
+    public async Task<Result<UserRegistrationResponseModel>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    {
+		try
+		{
+            var newUserModel = new UserModel
+            {
+                Email = request.UserRegistrationModel.Email,
+                FirstName = request.UserRegistrationModel.FirstName,
+                LastName = request.UserRegistrationModel.LastName
+            };
+
+            var createdUser = await _usersService.CreateUser(newUserModel, request.UserRegistrationModel.Password, cancellationToken);
+
+            var newUserResponse = new UserRegistrationResponseModel
+            {
+                Id = createdUser.Id,
+                Email = createdUser.Email,
+                FirstName = createdUser.FirstName,
+                LastName = createdUser.LastName
+            };
+
+            return newUserResponse;
+		}
+		catch (Exception ex)
+        {
+            return new(ex);
+		}
+    }
+}

@@ -8,7 +8,7 @@ namespace PasswordManager.Domain.Models
 {
     public sealed class PasswordModel
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
         public string Password { get; set; } = null!;
