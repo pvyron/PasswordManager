@@ -7,26 +7,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Infrastructure.Services
+namespace PasswordManager.Infrastructure.Services;
+
+public sealed class AuthorizationService : IAuthorizationService
 {
-    public sealed class AuthorizationService : IAuthorizationService
+    private const string USER_TABLE_NAME = "users";
+
+    private readonly MDbClient _dbClient;
+
+    public AuthorizationService(MDbClient mDbClient)
     {
-        private const string USER_TABLE_NAME = "users";
+        _dbClient = mDbClient;
+    }
 
-        private readonly MDbClient _dbClient;
+    public async Task Authenticate(string email, string password, CancellationToken cancellationToken)
+    {
+        var user = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, ("Email", email), cancellationToken);
 
-        public AuthorizationService(MDbClient mDbClient)
-        {
-            _dbClient = mDbClient;
-        }
-
-        public async Task Authenticate(string email, string password, CancellationToken cancellationToken)
-        {
-            var user = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, ("Email", email), cancellationToken);
-
-            if (user is null || password != user.Password) { throw new Exception(""); }
+        if (user is null || password != user.Password) { throw new Exception(""); }
 
 
-        }
     }
 }

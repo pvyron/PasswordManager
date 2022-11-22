@@ -13,7 +13,7 @@ services.InstallServices()
         .AddEndpointsApiExplorer()
         .AddSwaggerGen();
 
-services.AddMediatR(Assembly.GetAssembly(typeof(ApplicationAssembly)));
+services.AddMediatR(Assembly.GetAssembly(typeof(ApplicationAssembly))!);
 
 //.AddMediator(o =>
 //{

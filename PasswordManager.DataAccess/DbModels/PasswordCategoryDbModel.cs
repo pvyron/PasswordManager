@@ -5,13 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.DataAccess.DbModels
+namespace PasswordManager.DataAccess.DbModels;
+
+public sealed class PasswordCategoryDbModel
 {
-    public class PasswordCategoryDbModel
-    {
-        [BsonId]
-        public Guid Id { get; set; }
-        public string Title { get; set; } = null!;
-        public string? Description { get; set; }
-    }
+    [BsonId]
+    public Guid Id { get; set; }
+    public string Title { get; set; } = null!;
+    public string? Description { get; set; }
 }

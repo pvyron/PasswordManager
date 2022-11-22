@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Application.IServices
+namespace PasswordManager.Application.IServices;
+
+public interface IAuthorizationService
 {
-    public interface IAuthorizationService
-    {
-        Task Authenticate(string email, string password, CancellationToken cancellationToken);
-    }
+    Task Authenticate(string email, string password, CancellationToken cancellationToken);
 }

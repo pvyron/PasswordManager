@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Authorization;
 
-public record RegisterUserCommand(UserRegistrationRequestModel UserRegistrationModel) : IRequest<Result<UserRegistrationResponseModel>>;
+public sealed record RegisterUserCommand(UserRegistrationRequestModel UserRegistrationModel) : IRequest<Result<UserRegistrationResponseModel>>;
 
-public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<UserRegistrationResponseModel>>
+public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<UserRegistrationResponseModel>>
 {
     private readonly IUsersService _usersService;
 

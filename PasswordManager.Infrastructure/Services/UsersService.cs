@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services;
 
-internal class UsersService : IUsersService
+internal sealed class UsersService : IUsersService
 {
     private const string USER_TABLE_NAME = "users";
 

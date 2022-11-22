@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Application
+namespace PasswordManager.Application;
+
+public sealed class ApplicationAssembly
 {
-    public class ApplicationAssembly
-    {
-    }
 }

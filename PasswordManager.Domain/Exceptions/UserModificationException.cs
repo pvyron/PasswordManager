@@ -5,20 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Domain.Exceptions
+namespace PasswordManager.Domain.Exceptions;
+
+public sealed class UserModificationException : Exception
 {
-    public class UserModificationException : Exception
+    public UserModificationException(string message) : base(message)
     {
-        public UserModificationException(string message) : base(message)
-        {
 
-        }
-
-        public UserModificationException(string message, UserModel userModel) : base(message)
-        {
-            UserModel = userModel;
-        }
-
-        public UserModel? UserModel { get; }
     }
+
+    public UserModificationException(string message, UserModel userModel) : base(message)
+    {
+        UserModel = userModel;
+    }
+
+    public UserModel? UserModel { get; }
 }

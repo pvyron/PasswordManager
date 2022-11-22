@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.DataAccess;
 
-public class MDbClient
+public sealed class MDbClient
 {
     private readonly IMongoDatabase _db;
 
