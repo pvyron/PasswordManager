@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PasswordManager.Application.Commands.Passwords;
+using PasswordManager.Application.DtObjects.Passwords;
+using PasswordManager.Application.Queries.Passwords;
+using PasswordManager.Domain.Exceptions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,37 +12,69 @@ namespace PasswordManager.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class PasswordsController : ControllerBase
+public class PasswordsController : MediatorControllerBase
 {
-    // GET: api/<PasswordsController>
     [HttpGet]
-    public IEnumerable<string> Get()
+    public IAsyncEnumerable<PasswordResponseModel> Get(CancellationToken cancellationToken)
     {
-        return new string[] { "value1", "value2" };
+        return Mediator.CreateStream(new GetAllPasswordsQuery(), cancellationToken);
     }
 
-    // GET api/<PasswordsController>/5
     [HttpGet("{id}")]
-    public string Get(int id)
+    public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        return "value";
+        var response = await Mediator.Send(new GetPasswordQuery(id), cancellationToken);
+
+        return response.Match<IActionResult>(
+            Ok,
+            Fail =>
+            {
+                if (Fail is AuthenticationException)
+                {
+                    return Unauthorized(Fail.Message);
+                }
+
+                if (Fail is AccessException<object>)
+                {
+                    return BadRequest(Fail.Message);
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            });
     }
 
-    // POST api/<PasswordsController>
     [HttpPost]
-    public void Post([FromBody] string value)
+    public async Task<IActionResult> Post([FromBody] PasswordRequestModel passwordRequestModel, CancellationToken cancellationToken)
     {
+        var response = await Mediator.Send(new CreatePasswordCommand(passwordRequestModel), cancellationToken);
+
+        return response.Match<IActionResult>(
+            Ok,
+            Fail =>
+            {
+                if (Fail is AuthenticationException)
+                {
+                    return Unauthorized(Fail.Message);
+                }
+
+                if (Fail is AccessException<object>)
+                {
+                    return BadRequest(Fail.Message);
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            });
     }
 
-    // PUT api/<PasswordsController>/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public async Task<IActionResult> Put(Guid id, [FromBody] PasswordRequestModel passwordRequestModel, CancellationToken cancellationToken)
     {
+        return Ok();
     }
 
-    // DELETE api/<PasswordsController>/5
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
+        return Ok();
     }
 }

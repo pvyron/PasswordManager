@@ -15,7 +15,11 @@ public static class ServicesInstaller
     public static IServiceCollection InstallServices(this IServiceCollection services)
     {
         services.AddSingleton<MDbClient>();
+
         services.AddSingleton<IUsersService, UsersService>();
+        services.AddSingleton<IPasswordService, PasswordService>();
+        services.AddSingleton<IPasswordCategoriesService, PasswordCategoryService>();
+
         services.AddSingleton<IAuthorizationService, AuthorizationService>();
 
         return services;

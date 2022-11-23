@@ -28,6 +28,7 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 		{
             var newUserModel = new UserModel
             {
+                Id = Guid.Empty,
                 Email = request.UserRegistrationModel.Email,
                 FirstName = request.UserRegistrationModel.FirstName,
                 LastName = request.UserRegistrationModel.LastName

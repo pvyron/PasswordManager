@@ -14,7 +14,8 @@ var configuration = builder.Configuration;
 
 services.InstallServices()
         .AddEndpointsApiExplorer()
-        .AddSwaggerGen();
+        .AddSwaggerGen()
+        .AddHttpContextAccessor();
 
 services.AddMediatR(Assembly.GetAssembly(typeof(ApplicationAssembly))!);
 

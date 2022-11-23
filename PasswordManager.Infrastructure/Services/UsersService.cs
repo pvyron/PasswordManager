@@ -30,6 +30,7 @@ internal sealed class UsersService : IUsersService
         {
             yield return new UserModel
             {
+                Id = userDbModel.Id,
                 Email = userDbModel.Email,
                 FirstName = userDbModel.FirstName,
                 LastName = userDbModel.LastName,
@@ -42,12 +43,12 @@ internal sealed class UsersService : IUsersService
         var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, id, cancellationToken);
 
         if (userDbModel is null)
-            throw new UserModificationException($"User {id} was not found");
+            throw new UserAccessException($"User {id} was not found");
 
         return new UserModel
         {
-            Email = userDbModel.Email,
             Id = userDbModel.Id,
+            Email = userDbModel.Email,
             FirstName = userDbModel.FirstName,
             LastName = userDbModel.LastName
         };
@@ -55,13 +56,14 @@ internal sealed class UsersService : IUsersService
 
     public async Task<UserModel> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, ("Email", email), cancellationToken);
+        var userDbModel = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, (nameof(UserDbModel.Email), email), cancellationToken);
 
         if (userDbModel is null)
-            throw new UserModificationException($"User with email {email} was not found");
+            throw new UserAccessException($"User with email {email} was not found");
 
         return new UserModel
         {
+            Id = userDbModel.Id,
             Email = userDbModel.Email,
             FirstName = userDbModel.FirstName,
             LastName = userDbModel.LastName
@@ -70,11 +72,11 @@ internal sealed class UsersService : IUsersService
 
     public async Task<UserModel> CreateUser(UserModel user, string password, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecord<UserDbModel?>(USER_TABLE_NAME, ("Email", user.Email), cancellationToken);
+        var userDbModel = await _dbClient.GetRecord<UserDbModel?>(USER_TABLE_NAME, (nameof(UserDbModel.Email), user.Email), cancellationToken);
 
         if (userDbModel is not null)
         {
-            throw new UserModificationException($"Email {user.Email} is already registered");
+            throw new UserAccessException($"Email {user.Email} is already registered");
         }
 
         var newUserDbModel = new UserDbModel
@@ -96,24 +98,12 @@ internal sealed class UsersService : IUsersService
         };
     }
 
-    public async Task DeleteUser(Guid id, CancellationToken cancellationToken)
-    {
-        var userDbModel = await _dbClient.GetRecordById<UserDbModel?>(USER_TABLE_NAME, id, cancellationToken);
-
-        if (userDbModel is null)
-            throw new UserModificationException($"User {id} was not found");
-
-        userDbModel.IsActive = false;
-
-        await _dbClient.UpdateRecord(USER_TABLE_NAME, id, userDbModel, cancellationToken);
-    }
-
     public async Task<UserModel> UpdateUser(UserModel user, CancellationToken cancellationToken)
     {
         var userDbModel = await _dbClient.GetRecordById<UserDbModel?>(USER_TABLE_NAME, user.Id, cancellationToken);
 
         if (userDbModel is null)
-            throw new UserModificationException($"User with email {user.Email} was not found");
+            throw new UserAccessException($"User with email {user.Email} was not found");
 
         userDbModel.Email = user.Email;
         userDbModel.FirstName = user.FirstName;
@@ -123,6 +113,7 @@ internal sealed class UsersService : IUsersService
 
         return new UserModel
         {
+            Id = updatedUser.Id,
             Email = updatedUser.Email,
             FirstName = updatedUser.FirstName,
             LastName = updatedUser.LastName
@@ -134,7 +125,7 @@ internal sealed class UsersService : IUsersService
         var userDbModel = await _dbClient.GetRecordById<UserDbModel?>(USER_TABLE_NAME, id, cancellationToken);
 
         if (userDbModel is null)
-            throw new UserModificationException($"User {id} was not found");
+            throw new UserAccessException($"User {id} was not found");
 
         userDbModel.Password = newPassword;
 
@@ -142,9 +133,22 @@ internal sealed class UsersService : IUsersService
 
         return new UserModel
         {
+            Id = updatedUser.Id,
             Email = updatedUser.Email,
             FirstName = updatedUser.FirstName,
             LastName = updatedUser.LastName
         };
+    }
+
+    public async Task DeleteUser(Guid id, CancellationToken cancellationToken)
+    {
+        var userDbModel = await _dbClient.GetRecordById<UserDbModel?>(USER_TABLE_NAME, id, cancellationToken);
+
+        if (userDbModel is null)
+            throw new UserAccessException($"User {id} was not found");
+
+        userDbModel.IsActive = false;
+
+        await _dbClient.UpdateRecord(USER_TABLE_NAME, id, userDbModel, cancellationToken);
     }
 }

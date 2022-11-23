@@ -23,7 +23,7 @@ public class AuthorizationController : MediatorControllerBase
             Succ => CreatedAtAction(nameof(Register), Succ),
             ex =>
             {
-                if (ex is UserModificationException)
+                if (ex is AccessException<object>)
                 {
                     return BadRequest(ex.Message);
                 }

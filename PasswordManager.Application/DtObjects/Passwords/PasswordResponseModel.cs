@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Domain.Models;
+namespace PasswordManager.Application.DtObjects.Passwords;
 
-public sealed class PasswordModel
+public sealed record PasswordResponseModel
 {
     public required Guid Id { get; set; }
-    public required Guid UserId { get; set; }
     public Guid? CategoryId { get; set; }
     public required string Title { get; set; }
     public string? Description { get; set; }

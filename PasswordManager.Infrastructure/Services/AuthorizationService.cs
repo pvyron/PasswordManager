@@ -40,12 +40,13 @@ public sealed class AuthorizationService : IAuthorizationService
 
     public async Task<UserModel> Authenticate(string email, string password, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, ("Email", email), cancellationToken);
+        var userDbModel = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, (nameof(UserDbModel.Email), email), cancellationToken);
 
         if (userDbModel is null || password != userDbModel.Password) { throw new AuthenticationException("Invalid credentials"); }
 
         return new UserModel
         {
+            Id = userDbModel.Id,
             Email = userDbModel.Email,
             FirstName = userDbModel.FirstName,
             LastName = userDbModel.LastName,
