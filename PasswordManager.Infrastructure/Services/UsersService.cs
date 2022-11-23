@@ -24,7 +24,6 @@ internal sealed class UsersService : IUsersService
         _dbClient = dbClient;
     }
 
-
     public async IAsyncEnumerable<UserModel> GetAllUsers([EnumeratorCancellation]CancellationToken cancellationToken)
     {
         foreach (var userDbModel in await _dbClient.GetAllRecords<UserDbModel>(USER_TABLE_NAME, cancellationToken))

@@ -16,6 +16,7 @@ public static class ServicesInstaller
     {
         services.AddSingleton<MDbClient>();
         services.AddSingleton<IUsersService, UsersService>();
+        services.AddSingleton<IAuthorizationService, AuthorizationService>();
 
         return services;
     }

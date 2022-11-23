@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Authorization;
 using PasswordManager.Application.DtObjects.Authorization;
+using PasswordManager.Application.Queries.Authorization;
 using PasswordManager.Domain.Exceptions;
 using System.Net.Mime;
 
@@ -25,6 +26,27 @@ public class AuthorizationController : MediatorControllerBase
                 if (ex is UserModificationException)
                 {
                     return BadRequest(ex.Message);
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            });
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(UserLoginResponseModel), StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest, MediaTypeNames.Text.Plain)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Login([FromHeader] string? email, [FromHeader] string? password, CancellationToken cancellationToken)
+    {
+        var response = await Mediator.Send(new LoginUserQuery(email, password), cancellationToken);
+
+        return response.Match<IActionResult>(
+            Succ => CreatedAtAction(nameof(Register), Succ),
+            ex =>
+            {
+                if (ex is AuthenticationException)
+                {
+                    return Unauthorized(ex.Message);
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
