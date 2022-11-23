@@ -19,13 +19,11 @@ namespace PasswordManager.Infrastructure.Services
 
         private readonly MDbClient _dbClient;
         private readonly IUsersService _usersService;
-        private readonly IPasswordCategoriesService _passwordCategoriesService;
 
-        public PasswordService(MDbClient dbClient, IUsersService usersService, IPasswordCategoriesService passwordCategoriesService)
+        public PasswordService(MDbClient dbClient, IUsersService usersService)
         {
             _dbClient = dbClient;
             _usersService = usersService;
-            _passwordCategoriesService = passwordCategoriesService;
         }
 
         public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -67,9 +65,6 @@ namespace PasswordManager.Infrastructure.Services
         public async Task<PasswordModel> SaveNewPassword(PasswordModel password, CancellationToken cancellationToken)
         {
             _ = await _usersService.GetUserById(password.UserId, cancellationToken);
-
-            if (password.CategoryId is not null)
-                _ = await _passwordCategoriesService.GetCategoryById((Guid)password.CategoryId, cancellationToken);
 
             var newPasswordDbModel = new PasswordDbModel
             {

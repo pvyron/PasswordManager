@@ -67,9 +67,26 @@ public class PasswordsController : MediatorControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, [FromBody] PasswordRequestModel passwordRequestModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Put([FromBody] PasswordRequestModel passwordRequestModel, CancellationToken cancellationToken)
     {
-        return Ok();
+        var response = await Mediator.Send(new UpdatePasswordCommand(passwordRequestModel), cancellationToken);
+
+        return response.Match<IActionResult>(
+            Ok,
+            Fail =>
+            {
+                if (Fail is AuthenticationException)
+                {
+                    return Unauthorized(Fail.Message);
+                }
+
+                if (Fail is AccessException<object>)
+                {
+                    return BadRequest(Fail.Message);
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            });
     }
 
     [HttpDelete("{id}")]

@@ -21,11 +21,15 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
 {
     private readonly HttpContext _httpContext;
     private readonly IPasswordService _passwordService;
+    private readonly IUsersService _usersService;
+    private readonly IPasswordCategoriesService _passwordCategoriesService;
 
-    public CreatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService)
+    public CreatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService, IUsersService usersService, IPasswordCategoriesService passwordCategoriesService)
     {
         _httpContext = httpContextAccessor.HttpContext;
         _passwordService = passwordService;
+        _usersService = usersService;
+        _passwordCategoriesService = passwordCategoriesService;
     }
 
     public async Task<Result<PasswordResponseModel>> Handle(CreatePasswordCommand request, CancellationToken cancellationToken)
@@ -39,10 +43,24 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 return new Result<PasswordResponseModel>(new AuthenticationException("You are not authorized for this action"));
             }
 
+            var userGuid = Guid.Parse(userId);
+
+            _ = await _usersService.GetUserById(userGuid, cancellationToken);
+
+            if (request.PasswordRequestModel.CategoryId is not null)
+            {
+                var category = await _passwordCategoriesService.GetCategoryById((Guid)request.PasswordRequestModel.CategoryId, cancellationToken);
+
+                if (!category.UserId.Equals(userGuid))
+                {
+                    return new Result<PasswordResponseModel>(new PasswordCategoryAccessException("You are not authorized for this action"));
+                }
+            }
+
             var passwordModel = new PasswordModel
             {
                 Id = Guid.Empty,
-                UserId = Guid.Parse(userId),
+                UserId = userGuid,
                 Title = request.PasswordRequestModel.Title,
                 Username = request.PasswordRequestModel.Username,
                 Password = request.PasswordRequestModel.Password,
