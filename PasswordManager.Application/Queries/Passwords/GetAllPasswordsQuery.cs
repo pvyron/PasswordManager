@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Queries.Passwords;
 
-public record GetAllPasswordsQuery : IStreamRequest<PasswordResponseModel>;
+public sealed record GetAllPasswordsQuery : IStreamRequest<PasswordResponseModel>;
 
 public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPasswordsQuery, PasswordResponseModel>
 {

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Queries.Passwords;
 
-public record GetPasswordQuery(Guid Id) : IRequest<Result<PasswordResponseModel>>;
+public sealed record GetPasswordQuery(Guid Id) : IRequest<Result<PasswordResponseModel>>;
 
 public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, Result<PasswordResponseModel>>
 {
