@@ -5,6 +5,7 @@ using PasswordManager.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -45,6 +46,18 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 o.IncludeErrorDetails = true;
             });
 
+services.AddCors(o =>
+{
+    o.AddDefaultPolicy(policy =>
+                      {
+                          policy.AllowAnyHeader();
+                          policy.AllowAnyMethod();
+                          policy.WithOrigins("https://localhost:7210");
+                          policy.AllowCredentials();
+                          policy.Build();
+                      });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -52,6 +65,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(policy =>
+{
+    policy.AllowAnyHeader();
+    policy.AllowAnyMethod();
+    policy.WithOrigins("https://localhost:7210");
+    policy.AllowCredentials();
+    policy.Build();
+});
 
 app.UseHttpsRedirection();
 

@@ -4,6 +4,7 @@ using PasswordManager.Application.Commands.Passwords;
 using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.Queries.Passwords;
 using PasswordManager.Domain.Exceptions;
+using System.Threading;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -90,8 +91,25 @@ public class PasswordsController : MediatorControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        return Ok();
+        var response = await Mediator.Send(new DeletePasswordCommand(id), cancellationToken);
+
+        return response.Match<IActionResult>(
+            _ => Ok(),
+            Fail =>
+            {
+                if (Fail is AuthenticationException)
+                {
+                    return Unauthorized(Fail.Message);
+                }
+
+                if (Fail is AccessException<object>)
+                {
+                    return BadRequest(Fail.Message);
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            });
     }
 }

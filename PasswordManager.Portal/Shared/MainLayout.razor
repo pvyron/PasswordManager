@@ -1,6 +1,5 @@
-﻿@using PasswordManager.Portal.Services;
-@inherits LayoutComponentBase
-@inject AuthenticationStateService _authenticationStateService
+﻿@inherits LayoutComponentBase
+@inject ClientStateData _clientStateData
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -9,15 +8,26 @@
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudText Typo="Typo.h5" Class="ml-3">Vyron's Password Manager</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End">
+            @if (_clientStateData.IsAuthenticated)
+            {
+                <MudMenuItem>My account</MudMenuItem>
+                <MudMenuItem Href="@ApplicationRoutes.Logout">Logout</MudMenuItem>
+            }
+            else
+            {
+                <MudMenuItem Href="@ApplicationRoutes.Login">Login</MudMenuItem>
+                <MudMenuItem Href="@ApplicationRoutes.Register">Register</MudMenuItem>
+            }
+        </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudContainer Fixed="true">
             @Body
         </MudContainer>
     </MudMainContent>

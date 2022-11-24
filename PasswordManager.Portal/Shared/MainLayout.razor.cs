@@ -11,17 +11,4 @@ public partial class MainLayout
     {
         _drawerOpen = !_drawerOpen;
     }
-
-
-
-
-    public async Task Login()
-    {
-        await _authenticationStateService.Login();
-    }
-
-    public async Task Logout()
-    {
-        await _authenticationStateService.Logout();
-    }
 }
