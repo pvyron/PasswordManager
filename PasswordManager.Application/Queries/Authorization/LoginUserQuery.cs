@@ -40,6 +40,9 @@ public sealed class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Resu
 
             return new UserLoginResponseModel
             {
+                Email = user.Email,
+                FirstName= user.FirstName,
+                LastName= user.LastName,
                 AccessToken = authenticationToken
             };
         }

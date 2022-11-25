@@ -25,7 +25,7 @@ public class AuthorizationController : MediatorControllerBase
             {
                 if (ex is AccessException<object>)
                 {
-                    return BadRequest(ex.Message);
+                    return Unauthorized(ex.Message);
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -46,7 +46,7 @@ public class AuthorizationController : MediatorControllerBase
             {
                 if (ex is AuthenticationException)
                 {
-                    return Unauthorized(ex.Message);
+                    return BadRequest(ex.Message);
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);

@@ -29,7 +29,7 @@ public sealed class ApiClient
     public async Task<HttpResponseMessage> SendAuthorized(HttpRequestMessage requestMessage, string relativeUrl, CancellationToken cancellationToken)
     {
         requestMessage.RequestUri = GetUri(relativeUrl);
-        requestMessage.Headers.Add("Authorization", $"Bearer {_clientStateData.AccessToken}");
+        requestMessage.Headers.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
         requestMessage.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7210");
 
         var response = await GetClient().SendAsync(requestMessage, cancellationToken);

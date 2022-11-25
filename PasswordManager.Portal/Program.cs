@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using PasswordManager.Portal;
 using PasswordManager.Portal.Services;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using PasswordManager.Portal.Installers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -10,10 +13,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddMudServices();
 
-builder.Services.AddHttpClient();
-builder.Services.AddSingleton<ClientStateData>();
-builder.Services.AddSingleton<ApiClient>();
-builder.Services.AddSingleton<AuthenticationService>();
-
+builder.Services
+    .AddHttpClient()
+    .AddJsonOptions()
+    .InstallServices();
 
 await builder.Build().RunAsync();

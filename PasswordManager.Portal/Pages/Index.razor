@@ -3,6 +3,15 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="12">
+        <MudText Align="Align.Center" Typo="Typo.h2">Hello@(_clientState.IsAuthenticated ? " " + _clientState.User!.FullName : "")!</MudText>
 
-Welcome to your new app.
+    @if (_clientState.IsAuthenticated)
+    {
+        <MudText Align="Align.Center" Typo="Typo.body1">Welcome to my password manager solution</MudText>
+        <MudText Align="Align.Center" Typo="Typo.subtitle2">Paschalidis Vyron <MudLink Typo="Typo.subtitle2" Href="pvyron.com" >www.pvyron.com</MudLink></MudText>
+    }
+
+    </MudItem>
+</MudGrid>

@@ -1,8 +1,8 @@
-﻿@inject ClientStateData _clientStateData
+﻿
 
 <MudNavMenu>
     <MudNavLink Href="@ApplicationRoutes.Index" Match="NavLinkMatch.All">Home</MudNavLink>
-    @if (_clientStateData.IsAuthenticated)
+    @if (_clientState.IsAuthenticated)
     {
         <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
         <MudNavGroup Title="Settings" Expanded="true">

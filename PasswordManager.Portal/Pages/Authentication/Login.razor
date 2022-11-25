@@ -1,6 +1,8 @@
 ﻿@using PasswordManager.Portal.Constants;
 @attribute [Route(ApplicationRoutes.Login)]
 
+<PageTitle>Login</PageTitle>
+
 <div style="margin:5%">
     <MudGrid Justify="Justify.FlexStart">
         <MudItem xs="12">
@@ -12,7 +14,7 @@
             </MudText>
         </MudItem>
         <MudItem xs="4">
-            <MudForm Model="@_loginForm">
+            <MudForm Model="@_loginForm" @bind-IsValid="@_loginForm.IsValid">
                 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
                     <MudGrid Spacing="5" Justify="Justify.Center" Style="margin-left:3%; margin-right:3%">
                         <MudItem xs="12">
@@ -34,7 +36,6 @@
                         </MudItem>
                         <MudItem xs="6">
                             <MudButton 
-                                    ButtonType="ButtonType.Button"
                                     Variant="Variant.Filled"
                                     Color="Color.Primary"
                                     Size="Size.Large"
@@ -57,6 +58,9 @@
                                 LabelPosition="LabelPosition.End"
                                 Label="Remember me"
                                 Size="Size.Medium"/>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.subtitle2">@_loginForm.ErrorMessage</MudText>
                         </MudItem>
                     </MudGrid>
                 </MudPaper>
