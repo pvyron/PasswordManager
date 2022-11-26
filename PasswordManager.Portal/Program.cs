@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using PasswordManager.Portal.Installers;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -18,6 +19,7 @@ builder.Services
     .AddHttpClient()
     .AddJsonOptions()
     .InstallServices()
-    .AddBlazoredLocalStorageAsSingleton();
+    .AddBlazoredSessionStorage()
+    .AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

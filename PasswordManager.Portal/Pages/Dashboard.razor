@@ -1,0 +1,12 @@
+﻿@attribute [Route(ApplicationRoutes.Dashboard)]
+
+<PageTitle>Dashboard</PageTitle>
+
+    <MudGrid Justify="Justify.SpaceEvenly">
+    @foreach (var password in Passwords)
+    {
+        <MudItem xs="2">
+            <PasswordManager.Portal.Components.PasswordCard Password="@password"/>
+        </MudItem>
+    }
+</MudGrid>

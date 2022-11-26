@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Passwords;
 using PasswordManager.Application.DtObjects.Passwords;
+using PasswordManager.Application.IServices;
 using PasswordManager.Application.Queries.Passwords;
 using PasswordManager.Domain.Exceptions;
 using System.Threading;
@@ -15,6 +16,8 @@ namespace PasswordManager.Api.Controllers;
 [Authorize]
 public class PasswordsController : MediatorControllerBase
 {
+    private readonly IPasswordService _passwordService;
+
     [HttpGet]
     public IAsyncEnumerable<PasswordResponseModel> Get(CancellationToken cancellationToken)
     {
@@ -111,5 +114,37 @@ public class PasswordsController : MediatorControllerBase
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             });
+    }
+
+    [HttpPatch("{number}")]
+    public async Task<IActionResult> Patch(int number, CancellationToken cancellationToken)
+    {
+
+        await _passwordService.CreateRandomPasswords(number, cancellationToken);
+
+        return Ok();
+        //var response = await Mediator.Send(new DeletePasswordCommand(id), cancellationToken);
+
+        //return response.Match<IActionResult>(
+        //    _ => Ok(),
+        //    Fail =>
+        //    {
+        //        if (Fail is AuthenticationException)
+        //        {
+        //            return Unauthorized(Fail.Message);
+        //        }
+
+        //        if (Fail is AccessException<object>)
+        //        {
+        //            return BadRequest(Fail.Message);
+        //        }
+
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    });
+    }
+
+    public PasswordsController(IPasswordService passwordService)
+    {
+        _passwordService = passwordService;
     }
 }

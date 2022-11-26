@@ -37,6 +37,15 @@ public sealed class ApiClient
         return response;
     }
 
+    public async Task<HttpResponseMessage> GetAuthorized(string relativeUrl, CancellationToken cancellationToken)
+    {
+        var client = GetClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
+        client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "https://localhost:7210");
+        
+        return await client.GetAsync(GetUri(relativeUrl), cancellationToken);
+    }
+
     HttpClient GetClient()
     {
         var httpClient = _httpClientFactory.CreateClient();

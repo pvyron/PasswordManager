@@ -5,7 +5,7 @@
 
 <div style="margin:5%">
     <MudGrid Justify="Justify.Center">
-        <MudItem xs="10">
+        <MudItem xl="8" lg="8" md="8" sm="10" xs="12">
             <MudText Typo="Typo.h6">
                 Registration
             </MudText>
@@ -13,11 +13,11 @@
                 Register and account with a unique email address and a complex password.
             </MudText>
         </MudItem>
-        <MudItem xs="10" >
+        <MudItem xl="8" lg="8" md="8" sm="10" xs="12">
             <MudForm Model="@_registerForm" @bind-IsValid="@_registerForm.IsValid" >
                 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" >
                     <MudGrid Spacing="5" Justify="Justify.SpaceBetween" Style="margin-left:3%; margin-right:3%" >
-                        <MudItem xs="5">
+                        <MudItem lg="6" md="12" sm="12" xs="12">
                             <MudGrid Justify="Justify.Center" Spacing="7">
                                 <MudItem xs="12">
                                     <MudTextField 
@@ -54,7 +54,7 @@
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
-                        <MudItem xs="6">
+                        <MudItem lg="6" md="12" sm="12" xs="12">
                             <MudGrid Justify="Justify.FlexEnd" Spacing="7">
                                 <MudItem xs="12">
                                     <MudTextField 
@@ -68,10 +68,10 @@
                                         Variant="Variant.Text"
                                         Label="Last Name"/>
                                 </MudItem>
-                                <MudItem xs="4">
+                                <MudItem md="6" sm="12" xs="12">
                                     <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.subtitle2">@_registerForm.ErrorMessage</MudText>
                                 </MudItem>
-                                <MudItem xs="4">
+                                <MudItem md="6" sm="12" xs="12">
                                     <MudButton 
                                         Variant="Variant.Filled"
                                         Color="Color.Primary"

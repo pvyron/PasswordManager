@@ -4,6 +4,8 @@ public static class ApplicationRoutes
 {
     public const string Index = "/";
 
+    public const string Dashboard = "/Dashboard";
+
     public const string Login = "/login";
     public const string Logout = "/logout";
     public const string Register = "/register";

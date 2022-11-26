@@ -14,5 +14,6 @@ namespace PasswordManager.Application.IServices
         Task<PasswordModel> SaveNewPassword(PasswordModel password, CancellationToken cancellationToken);
         Task<PasswordModel> UpdatePassword(PasswordModel password, CancellationToken cancellationToken);
         Task DeletePassword(Guid id, CancellationToken cancellationToken);
+        Task CreateRandomPasswords(int numberOfPasswords, CancellationToken cancellationToken);
     }
 }

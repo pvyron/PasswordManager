@@ -1,9 +1,10 @@
 ﻿<MudNavMenu>
-    <MudNavLink Href="@ApplicationRoutes.Index" Match="NavLinkMatch.All">Home</MudNavLink>
     @if (_clientState.IsAuthenticated)
     {
-        <MudNavLink Href="@ApplicationRoutes.Passwords" Match="NavLinkMatch.Prefix">Passwords</MudNavLink>
-        <MudNavLink Href="@ApplicationRoutes.Categories" Match="NavLinkMatch.Prefix">Categories</MudNavLink>
+        <MudNavLink Href="@ApplicationRoutes.Dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+        <MudNavGroup Title="Tools" @bind-Expanded="@_isMyPasswordsExpanded">
+            <MudNavLink Href="@ApplicationRoutes.Categories" Match="NavLinkMatch.Prefix">Edit categories</MudNavLink>
+        </MudNavGroup>
     }
     <MudNavLink Href="@ApplicationRoutes.About" Match="NavLinkMatch.Prefix">About</MudNavLink>
 </MudNavMenu>

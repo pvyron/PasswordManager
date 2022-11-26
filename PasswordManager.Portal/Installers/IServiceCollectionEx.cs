@@ -9,9 +9,10 @@ public static class IServiceCollectionEx
     public static IServiceCollection InstallServices(this IServiceCollection services)
     {
         return services
-            .AddSingleton<ClientStateData>()
-            .AddSingleton<ApiClient>()
-            .AddSingleton<AuthenticationService>();
+            .AddScoped<ClientStateData>()
+            .AddScoped<ApiClient>()
+            .AddScoped<AuthenticationService>()
+            .AddScoped<PasswordsService>();
     }
 
     public static IServiceCollection AddJsonOptions(this IServiceCollection services)

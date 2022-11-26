@@ -83,6 +83,7 @@ public sealed class AuthenticationService
 				Email = responseModel.Email,
 				FirstName = responseModel.FirstName,
 				LastName = responseModel.LastName,
+				RemainLoggedIn = loginModel.RememberMe
 			};
 
 			_clientStateData.LoggedIn(user);

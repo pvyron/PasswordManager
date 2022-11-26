@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using LanguageExt.Pipes;
 using Microsoft.Extensions.Logging.Abstractions;
 using PasswordManager.Portal.Models;
@@ -9,19 +10,26 @@ namespace PasswordManager.Portal.Services;
 public sealed class ClientStateData
 {
     private readonly ISyncLocalStorageService _localStorage;
+    private readonly ISyncSessionStorageService _sessionStorage;
 
     public bool IsAuthenticated 
     {
         get
         {
-            if (!_localStorage.ContainKey("isAuthenticated"))
-                return false;
+            if (_sessionStorage.ContainKey("isAuthenticated"))
+                return _sessionStorage.GetItem<bool>("isAuthenticated");
 
-            return _localStorage.GetItem<bool>("isAuthenticated");
+            if (_localStorage.ContainKey("isAuthenticated"))
+                return _localStorage.GetItem<bool>("isAuthenticated");
+
+            return false;
         }
         private set
         {
-            _localStorage.SetItem("isAuthenticated", value);
+            _sessionStorage.SetItem("isAuthenticated", value);
+
+            if (User?.RemainLoggedIn ?? false)
+                _localStorage.SetItem("isAuthenticated", value);
         }
     }
 
@@ -36,13 +44,17 @@ public sealed class ClientStateData
         }
         private set
         {
-            _localStorage.SetItem("user", value);
+            _sessionStorage.SetItem("user", value);
+
+            if (value?.RemainLoggedIn?? false)
+                _localStorage.SetItem("user", value);
         }
     }
 
-    public ClientStateData(ISyncLocalStorageService localStorage)
+    public ClientStateData(ISyncLocalStorageService localStorage, ISyncSessionStorageService sessionStorage)
     {
         _localStorage = localStorage;
+        _sessionStorage = sessionStorage;
     }
 
     public void LoggedIn(User user)
@@ -61,11 +73,8 @@ public sealed class ClientStateData
 
     public void Logout()
     {
-        User = null;
-        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(User) });
-
-        IsAuthenticated = false;
-        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(IsAuthenticated) });
+        _sessionStorage.Clear();
+        _localStorage.Clear();
     }
 
     public event EventHandler<ClientStateEventArgs>? StateHasChanged;

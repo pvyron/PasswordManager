@@ -1,4 +1,5 @@
-﻿using LanguageExt.Pipes;
+﻿using Bogus;
+using LanguageExt.Pipes;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
@@ -130,6 +131,25 @@ namespace PasswordManager.Infrastructure.Services
             passwordDbModel.IsActive = false;
 
             await _dbClient.UpdateRecord(PASSWORD_TABLE_NAME, id, passwordDbModel, cancellationToken);
+        }
+
+        public async Task CreateRandomPasswords(int numberOfPasswords, CancellationToken cancellationToken)
+        {
+            var userIds = await _usersService.GetAllUsers(cancellationToken).Select(u => u.Id).ToListAsync(cancellationToken);
+
+            var passwordDbModels = new Faker<PasswordDbModel>()
+                .RuleFor(p => p.CategoryId, _ => null)
+                .RuleFor(p => p.Title, f => f.Random.Word())
+                .RuleFor(p => p.Description, f => f.Lorem.Text())
+                .RuleFor(p => p.Username, f => f.Random.Word())
+                .RuleFor(p => p.Password, f => f.Internet.Password())
+                .RuleFor(p => p.UserId, f => f.PickRandom(userIds))
+                .GenerateBetween(numberOfPasswords, numberOfPasswords);
+
+            foreach (var pwModel in passwordDbModels)
+            {
+                await _dbClient.InsertRecord(PASSWORD_TABLE_NAME, pwModel, cancellationToken);
+            }
         }
     }
 }

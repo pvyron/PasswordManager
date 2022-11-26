@@ -38,6 +38,7 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
 
         await foreach (var password in _passwordService.GetAllUserPasswords(Guid.Parse(userId), cancellationToken))
         {
+
             yield return new PasswordResponseModel
             {
                 CategoryId = password.CategoryId,

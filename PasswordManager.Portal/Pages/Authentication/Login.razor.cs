@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
 using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.LoginPage;
@@ -26,7 +27,7 @@ public partial class Login
             if (!_loginForm.IsValid)
                 return;
 
-            var result = await _authenticationService.Login(new DtObjects.LoginModel(_loginForm.Email!, _loginForm.Password!));
+            var result = await _authenticationService.Login(new DtObjects.LoginModel(_loginForm.Email!, _loginForm.Password!, _loginForm.RememberMe));
 
             result.IfSucc(SuccessfulLogin);
 
@@ -36,6 +37,13 @@ public partial class Login
         {
             _authenticationInProgress = false;
         }
+    }
+
+    private async Task PasswordFieldOnKeyPress(KeyboardEventArgs args)
+    {
+        if (!args.Key.Equals("Enter")) return;
+
+        await LoginUser();
     }
 
     private void SuccessfulLogin(Unit unit)
