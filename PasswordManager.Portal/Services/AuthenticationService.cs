@@ -3,6 +3,7 @@ using LanguageExt.Common;
 using MudBlazor.Utilities;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.Models;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace PasswordManager.Portal.Services;
@@ -20,11 +21,32 @@ public sealed class AuthenticationService
         _jsonSerializerOptions = jsonSerializerOptions;
     }
 
-	public async Task<bool> Register(RegistrationModel registrationModel)
+	public async Task<Result<Unit>> Register(RegistrationModel registrationModel)
 	{
-        await Task.Delay(1000);
+		try
+		{
+			var request = new HttpRequestMessage
+			{
+				Content = JsonContent.Create(new RegistrationRequestModel
+				{
+					Email = registrationModel.Email,
+					FirstName = registrationModel.FirstName,
+					LastName = registrationModel.LastName,
+					Password = registrationModel.Password,
+				}),
+                Method = HttpMethod.Post
+            };
 
-		return true;
+            var response = await _apiClient.SendAnonymous(request, "/api/Authorization/Register", CancellationToken.None);
+
+            response.EnsureSuccessStatusCode();
+
+			return Unit.Default;
+        }
+		catch (Exception ex)
+		{
+			return new Result<Unit>(ex);
+		}
     }
 
 	public async Task<Result<Unit>> Login(LoginModel loginModel)
@@ -73,9 +95,9 @@ public sealed class AuthenticationService
         }
 	}
 
-	public async Task Logout()
+	public Task Logout()
 	{
-		await Task.Delay(500);
-
+		_clientStateData.Logout();
+		return Task.CompletedTask;
 	}
 }

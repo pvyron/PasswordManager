@@ -19,6 +19,9 @@ public sealed class RegisterForm
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
 
+    public string? ErrorMessage { get; set; }
+    public bool IsValid { get; set; }
+
     public bool ShowOriginalPassword { get; set; } = false;
     public bool ShowConfirmationPassword { get; set; } = false;
 }

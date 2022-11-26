@@ -16,9 +16,8 @@ public partial class NavMenu
 
     private void _clientState_StateHasChanged(object? sender, ClientStateEventArgs e)
     {
-        if (e.PropertyChange.Equals(nameof(ClientStateData.IsAuthenticated)))
-        {
-            StateHasChanged();
-        }
+        if (!e.PropertyChanged.Equals(nameof(ClientStateData.IsAuthenticated))) return;
+
+        StateHasChanged();
     }
 }

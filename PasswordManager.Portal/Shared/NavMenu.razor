@@ -1,14 +1,9 @@
-﻿
-
-<MudNavMenu>
+﻿<MudNavMenu>
     <MudNavLink Href="@ApplicationRoutes.Index" Match="NavLinkMatch.All">Home</MudNavLink>
     @if (_clientState.IsAuthenticated)
     {
-        <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
-        <MudNavGroup Title="Settings" Expanded="true">
-            <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-            <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-        </MudNavGroup>
+        <MudNavLink Href="@ApplicationRoutes.Passwords" Match="NavLinkMatch.Prefix">Passwords</MudNavLink>
+        <MudNavLink Href="@ApplicationRoutes.Categories" Match="NavLinkMatch.Prefix">Categories</MudNavLink>
     }
     <MudNavLink Href="@ApplicationRoutes.About" Match="NavLinkMatch.Prefix">About</MudNavLink>
 </MudNavMenu>

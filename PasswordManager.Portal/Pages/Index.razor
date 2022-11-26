@@ -10,8 +10,14 @@
     @if (_clientState.IsAuthenticated)
     {
         <MudText Align="Align.Center" Typo="Typo.body1">Welcome to my password manager solution</MudText>
-        <MudText Align="Align.Center" Typo="Typo.subtitle2">Paschalidis Vyron <MudLink Typo="Typo.subtitle2" Href="pvyron.com" >www.pvyron.com</MudLink></MudText>
-    }
+            <MudText Align="Align.Center" Typo="Typo.subtitle2">Paschalidis Vyron <MudLink Typo="Typo.subtitle2" Href="https://www.pvyron.com">pvyron.com</MudLink></MudText>
+        }
+        else
+        {
+            <MudText Align="Align.Center" Typo="Typo.subtitle2">
+                Consider <MudLink Typo="Typo.subtitle2" Href="@ApplicationRoutes.Login">logging in</MudLink> or <MudLink Typo="Typo.subtitle2" Href="@ApplicationRoutes.Register">registering</MudLink> if you are not already a user!
+            </MudText>
+        }
 
     </MudItem>
 </MudGrid>

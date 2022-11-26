@@ -9,7 +9,7 @@ namespace PasswordManager.Portal.Pages.Authentication;
 
 public partial class Login
 {
-    [Inject] AuthenticationService _authenticationStateService { get; set; } = default!;
+    [Inject] AuthenticationService _authenticationService { get; set; } = default!;
     [Inject] NavigationManager _navManager { get; set; } = default!;
 
     private LoginForm _loginForm { get; set; } = new();
@@ -26,7 +26,7 @@ public partial class Login
             if (!_loginForm.IsValid)
                 return;
 
-            var result = await _authenticationStateService.Login(new DtObjects.LoginModel(_loginForm.Email!, _loginForm.Password!));
+            var result = await _authenticationService.Login(new DtObjects.LoginModel(_loginForm.Email!, _loginForm.Password!));
 
             result.IfSucc(SuccessfulLogin);
 

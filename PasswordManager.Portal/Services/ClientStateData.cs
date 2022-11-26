@@ -1,17 +1,48 @@
-﻿using PasswordManager.Portal.Models;
+﻿using Blazored.LocalStorage;
+using LanguageExt.Pipes;
+using Microsoft.Extensions.Logging.Abstractions;
+using PasswordManager.Portal.Models;
 using System.Security.Claims;
 
 namespace PasswordManager.Portal.Services;
 
 public sealed class ClientStateData
 {
-    public bool IsAuthenticated { get; private set; }
+    private readonly ISyncLocalStorageService _localStorage;
 
-    public User? User { get; private set; }
-
-    public ClientStateData()
+    public bool IsAuthenticated 
     {
-        IsAuthenticated = false;
+        get
+        {
+            if (!_localStorage.ContainKey("isAuthenticated"))
+                return false;
+
+            return _localStorage.GetItem<bool>("isAuthenticated");
+        }
+        private set
+        {
+            _localStorage.SetItem("isAuthenticated", value);
+        }
+    }
+
+    public User? User 
+    { 
+        get
+        {
+            if (!_localStorage.ContainKey("user"))
+                return null;
+
+            return _localStorage.GetItem<User>("user");
+        }
+        private set
+        {
+            _localStorage.SetItem("user", value);
+        }
+    }
+
+    public ClientStateData(ISyncLocalStorageService localStorage)
+    {
+        _localStorage = localStorage;
     }
 
     public void LoggedIn(User user)
@@ -21,27 +52,26 @@ public sealed class ClientStateData
             throw new Exception("Invalid user");
         }
 
-        User = ChangeValue(nameof(User), User, user);
-        IsAuthenticated = ChangeValue(nameof(IsAuthenticated), IsAuthenticated, true);
+        User = user;
+        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(User)});
+
+        IsAuthenticated = true;
+        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(IsAuthenticated) });
+    }
+
+    public void Logout()
+    {
+        User = null;
+        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(User) });
+
+        IsAuthenticated = false;
+        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(IsAuthenticated) });
     }
 
     public event EventHandler<ClientStateEventArgs>? StateHasChanged;
-
-    private T ChangeValue<T>(string propertyName, T oldValue, T newValue)
-    {
-        StateHasChanged?.Invoke(this, new()
-        {
-            PropertyChange = propertyName,
-            OldValue = oldValue,
-            NewValue = newValue,
-        });
-        return newValue;
-    }
 }
 
 public sealed class ClientStateEventArgs : EventArgs
 {
-    public required string PropertyChange { get; init; }
-    public object? OldValue { get; set; }
-    public object? NewValue { get; set; }
+    public required string PropertyChanged { get; init; }
 }

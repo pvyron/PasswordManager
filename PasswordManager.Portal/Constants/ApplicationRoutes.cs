@@ -8,5 +8,8 @@ public static class ApplicationRoutes
     public const string Logout = "/logout";
     public const string Register = "/register";
 
+    public const string Passwords = "/passwords";
+    public const string Categories = "/categories";
+
     public const string About = "/about";
 }
