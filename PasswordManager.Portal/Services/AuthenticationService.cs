@@ -63,12 +63,14 @@ public sealed class AuthenticationService
 
 			var response = await _apiClient.SendAnonymous(request, "/api/Authorization/Login", CancellationToken.None);
 
-			if (!response.IsSuccessStatusCode)
-			{
-				return new Result<Unit>(new Exception(response.ReasonPhrase));
-			}
+            var responseContent = await response.Content.ReadAsStreamAsync();
 
-			var responseContent = await response.Content.ReadAsStreamAsync();
+            if (!response.IsSuccessStatusCode)
+			{
+				var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
+
+                return new Result<Unit>(new Exception(errorResponse?.Message));
+			}
 
 			var responseModel = await JsonSerializer.DeserializeAsync<LoginReponseModel>(responseContent, _jsonSerializerOptions);
 

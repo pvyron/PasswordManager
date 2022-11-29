@@ -5,7 +5,7 @@ namespace PasswordManager.Portal.Shared;
 
 public partial class MainLayout
 {
-    bool _drawerOpen = true;
+    bool _drawerOpen = false;
 
     void DrawerToggle()
     {

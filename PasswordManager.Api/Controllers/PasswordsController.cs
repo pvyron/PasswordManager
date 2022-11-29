@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Passwords;
+using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Application.Queries.Passwords;
@@ -35,12 +36,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(Fail.Message);
+                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(Fail.Message);
+                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -58,12 +59,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(Fail.Message);
+                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(Fail.Message);
+                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -81,12 +82,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(Fail.Message);
+                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(Fail.Message);
+                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -104,12 +105,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(Fail.Message);
+                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(Fail.Message);
+                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);

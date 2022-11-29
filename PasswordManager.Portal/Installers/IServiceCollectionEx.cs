@@ -12,7 +12,8 @@ public static class IServiceCollectionEx
             .AddScoped<ClientStateData>()
             .AddScoped<ApiClient>()
             .AddScoped<AuthenticationService>()
-            .AddScoped<PasswordsService>();
+            .AddScoped<PasswordsService>()
+            .AddSingleton<ClipboardService>();
     }
 
     public static IServiceCollection AddJsonOptions(this IServiceCollection services)

@@ -33,7 +33,8 @@
                                             OnAdornmentClick="@(() => _loginForm.ShowPassword = !_loginForm.ShowPassword)"
                                             AdornmentAriaLabel="Show password"
                                             OnKeyPress="PasswordFieldOnKeyPress"
-                                            For="@(() => _loginForm.Password)" />
+                                            For="@(() => _loginForm.Password)"
+                                            Immediate="true"/>
                         </MudItem>
                         <MudItem md="6" sm="12" xs="12">
                             <MudCheckBox @bind-Checked="@_loginForm.RememberMe"

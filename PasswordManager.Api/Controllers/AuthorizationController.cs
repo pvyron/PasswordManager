@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Authorization;
+using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.Queries.Authorization;
 using PasswordManager.Domain.Exceptions;
@@ -25,7 +26,7 @@ public class AuthorizationController : MediatorControllerBase
             {
                 if (ex is AccessException<object>)
                 {
-                    return Unauthorized(ex.Message);
+                    return Unauthorized(new ErrorResponse(ex.Message, ex));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -46,7 +47,7 @@ public class AuthorizationController : MediatorControllerBase
             {
                 if (ex is AuthenticationException)
                 {
-                    return BadRequest(ex.Message);
+                    return BadRequest(new ErrorResponse(ex.Message, ex));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
