@@ -5,12 +5,7 @@ using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services
 {
@@ -31,7 +26,7 @@ namespace PasswordManager.Infrastructure.Services
         {
             foreach (var userDbModel in await _dbClient.GetRecords<UserDbModel>(USER_TABLE_NAME, (nameof(UserDbModel.Id), userId), cancellationToken))
             {
-                if ((userDbModel.Categories?.Sum(c => (c.Passwords?.Count() ?? 0)) ?? 0) == 0)
+                if ((userDbModel.Categories?.Sum(c => (c.Passwords?.Count ?? 0)) ?? 0) == 0)
                     continue;
 
                 await foreach (var passwordModel in userDbModel.Categories!.ToAsyncEnumerable().SelectMany(c => c.Passwords!.Select(p => new PasswordModel
@@ -45,7 +40,7 @@ namespace PasswordManager.Infrastructure.Services
                     Username = p.Username,
                 }).ToAsyncEnumerable()))
                 {
-                    if (passwordModel is null) 
+                    if (passwordModel is null)
                         continue;
 
                     yield return passwordModel;
@@ -55,20 +50,7 @@ namespace PasswordManager.Infrastructure.Services
 
         public async Task<PasswordModel> GetPasswordById(Guid userId, Guid id, CancellationToken cancellationToken)
         {
-            var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, userId, cancellationToken);
-
-            if (userDbModel is null)
-            {
-                throw new UserAccessException($"User {userId} was not found");
-            }
-
-            if ((userDbModel.Categories?.Sum(c => (c.Passwords?.Count() ?? 0)) ?? 0) == 0)
-                throw new PasswordAccessException($"Password {id} was not found");
-
-            var passwordDbModel = userDbModel.Categories?.Find(c => c.Passwords?.Any(p => p.Id == id) ?? false)?.Passwords!.First(p => p.Id == id);
-
-            if (passwordDbModel is null)
-                throw new PasswordAccessException($"Password {id} was not found");
+            var passwordDbModel = await GetPasswordDbModel(userId, null, id, cancellationToken);
 
             return new PasswordModel
             {
@@ -84,20 +66,7 @@ namespace PasswordManager.Infrastructure.Services
 
         public async Task<PasswordModel> GetPasswordById(Guid userId, Guid categoryId, Guid id, CancellationToken cancellationToken)
         {
-            var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, userId, cancellationToken);
-
-            if (userDbModel is null)
-                throw new UserAccessException($"User {userId} was not found");
-
-            var categoryDbModel = userDbModel.Categories?.Find(c => c.Id== categoryId);
-
-            if (categoryDbModel is null)
-                throw new PasswordCategoryAccessException($"Category {categoryId} was not found");
-
-            var passwordDbModel = categoryDbModel.Passwords?.Find(p => p.Id == id);
-
-            if (passwordDbModel is null)
-                throw new PasswordAccessException($"Password {id} was not found");
+            var passwordDbModel = await GetPasswordDbModel(userId, categoryId, id, cancellationToken);
 
             return new PasswordModel
             {
@@ -127,18 +96,15 @@ namespace PasswordManager.Infrastructure.Services
             {
                 categoryDbModel = userDbModel.Categories?.Find(c => c.Title == "Default");
             }
-            
-            if (categoryDbModel is null)
+
+            categoryDbModel ??= new()
             {
-                categoryDbModel = new()
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Default",
-                    IsActive = true,
-                    UserId = userDbModel.Id,
-                    Passwords = new()
-                };
-            }
+                Id = Guid.NewGuid(),
+                Title = "Default",
+                IsActive = true,
+                UserId = userDbModel.Id,
+                Passwords = new()
+            };
 
             var newPasswordDbModel = new PasswordDbModel
             {
@@ -151,7 +117,7 @@ namespace PasswordManager.Infrastructure.Services
                 Username = password.Username,
             };
 
-            await _dbClient.UpdateRecord(USER_TABLE_NAME, userDbModel.Id, userDbModel, cancellationToken);
+            await UpdateUserDbModel(userDbModel, cancellationToken);
 
             return new PasswordModel
             {
@@ -167,42 +133,49 @@ namespace PasswordManager.Infrastructure.Services
 
         public async Task<PasswordModel> UpdatePassword(PasswordModel password, CancellationToken cancellationToken)
         {
-            var passwordDbModel = await _dbClient.GetRecordById<PasswordDbModel?>(PASSWORD_TABLE_NAME, password.Id, cancellationToken);
+            var userDbModel = await GetUserDbModel(password.UserId, cancellationToken);
 
-            if (passwordDbModel is null)
-                throw new PasswordAccessException($"Password with id {password.Id} was not found", password);
+            var existingPassword = userDbModel.Categories!.Find(c => c.Id == (Guid)password.CategoryId!)!.Passwords!.Find(p => p.Id == password.Id);
 
-            passwordDbModel.Description = password.Description;
-            passwordDbModel.Username = password.Username;
-            passwordDbModel.Password = password.Password;
-            passwordDbModel.UserId = password.UserId;
-            passwordDbModel.Username = password.Username;
-            passwordDbModel.CategoryId = password.CategoryId;
-            passwordDbModel.Title = password.Title;
-            passwordDbModel.Password = password.Password;
+            if (existingPassword is null)
+                throw new PasswordAccessException("Password was not found", password);
 
-            var updatedPasswordDbModel = await _dbClient.UpdateRecord(PASSWORD_TABLE_NAME, password.Id, passwordDbModel, cancellationToken);
+            existingPassword.Description = password.Description;
+            existingPassword.Username = password.Username;
+            existingPassword.Password = password.Password;
+            existingPassword.UserId = password.UserId;
+            existingPassword.Username = password.Username;
+            existingPassword.CategoryId = password.CategoryId;
+            existingPassword.Title = password.Title;
+            existingPassword.Password = password.Password;
+
+            await UpdateUserDbModel(userDbModel, cancellationToken);
 
             return new PasswordModel
             {
-                CategoryId = updatedPasswordDbModel.CategoryId,
-                Description = updatedPasswordDbModel.Description,
-                Id = updatedPasswordDbModel.Id,
-                Password = updatedPasswordDbModel.Password,
-                Title = updatedPasswordDbModel.Title,
-                UserId = updatedPasswordDbModel.UserId,
-                Username = updatedPasswordDbModel.Username,
+                CategoryId = existingPassword.CategoryId,
+                Description = existingPassword.Description,
+                Id = existingPassword.Id,
+                Password = existingPassword.Password,
+                Title = existingPassword.Title,
+                UserId = existingPassword.UserId,
+                Username = existingPassword.Username,
             };
         }
 
-        public async Task DeletePassword(Guid userId, Guid id, CancellationToken cancellationToken)
+        public async Task DeletePassword(Guid userId, Guid categoryId, Guid id, CancellationToken cancellationToken)
         {
-            var passwordDbModel = await _dbClient.GetRecordById<PasswordDbModel?>(PASSWORD_TABLE_NAME, id, cancellationToken);
-
-            if (passwordDbModel is null)
-                throw new PasswordAccessException($"Password with id {id} was not found");
+            var passwordDbModel = await GetPasswordDbModel(userId, categoryId, id, cancellationToken);
 
             passwordDbModel.IsActive = false;
+
+            var userDbModel = await GetUserDbModel(userId, cancellationToken);
+
+            var existingPassword = userDbModel.Categories!.Find(c => c.Id == categoryId)!.Passwords!.Find(p => p.Id == id);
+
+            existingPassword = passwordDbModel;
+
+            await UpdateUserDbModel(userDbModel, cancellationToken);
 
             await _dbClient.UpdateRecord(PASSWORD_TABLE_NAME, id, passwordDbModel, cancellationToken);
         }
@@ -224,6 +197,42 @@ namespace PasswordManager.Infrastructure.Services
             {
                 await _dbClient.InsertRecord(PASSWORD_TABLE_NAME, pwModel, cancellationToken);
             }
+        }
+
+        private static PasswordDbModel GetPasswordDbModel(UserDbModel userDbModel, Guid id)
+        {
+            if ((userDbModel.Categories?.Sum(c => (c.Passwords?.Count ?? 0)) ?? 0) == 0)
+                throw new PasswordAccessException($"Password {id} was not found");
+
+            var passwordDbModel = userDbModel.Categories?.Find(c => c.Passwords?.Any(p => p.Id == id) ?? false)?.Passwords!.First(p => p.Id == id);
+
+            if (passwordDbModel is null)
+                throw new PasswordAccessException($"Password {id} was not found");
+
+            return passwordDbModel;
+        }
+
+        private async Task<PasswordDbModel> GetPasswordDbModel(Guid userId, Guid? categoryId, Guid id, CancellationToken cancellationToken)
+        {
+            var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, userId, cancellationToken);
+
+            if (userDbModel is null)
+                throw new UserAccessException($"User {userId} was not found");
+
+            if (categoryId is null)
+                return GetPasswordDbModel(userDbModel, id);
+
+            var categoryDbModel = userDbModel.Categories?.Find(c => c.Id == categoryId);
+
+            if (categoryDbModel is null)
+                throw new PasswordCategoryAccessException($"Category {categoryId} was not found");
+
+            var passwordDbModel = categoryDbModel.Passwords?.Find(p => p.Id == id);
+
+            if (passwordDbModel is null)
+                throw new PasswordAccessException($"Password {id} was not found");
+
+            return passwordDbModel;
         }
     }
 }

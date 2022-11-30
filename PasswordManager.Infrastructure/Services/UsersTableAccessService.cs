@@ -28,4 +28,9 @@ abstract class UsersTableAccessService
 
         return userDbModel;
     }
+
+    protected async Task<UserDbModel> UpdateUserDbModel(UserDbModel userDbModel, CancellationToken cancellationToken)
+    {
+        return await _dbClient.UpdateRecord(USER_TABLE_NAME, userDbModel.Id, userDbModel, cancellationToken);
+    }
 }

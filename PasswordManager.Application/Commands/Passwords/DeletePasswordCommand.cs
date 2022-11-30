@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
-public sealed record DeletePasswordCommand(Guid Id) : IRequest<Result<Unit>>;
+public sealed record DeletePasswordCommand(Guid CategoryGuid, Guid PasswordGuid) : IRequest<Result<Unit>>;
 
 public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswordCommand, Result<Unit>>
 {
@@ -40,14 +40,7 @@ public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswor
 
             var userGuid = Guid.Parse(userId);
 
-            var passwordModel = await _passwordService.GetPasswordById(userGuid, request.Id, cancellationToken);
-
-            if (!passwordModel.UserId.Equals(userGuid))
-            {
-                return new Result<Unit>(new AuthenticationException("You are not authorized for this action"));
-            }
-
-            await _passwordService.DeletePassword(userGuid, request.Id, cancellationToken);
+            await _passwordService.DeletePassword(userGuid, request.CategoryGuid, request.PasswordGuid, cancellationToken);
 
             return Unit.Value;
         }
