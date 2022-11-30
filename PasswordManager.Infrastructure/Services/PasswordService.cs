@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services
 {
-    internal sealed class PasswordService : IPasswordService
+    internal sealed class PasswordService : UsersTableAccessService, IPasswordService
     {
         private const string PASSWORD_TABLE_NAME = "passwords";
 
         private readonly MDbClient _dbClient;
         private readonly IUsersService _usersService;
 
-        public PasswordService(MDbClient dbClient, IUsersService usersService)
+        public PasswordService(MDbClient dbClient, IUsersService usersService) : base(dbClient)
         {
             _dbClient = dbClient;
             _usersService = usersService;
@@ -29,24 +29,72 @@ namespace PasswordManager.Infrastructure.Services
 
         public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            foreach (var passwordDbModel in await _dbClient.GetRecords<PasswordDbModel>(PASSWORD_TABLE_NAME, (nameof(PasswordDbModel.UserId), userId), cancellationToken))
+            foreach (var userDbModel in await _dbClient.GetRecords<UserDbModel>(USER_TABLE_NAME, (nameof(UserDbModel.Id), userId), cancellationToken))
             {
-                yield return new PasswordModel
+                if ((userDbModel.Categories?.Sum(c => (c.Passwords?.Count() ?? 0)) ?? 0) == 0)
+                    continue;
+
+                await foreach (var passwordModel in userDbModel.Categories!.ToAsyncEnumerable().SelectMany(c => c.Passwords!.Select(p => new PasswordModel
                 {
-                    CategoryId = passwordDbModel.CategoryId,
-                    Description = passwordDbModel.Description,
-                    Id = passwordDbModel.Id,
-                    Password = passwordDbModel.Password,
-                    Title = passwordDbModel.Title,
-                    UserId = passwordDbModel.UserId,
-                    Username = passwordDbModel.Username,
-                };
+                    CategoryId = p.CategoryId,
+                    Description = p.Description,
+                    Id = p.Id,
+                    Password = p.Password,
+                    Title = p.Title,
+                    UserId = p.UserId,
+                    Username = p.Username,
+                }).ToAsyncEnumerable()))
+                {
+                    if (passwordModel is null) 
+                        continue;
+
+                    yield return passwordModel;
+                }
             }
         }
 
-        public async Task<PasswordModel> GetPasswordById(Guid id, CancellationToken cancellationToken)
+        public async Task<PasswordModel> GetPasswordById(Guid userId, Guid id, CancellationToken cancellationToken)
         {
-            var passwordDbModel = await _dbClient.GetRecordById<PasswordDbModel>(PASSWORD_TABLE_NAME, id, cancellationToken);
+            var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, userId, cancellationToken);
+
+            if (userDbModel is null)
+            {
+                throw new UserAccessException($"User {userId} was not found");
+            }
+
+            if ((userDbModel.Categories?.Sum(c => (c.Passwords?.Count() ?? 0)) ?? 0) == 0)
+                throw new PasswordAccessException($"Password {id} was not found");
+
+            var passwordDbModel = userDbModel.Categories?.Find(c => c.Passwords?.Any(p => p.Id == id) ?? false)?.Passwords!.First(p => p.Id == id);
+
+            if (passwordDbModel is null)
+                throw new PasswordAccessException($"Password {id} was not found");
+
+            return new PasswordModel
+            {
+                CategoryId = passwordDbModel.CategoryId,
+                Description = passwordDbModel.Description,
+                Id = passwordDbModel.Id,
+                Password = passwordDbModel.Password,
+                Title = passwordDbModel.Title,
+                UserId = passwordDbModel.UserId,
+                Username = passwordDbModel.Username,
+            };
+        }
+
+        public async Task<PasswordModel> GetPasswordById(Guid userId, Guid categoryId, Guid id, CancellationToken cancellationToken)
+        {
+            var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, userId, cancellationToken);
+
+            if (userDbModel is null)
+                throw new UserAccessException($"User {userId} was not found");
+
+            var categoryDbModel = userDbModel.Categories?.Find(c => c.Id== categoryId);
+
+            if (categoryDbModel is null)
+                throw new PasswordCategoryAccessException($"Category {categoryId} was not found");
+
+            var passwordDbModel = categoryDbModel.Passwords?.Find(p => p.Id == id);
 
             if (passwordDbModel is null)
                 throw new PasswordAccessException($"Password {id} was not found");
@@ -65,25 +113,51 @@ namespace PasswordManager.Infrastructure.Services
 
         public async Task<PasswordModel> SaveNewPassword(PasswordModel password, CancellationToken cancellationToken)
         {
-            _ = await _usersService.GetUserById(password.UserId, cancellationToken);
+            UserDbModel userDbModel = await GetUserDbModel(password.UserId, cancellationToken);
+
+            PasswordCategoryDbModel? categoryDbModel;
+
+            if (password.CategoryId is not null)
+            {
+                categoryDbModel = userDbModel.Categories?.Find(c => c.Id == password.CategoryId);
+
+                throw new PasswordCategoryAccessException($"Category {password.CategoryId} was not found");
+            }
+            else
+            {
+                categoryDbModel = userDbModel.Categories?.Find(c => c.Title == "Default");
+            }
+            
+            if (categoryDbModel is null)
+            {
+                categoryDbModel = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Default",
+                    IsActive = true,
+                    UserId = userDbModel.Id,
+                    Passwords = new()
+                };
+            }
 
             var newPasswordDbModel = new PasswordDbModel
             {
-                UserId = password.UserId,
-                CategoryId = password.CategoryId,
+                Id = Guid.NewGuid(),
+                UserId = userDbModel.Id,
+                CategoryId = categoryDbModel.Id,
                 Description = password.Description,
                 Password = password.Password,
                 Title = password.Title,
                 Username = password.Username,
             };
 
-            var createdPassword = await _dbClient.InsertRecord(PASSWORD_TABLE_NAME, newPasswordDbModel, cancellationToken);
+            await _dbClient.UpdateRecord(USER_TABLE_NAME, userDbModel.Id, userDbModel, cancellationToken);
 
             return new PasswordModel
             {
                 CategoryId = newPasswordDbModel.CategoryId,
                 Description = newPasswordDbModel.Description,
-                Id = createdPassword.Id,
+                Id = newPasswordDbModel.Id,
                 Password = newPasswordDbModel.Password,
                 Title = newPasswordDbModel.Title,
                 UserId = newPasswordDbModel.UserId,
@@ -121,7 +195,7 @@ namespace PasswordManager.Infrastructure.Services
             };
         }
 
-        public async Task DeletePassword(Guid id, CancellationToken cancellationToken)
+        public async Task DeletePassword(Guid userId, Guid id, CancellationToken cancellationToken)
         {
             var passwordDbModel = await _dbClient.GetRecordById<PasswordDbModel?>(PASSWORD_TABLE_NAME, id, cancellationToken);
 

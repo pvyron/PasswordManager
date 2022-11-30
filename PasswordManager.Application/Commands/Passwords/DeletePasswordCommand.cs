@@ -40,14 +40,14 @@ public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswor
 
             var userGuid = Guid.Parse(userId);
 
-            var passwordModel = await _passwordService.GetPasswordById(request.Id, cancellationToken);
+            var passwordModel = await _passwordService.GetPasswordById(userGuid, request.Id, cancellationToken);
 
             if (!passwordModel.UserId.Equals(userGuid))
             {
                 return new Result<Unit>(new AuthenticationException("You are not authorized for this action"));
             }
 
-            await _passwordService.DeletePassword(request.Id, cancellationToken);
+            await _passwordService.DeletePassword(userGuid, request.Id, cancellationToken);
 
             return Unit.Value;
         }
