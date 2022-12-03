@@ -7,8 +7,9 @@ namespace PasswordManager.Portal.Components;
 
 public partial class PasswordCard
 {
-    [Inject] IDialogService _dialogService { get; set; } = default!;
     [Parameter] public PasswordViewModel Password { get; set; } = null!;
+    [Parameter] public EventCallback<PasswordViewModel> OnViewPasswordCredentials { get; set; }
+
     MudCard? _passwordCard { get; set; }
     private bool _mouseOnPasswords { get; set; } = false;
 
@@ -35,21 +36,6 @@ public partial class PasswordCard
 
     private async Task ShowPasswordsButtonClicked(MouseEventArgs args)
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = false,
-            Position = DialogPosition.Center,
-            MaxWidth = MaxWidth.ExtraLarge
-        };
-
-        var parameters = new DialogParameters
-        {
-            { "Username", Password.Username },
-            { "Password", Password.Password }
-        };
-
-        var dialog = _dialogService.Show<PasswordCredentialsDialog>(Password.Title, parameters, options);
-
-        await dialog.Result;
+        await OnViewPasswordCredentials.InvokeAsync(Password);
     }
 }

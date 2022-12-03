@@ -47,7 +47,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 return new Result<PasswordResponseModel>(new PasswordAccessException("No specified password to update"));
             }
 
-            var passwordModel = await _passwordService.GetPasswordById((Guid)request.PasswordRequestModel.Id, cancellationToken);
+            var passwordModel = await _passwordService.GetPasswordById(userGuid, (Guid)request.PasswordRequestModel.Id, cancellationToken);
 
             if (!passwordModel.UserId.Equals(userGuid))
             {

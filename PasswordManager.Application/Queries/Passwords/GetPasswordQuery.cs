@@ -37,9 +37,11 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
                 return new Result<PasswordResponseModel>(new AuthenticationException("You are not authorized for this action"));
             }
 
-            var password = await _passwordService.GetPasswordById(request.Id, cancellationToken);
+            var userGuid = Guid.Parse(userId);
 
-            if (!password.UserId.Equals(userId))
+            var password = await _passwordService.GetPasswordById(userGuid, request.Id, cancellationToken);
+
+            if (!password.UserId.Equals(userGuid))
             {
                 return new Result<PasswordResponseModel>(new AuthenticationException("You are not authorized for this action"));
             }
