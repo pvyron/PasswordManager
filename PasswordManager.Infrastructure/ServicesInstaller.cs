@@ -16,13 +16,13 @@ public static class ServicesInstaller
 {
     public static IServiceCollection InstallServices(this IServiceCollection services)
     {
-        services.AddSingleton<MDbClient>();
+        services.AddScoped<MDbClient>();
 
-        services.AddSingleton<IUsersService, UsersService>();
-        services.AddSingleton<IPasswordService, PasswordService>();
-        services.AddSingleton<IPasswordCategoriesService, PasswordCategoryService>();
+        services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IPasswordCategoriesService, PasswordCategoryService>();
 
-        services.AddSingleton<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
 
         return services;
     }

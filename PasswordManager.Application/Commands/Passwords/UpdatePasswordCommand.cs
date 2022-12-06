@@ -56,12 +56,12 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
 
             if (request.PasswordRequestModel.CategoryId is not null)
             {
-                var category = await _passwordCategoriesService.GetCategoryById((Guid)request.PasswordRequestModel.CategoryId, cancellationToken);
+                //var category = await _passwordCategoriesService.GetCategoryById((Guid)request.PasswordRequestModel.CategoryId, cancellationToken);
 
-                if (!category.UserId.Equals(userGuid))
-                {
-                    return new Result<PasswordResponseModel>(new PasswordCategoryAccessException("You are not authorized for this action"));
-                }
+                //if (!category.UserId.Equals(userGuid))
+                //{
+                //    return new Result<PasswordResponseModel>(new PasswordCategoryAccessException("You are not authorized for this action"));
+                //}
             }
 
             passwordModel = new PasswordModel

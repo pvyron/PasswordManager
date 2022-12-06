@@ -16,6 +16,6 @@ public sealed class ResponseMiddleware
         // Call the next delegate/middleware in the pipeline.
         await _next(context);
     
-        
+        var response = context.Response;
     }
 }

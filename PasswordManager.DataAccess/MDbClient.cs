@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using PasswordManager.DataAccess.DbModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,12 @@ namespace PasswordManager.DataAccess;
 public sealed class MDbClient
 {
     private readonly IMongoDatabase _db;
+
+    private readonly ReplaceOptions _replaceOptions = new()
+    {
+        BypassDocumentValidation = false,
+        IsUpsert = false
+    };
 
     public MDbClient()
     {
@@ -61,10 +68,7 @@ public sealed class MDbClient
     {
         var collection = _db.GetCollection<T>(table);
 
-        await collection.ReplaceOneAsync(new BsonDocument("Id", BsonValue.Create(id)), record, new ReplaceOptions()
-        {
-            IsUpsert = false
-        }, cancellationToken);
+        await collection.ReplaceOneAsync(new BsonDocument("Id", BsonValue.Create(id)), record, _replaceOptions, cancellationToken);
 
         return record;
     }

@@ -12,22 +12,17 @@ using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services
 {
-    internal sealed class PasswordCategoryService : IPasswordCategoriesService
+    internal sealed class PasswordCategoryService : UsersTableAccessService, IPasswordCategoriesService
     {
-        private const string PASSWORD_CATEGORY_TABLE_NAME = "pass_categories";
-
-        private readonly MDbClient _dbClient;
-        private readonly IUsersService _usersService;
-
-        public PasswordCategoryService(MDbClient dbClient, IUsersService usersService)
+        public PasswordCategoryService(MDbClient dbClient) : base(dbClient)
         {
-            _dbClient = dbClient;
-            _usersService = usersService;
         }
 
         public async IAsyncEnumerable<PasswordCategoryModel> GetAllUserCategories(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            foreach (var passwordCategoryDbModel in await _dbClient.GetRecords<PasswordCategoryDbModel>(PASSWORD_CATEGORY_TABLE_NAME, (nameof(PasswordCategoryDbModel.UserId), userId), cancellationToken))
+            var user = await GetUserDbModel(userId, cancellationToken);
+
+            foreach (var passwordCategoryDbModel in user.Categories)
             {
                 yield return new PasswordCategoryModel
                 {
@@ -39,48 +34,58 @@ namespace PasswordManager.Infrastructure.Services
             }
         }
 
-        public async Task<PasswordCategoryModel> GetCategoryById(Guid id, CancellationToken cancellationToken)
+        public async Task<PasswordCategoryModel> GetCategoryById(Guid userId, Guid categoryId, CancellationToken cancellationToken)
         {
-            var passwordCategoryDbModel = await _dbClient.GetRecordById<PasswordCategoryDbModel>(PASSWORD_CATEGORY_TABLE_NAME, id, cancellationToken);
+            var user = await GetUserDbModel(userId, cancellationToken);
+
+            var passwordCategoryDbModel = user.Categories.Find(c => c.Id == categoryId);
 
             if (passwordCategoryDbModel is null)
-                throw new PasswordCategoryAccessException($"Password category {id} was not found");
+                throw new PasswordCategoryAccessException($"Password category {categoryId} was not found");
 
             return new PasswordCategoryModel
             {
                 Description = passwordCategoryDbModel.Description,
                 Id = passwordCategoryDbModel.Id,
                 Title = passwordCategoryDbModel.Title,
-                UserId = passwordCategoryDbModel.UserId,
+                UserId = userId,
             };
         }
 
         public async Task<PasswordCategoryModel> CreateNewCategory(PasswordCategoryModel passwordCategory, CancellationToken cancellationToken)
         {
-            _ = await _usersService.GetUserById(passwordCategory.UserId, cancellationToken);
+            var user = await GetUserDbModel(passwordCategory.UserId, cancellationToken);
+
+            if (user.Categories.Any(c => c.Title == passwordCategory.Title && c.IsActive))
+                throw new PasswordCategoryAccessException($"Category with title {passwordCategory.Title} already exists");
 
             var newPasswordCategoryDbModel = new PasswordCategoryDbModel
             {
                 Description = passwordCategory.Description,
                 Id = passwordCategory.Id,
                 Title = passwordCategory.Title,
-                UserId = passwordCategory.UserId,
             };
 
-            var createdPasswordCategoryDbModel = await _dbClient.InsertRecord(PASSWORD_CATEGORY_TABLE_NAME, newPasswordCategoryDbModel, cancellationToken);
+            user.Categories.Add(newPasswordCategoryDbModel);
+
+            user = await UpdateUserDbModel(user, cancellationToken);
+
+            newPasswordCategoryDbModel = user.Categories.Find(c => c.Id == newPasswordCategoryDbModel.Id)!;
 
             return new PasswordCategoryModel
             {
-                Id = createdPasswordCategoryDbModel.Id,
-                Title = createdPasswordCategoryDbModel.Title,
-                UserId = createdPasswordCategoryDbModel.UserId,
-                Description = createdPasswordCategoryDbModel.Description,
+                Id = newPasswordCategoryDbModel.Id,
+                Title = newPasswordCategoryDbModel.Title,
+                UserId = user.Id,
+                Description = newPasswordCategoryDbModel.Description,
             };
         }
 
         public async Task<PasswordCategoryModel> UpdateCategory(PasswordCategoryModel passwordCategory, CancellationToken cancellationToken)
         {
-            var passwordCategoryDbModel = await _dbClient.GetRecordById<PasswordCategoryDbModel?>(PASSWORD_CATEGORY_TABLE_NAME, passwordCategory.Id, cancellationToken);
+            var user = await GetUserDbModel(passwordCategory.UserId, cancellationToken);
+
+            var passwordCategoryDbModel = user.Categories.Find(c => c.Id == passwordCategory.Id);
 
             if (passwordCategoryDbModel is null)
                 throw new PasswordCategoryAccessException($"Password Category with id {passwordCategory.Id} was not found", passwordCategory);
@@ -88,27 +93,31 @@ namespace PasswordManager.Infrastructure.Services
             passwordCategoryDbModel.Description = passwordCategory.Description;
             passwordCategoryDbModel.Title = passwordCategory.Title;
 
-            var updatedPasswordCategoryDbModel = await _dbClient.UpdateRecord(PASSWORD_CATEGORY_TABLE_NAME, passwordCategory.Id, passwordCategoryDbModel, cancellationToken);
+            user = await UpdateUserDbModel(user, cancellationToken);
+
+            passwordCategoryDbModel = user.Categories.Find(c => c.Id == passwordCategoryDbModel.Id)!;
 
             return new PasswordCategoryModel
             {
-                Id = updatedPasswordCategoryDbModel.Id,
-                Title = updatedPasswordCategoryDbModel.Title,
-                UserId = updatedPasswordCategoryDbModel.UserId,
-                Description = updatedPasswordCategoryDbModel.Description,
+                Id = passwordCategoryDbModel.Id,
+                Title = passwordCategoryDbModel.Title,
+                UserId = user.Id,
+                Description = passwordCategoryDbModel.Description,
             };
         }
 
-        public async Task DeleteCategory(Guid id, CancellationToken cancellationToken)
+        public async Task DeleteCategory(Guid userId, Guid categoryId, CancellationToken cancellationToken)
         {
-            var passwordCategoryDbModel = await _dbClient.GetRecordById<PasswordCategoryDbModel?>(PASSWORD_CATEGORY_TABLE_NAME, id, cancellationToken);
+            var user = await GetUserDbModel(userId, cancellationToken);
+
+            var passwordCategoryDbModel = user.Categories.Find(c => c.Id == categoryId);
 
             if (passwordCategoryDbModel is null)
-                throw new PasswordCategoryAccessException($"Password Category with id {id} was not found");
+                throw new PasswordCategoryAccessException($"Password Category with id {categoryId} was not found");
 
             passwordCategoryDbModel.IsActive = false;
 
-            await _dbClient.UpdateRecord(PASSWORD_CATEGORY_TABLE_NAME, id, passwordCategoryDbModel, cancellationToken);
+            user = await UpdateUserDbModel(user, cancellationToken);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using LanguageExt.Pretty;
+﻿using Bogus;
+using LanguageExt.Pretty;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
@@ -9,17 +10,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services;
 
-internal sealed class UsersService : IUsersService
+internal sealed class UsersService : UsersTableAccessService, IUsersService
 {
-    private const string USER_TABLE_NAME = "users";
-
     private readonly MDbClient _dbClient;
 
-    public UsersService(MDbClient dbClient)
+    public UsersService(MDbClient dbClient) : base(dbClient)
     {
         _dbClient = dbClient;
     }
@@ -40,10 +40,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<UserModel> GetUserById(Guid id, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, id, cancellationToken);
-
-        if (userDbModel is null)
-            throw new UserAccessException($"User {id} was not found");
+        var userDbModel = await GetUserDbModel(id, cancellationToken);
 
         return new UserModel
         {
@@ -72,7 +69,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<UserModel> CreateUser(UserModel user, string password, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecord<UserDbModel?>(USER_TABLE_NAME, (nameof(UserDbModel.Email), user.Email), cancellationToken);
+        var userDbModel = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, (nameof(UserDbModel.Email), user.Email), cancellationToken);
 
         if (userDbModel is not null)
         {
@@ -84,7 +81,7 @@ internal sealed class UsersService : IUsersService
             Email= user.Email,
             FirstName = user.FirstName,
             LastName= user.LastName,
-            Password = password
+            Password = password,
         };
 
         var createdUser = await _dbClient.InsertRecord(USER_TABLE_NAME, newUserDbModel, cancellationToken);
@@ -94,13 +91,13 @@ internal sealed class UsersService : IUsersService
             Id = createdUser.Id,
             Email = createdUser.Email,
             FirstName = createdUser.FirstName,
-            LastName = createdUser.LastName
+            LastName = createdUser.LastName,
         };
     }
 
     public async Task<UserModel> UpdateUser(UserModel user, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecordById<UserDbModel?>(USER_TABLE_NAME, user.Id, cancellationToken);
+        var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, user.Id, cancellationToken);
 
         if (userDbModel is null)
             throw new UserAccessException($"User with email {user.Email} was not found");
@@ -116,13 +113,13 @@ internal sealed class UsersService : IUsersService
             Id = updatedUser.Id,
             Email = updatedUser.Email,
             FirstName = updatedUser.FirstName,
-            LastName = updatedUser.LastName
+            LastName = updatedUser.LastName,
         };
     }
 
     public async Task<UserModel> UpdateUserPassword(Guid id, string newPassword, CancellationToken cancellationToken)
     {
-        var userDbModel = await _dbClient.GetRecordById<UserDbModel?>(USER_TABLE_NAME, id, cancellationToken);
+        var userDbModel = await _dbClient.GetRecordById<UserDbModel>(USER_TABLE_NAME, id, cancellationToken);
 
         if (userDbModel is null)
             throw new UserAccessException($"User {id} was not found");
@@ -150,5 +147,51 @@ internal sealed class UsersService : IUsersService
         userDbModel.IsActive = false;
 
         await _dbClient.UpdateRecord(USER_TABLE_NAME, id, userDbModel, cancellationToken);
+    }
+
+    public async Task PopulateDb(CancellationToken cancellationToken)
+    {
+        var faker = new Faker();
+
+        List<UserDbModel> result = faker.Make(2, _ =>
+        {
+            return new UserDbModel 
+            { 
+                Email = faker.Internet.Email(provider: "pvyron.com"),
+                FirstName = faker.Name.FirstName(),
+                LastName = faker.Name.LastName(),
+                IsActive= true,
+                Password = "1234",
+                Categories = faker.Make(2, _ =>
+                {
+                    return new PasswordCategoryDbModel
+                    {
+                        IsActive = true,
+                        Description = faker.Lorem.Sentence(3),
+                        Id = Guid.NewGuid(),
+                        Title = faker.Company.CompanyName(),
+                        Passwords = faker.Make(5, _ =>
+                        {
+                            return new PasswordDbModel
+                            {
+                                Id = Guid.NewGuid(),
+                                IsActive = true,
+                                Title = faker.Company.CompanyName(),
+                                Description = faker.Lorem.Sentences(3),
+                                Password = faker.Internet.Password(5),
+                                Username = faker.Internet.UserName()
+                            };
+                        }).ToList()
+                    };
+                }).ToList()
+            };
+        }).ToList();
+
+        foreach (var res in result)
+        {
+            await _dbClient.InsertRecord(USER_TABLE_NAME, res, cancellationToken);
+        }
+
+        
     }
 }

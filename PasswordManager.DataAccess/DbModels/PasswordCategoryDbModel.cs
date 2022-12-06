@@ -9,11 +9,11 @@ namespace PasswordManager.DataAccess.DbModels;
 
 public sealed class PasswordCategoryDbModel
 {
-    [BsonId]
-    public Guid Id { get; set; }
-    public Guid UserId { get; set; }
-    public string Title { get; set; } = null!;
+    [BsonRequired]
+    public required Guid Id { get; set; }
+    [BsonRequired]
+    public required string Title { get; set; } = null!;
     public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
-    public List<PasswordDbModel>? Passwords { get; set; }
+    public List<PasswordDbModel> Passwords { get; set; } = new();
 }

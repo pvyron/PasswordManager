@@ -21,15 +21,11 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
 {
     private readonly HttpContext _httpContext;
     private readonly IPasswordService _passwordService;
-    private readonly IUsersService _usersService;
-    private readonly IPasswordCategoriesService _passwordCategoriesService;
 
-    public CreatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService, IUsersService usersService, IPasswordCategoriesService passwordCategoriesService)
+    public CreatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService)
     {
         _httpContext = httpContextAccessor.HttpContext;
         _passwordService = passwordService;
-        _usersService = usersService;
-        _passwordCategoriesService = passwordCategoriesService;
     }
 
     public async Task<Result<PasswordResponseModel>> Handle(CreatePasswordCommand request, CancellationToken cancellationToken)
@@ -45,27 +41,15 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
 
             var userGuid = Guid.Parse(userId);
 
-            _ = await _usersService.GetUserById(userGuid, cancellationToken);
-
-            if (request.PasswordRequestModel.CategoryId is not null)
-            {
-                var category = await _passwordCategoriesService.GetCategoryById((Guid)request.PasswordRequestModel.CategoryId, cancellationToken);
-
-                if (!category.UserId.Equals(userGuid))
-                {
-                    return new Result<PasswordResponseModel>(new PasswordCategoryAccessException("You are not authorized for this action"));
-                }
-            }
-
             var passwordModel = new PasswordModel
             {
-                Id = Guid.Empty,
-                UserId = userGuid,
-                Title = request.PasswordRequestModel.Title,
-                Username = request.PasswordRequestModel.Username,
-                Password = request.PasswordRequestModel.Password,
                 CategoryId = request.PasswordRequestModel.CategoryId,
                 Description = request.PasswordRequestModel.Description,
+                Id = Guid.NewGuid(),
+                Password = request.PasswordRequestModel.Password,
+                Title = request.PasswordRequestModel.Title,
+                UserId = userGuid,
+                Username = request.PasswordRequestModel.Username,
             };
 
             var createdPassword = await _passwordService.SaveNewPassword(passwordModel, cancellationToken);

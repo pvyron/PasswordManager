@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PasswordManager.Application.Commands;
 using PasswordManager.Application.Commands.Passwords;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;
@@ -17,8 +18,6 @@ namespace PasswordManager.Api.Controllers;
 [Authorize]
 public class PasswordsController : MediatorControllerBase
 {
-    private readonly IPasswordService _passwordService;
-
     [HttpGet]
     public IAsyncEnumerable<PasswordResponseModel> Get(CancellationToken cancellationToken)
     {
@@ -117,35 +116,13 @@ public class PasswordsController : MediatorControllerBase
             });
     }
 
-    [HttpPatch("{number}")]
-    public async Task<IActionResult> Patch(int number, CancellationToken cancellationToken)
+    [HttpPatch]
+    [AllowAnonymous]
+    public async Task<IActionResult> Patch(CancellationToken cancellationToken)
     {
+        await Mediator.Send(new PopulateDbWithRandomDataCommand(), cancellationToken);
 
-        await _passwordService.CreateRandomPasswords(number, cancellationToken);
 
         return Ok();
-        //var response = await Mediator.Send(new DeletePasswordCommand(id), cancellationToken);
-
-        //return response.Match<IActionResult>(
-        //    _ => Ok(),
-        //    Fail =>
-        //    {
-        //        if (Fail is AuthenticationException)
-        //        {
-        //            return Unauthorized(Fail.Message);
-        //        }
-
-        //        if (Fail is AccessException<object>)
-        //        {
-        //            return BadRequest(Fail.Message);
-        //        }
-
-        //        return StatusCode(StatusCodes.Status500InternalServerError);
-        //    });
-    }
-
-    public PasswordsController(IPasswordService passwordService)
-    {
-        _passwordService = passwordService;
     }
 }
