@@ -2,13 +2,25 @@
 
 <PageTitle>Dashboard</PageTitle>
 
+
+
 <div style="margin-top:2%; width:98%">
-<MudGrid Justify="Justify.SpaceEvenly" Spacing="10">
-    @foreach (var password in Passwords)
-    {
-        <MudItem xl="3" lg="4" md="6" sm="12" xs="12">
-                <PasswordManager.Portal.Components.PasswordCard Password="@password" OnViewPasswordCredentials="@OnViewPasswordCredentials" />
-        </MudItem>
-    }
-</MudGrid>
+@*
+    <MudIconButton Class="object-right-bottom z-90 fixed" Icon="@Icons.Filled.Add" Size="Size.Large" />*@
+
+    <MudGrid Justify="Justify.SpaceEvenly" Spacing="10">
+        
+        @foreach (var password in Passwords)
+        {
+            <MudItem xl="3" lg="4" md="6" sm="12" xs="12">
+                    <PasswordManager.Portal.Components.PasswordCard Password="@password" OnViewPasswordCredentials="@OnViewPasswordCredentials" />
+            </MudItem>
+        }
+
+    </MudGrid>
+
 </div>
+@*<button id="add-password-button">
+    <MudIcon Style="font-size: 8rem;" Color="Color.Primary" Icon="@Icons.Outlined.AddCircleOutline"></MudIcon>
+</button>
+*@

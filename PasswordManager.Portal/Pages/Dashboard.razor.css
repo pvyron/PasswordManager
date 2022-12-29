@@ -1,0 +1,11 @@
+﻿#add-password-button {
+    border-radius: 50%;
+    background-color: white;
+    bottom: 5%;
+    min-width: 20px;
+    min-height: 20px;
+    position: fixed;
+    right: 5%;
+    text-align: center;
+    text-decoration: none;
+}

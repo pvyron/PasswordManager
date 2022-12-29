@@ -6,7 +6,9 @@ namespace PasswordManager.Portal.Shared;
 public partial class NavMenu
 {
     [Inject] ClientStateData _clientState { get; set; } = default!;
-    private bool _isMyPasswordsExpanded { get; set; } = false;
+    private bool _isToolsExpanded { get; set; } = false;
+    private bool _isPasswordsExpanded { get; set; } = false;
+    private bool _isCategoriesExpanded { get; set; } = false;
 
     protected override Task OnInitializedAsync()
     {

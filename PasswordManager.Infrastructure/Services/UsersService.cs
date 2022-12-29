@@ -82,6 +82,24 @@ internal sealed class UsersService : UsersTableAccessService, IUsersService
             FirstName = user.FirstName,
             LastName= user.LastName,
             Password = password,
+            Categories = new List<PasswordCategoryDbModel>
+            {
+                new PasswordCategoryDbModel
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Default Category",
+                    Passwords = new List<PasswordDbModel>
+                    {
+                        new PasswordDbModel
+                        {
+                            Id= Guid.NewGuid(),
+                            Title = "Default Password",
+                            Username = "Username",
+                            Password = "Password"
+                        }
+                    }
+                }
+            }
         };
 
         var createdUser = await _dbClient.InsertRecord(USER_TABLE_NAME, newUserDbModel, cancellationToken);

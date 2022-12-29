@@ -13,6 +13,7 @@ public static class IServiceCollectionEx
             .AddScoped<ApiClient>()
             .AddScoped<AuthenticationService>()
             .AddScoped<PasswordsService>()
+            .AddScoped<CategoriesService>()
             .AddSingleton<ClipboardService>();
     }
 
