@@ -1,6 +1,5 @@
 ﻿using LanguageExt;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.Services;
@@ -51,7 +50,7 @@ public partial class Login
         _navManager.NavigateTo(ApplicationRoutes.Index);
     }
 
-    private void FailedLogin(Exception ex) 
+    private void FailedLogin(Exception ex)
     {
         _loginForm.ErrorMessage = ex.Message;
     }

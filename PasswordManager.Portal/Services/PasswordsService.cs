@@ -1,13 +1,10 @@
-﻿using LanguageExt.Common;
-using LanguageExt;
+﻿using LanguageExt;
+using LanguageExt.Common;
 using LanguageExt.Pipes;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.ViewModels.Dashboard;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Reflection.Metadata.Ecma335;
-using PasswordManager.Portal.Models;
 
 namespace PasswordManager.Portal.Services;
 

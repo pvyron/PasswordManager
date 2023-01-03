@@ -1,15 +1,10 @@
-﻿using LanguageExt;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.DtObjects;
-using PasswordManager.Portal.Models;
-using PasswordManager.Portal.Pages.Categories;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
-using PasswordManager.Portal.ViewModels.Dashboard;
-using System.Text.RegularExpressions;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 

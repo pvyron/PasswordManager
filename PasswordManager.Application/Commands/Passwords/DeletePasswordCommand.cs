@@ -2,15 +2,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
-using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
@@ -18,12 +11,12 @@ public sealed record DeletePasswordCommand(Guid CategoryGuid, Guid PasswordGuid)
 
 public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswordCommand, Result<Unit>>
 {
-    private readonly HttpContext _httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasswordService _passwordService;
 
     public DeletePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService)
     {
-        _httpContext = httpContextAccessor.HttpContext;
+        _httpContextAccessor = httpContextAccessor;
         _passwordService = passwordService;
     }
 
@@ -31,7 +24,7 @@ public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswor
     {
         try
         {
-            var userId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
+            var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
 
             if (userId is null)
             {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace PasswordManager.Portal.DtObjects;
+﻿namespace PasswordManager.Portal.DtObjects;
 
 public sealed class ErrorResponseModel
 {

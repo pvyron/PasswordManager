@@ -1,13 +1,6 @@
-﻿using Bogus;
-using LanguageExt.Common;
+﻿using LanguageExt.Common;
 using MediatR;
 using PasswordManager.Application.IServices;
-using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands;
 

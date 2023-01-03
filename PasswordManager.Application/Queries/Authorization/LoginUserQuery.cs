@@ -1,14 +1,8 @@
 ﻿using LanguageExt.Common;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Queries.Authorization;
 
@@ -27,7 +21,7 @@ public sealed class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Resu
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password)) 
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             {
                 return new Result<UserLoginResponseModel>(new AuthenticationException("Please provide credentials on the request"));
             }
@@ -41,8 +35,8 @@ public sealed class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Resu
             return new UserLoginResponseModel
             {
                 Email = user.Email,
-                FirstName= user.FirstName,
-                LastName= user.LastName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
                 AccessToken = authenticationToken
             };
         }

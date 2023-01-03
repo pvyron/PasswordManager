@@ -1,17 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
 using PasswordManager.Infrastructure.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
+using PasswordManager.Infrastructure.ServiceSettings;
+using PasswordManager.Shared;
 
 namespace PasswordManager.Infrastructure;
 
@@ -31,15 +25,13 @@ public static class ServicesInstaller
         return services;
     }
 
-    public static IServiceCollection InstallServices(this IServiceCollection services)
+    public static IServiceCollection InstallServices(this IServiceCollection services, IConfiguration configuration)
     {
-        
-
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IPasswordCategoriesService, PasswordCategoryService>();
 
-        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScopedWithSettings<IAuthorizationService, AuthorizationService, AuthorizationServiceSettings>(configuration);
 
         return services;
     }

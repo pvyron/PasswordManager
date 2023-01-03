@@ -1,9 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
-using LanguageExt.Pipes;
-using Microsoft.Extensions.Logging.Abstractions;
 using PasswordManager.Portal.Models;
-using System.Security.Claims;
 
 namespace PasswordManager.Portal.Services;
 
@@ -12,7 +9,7 @@ public sealed class ClientStateData
     private readonly ISyncLocalStorageService _localStorage;
     private readonly ISyncSessionStorageService _sessionStorage;
 
-    public bool IsAuthenticated 
+    public bool IsAuthenticated
     {
         get
         {
@@ -33,8 +30,8 @@ public sealed class ClientStateData
         }
     }
 
-    public User? User 
-    { 
+    public User? User
+    {
         get
         {
             if (!_localStorage.ContainKey("user"))
@@ -46,7 +43,7 @@ public sealed class ClientStateData
         {
             _sessionStorage.SetItem("user", value);
 
-            if (value?.RemainLoggedIn?? false)
+            if (value?.RemainLoggedIn ?? false)
                 _localStorage.SetItem("user", value);
         }
     }
@@ -65,7 +62,7 @@ public sealed class ClientStateData
         }
 
         User = user;
-        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(User)});
+        StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(User) });
 
         IsAuthenticated = true;
         StateHasChanged?.Invoke(this, new ClientStateEventArgs { PropertyChanged = nameof(IsAuthenticated) });

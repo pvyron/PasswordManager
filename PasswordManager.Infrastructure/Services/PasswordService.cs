@@ -1,10 +1,8 @@
-﻿using Bogus;
-using LanguageExt.Pipes;
+﻿using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
-using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
 using System.Runtime.CompilerServices;
 
@@ -24,19 +22,19 @@ internal sealed class PasswordService : IPasswordService
         throw new NotImplementedException();
     }
 
-    public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        foreach( var password in await _context.Passwords.Where(p => p.User!.Id == userId).ToListAsync(cancellationToken))
+        await foreach (var passwordDbModel in _context.Passwords.Where(p => p.UserId == userId).AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
             yield return new PasswordModel
             {
-                Id= password.Id,
-                CategoryId = password.CategoryId,
-                Description= password.Description,
-                Password = password.Password,
-                Title= password.Title,
-                UserId= userId,
-                Username= password.Username,
+                Id = passwordDbModel.Id,
+                CategoryId = passwordDbModel.CategoryId,
+                Description = passwordDbModel.Description,
+                Password = passwordDbModel.Password,
+                Title = passwordDbModel.Title,
+                UserId = passwordDbModel.UserId,
+                Username = passwordDbModel.Username,
             };
         }
     }
@@ -74,7 +72,7 @@ internal sealed class PasswordService : IPasswordService
             Title = addPasswordResult.Entity.Title,
             UserId = addPasswordResult.Entity.UserId,
             Username = addPasswordResult.Entity.Username,
-        }; 
+        };
     }
 
     public Task<PasswordModel> UpdatePassword(PasswordModel password, CancellationToken cancellationToken)

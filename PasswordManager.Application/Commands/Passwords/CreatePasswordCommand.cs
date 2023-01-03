@@ -6,25 +6,19 @@ using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
-public sealed record CreatePasswordCommand (PasswordRequestModel PasswordRequestModel) : IRequest<Result<PasswordResponseModel>>;
+public sealed record CreatePasswordCommand(PasswordRequestModel PasswordRequestModel) : IRequest<Result<PasswordResponseModel>>;
 
 public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordCommand, Result<PasswordResponseModel>>
 {
-    private readonly HttpContext _httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasswordService _passwordService;
 
     public CreatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService)
     {
-        _httpContext = httpContextAccessor.HttpContext;
+        _httpContextAccessor = httpContextAccessor;
         _passwordService = passwordService;
     }
 
@@ -32,7 +26,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
     {
         try
         {
-            var userId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
+            var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
 
             if (userId is null)
             {

@@ -6,11 +6,6 @@ using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
@@ -18,13 +13,13 @@ public sealed record UpdatePasswordCommand(PasswordRequestModel PasswordRequestM
 
 public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswordCommand, Result<PasswordResponseModel>>
 {
-    private readonly HttpContext _httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasswordService _passwordService;
     private readonly IPasswordCategoriesService _passwordCategoriesService;
 
     public UpdatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService, IPasswordCategoriesService passwordCategoriesService)
     {
-        _httpContext = httpContextAccessor.HttpContext;
+        _httpContextAccessor = httpContextAccessor;
         _passwordService = passwordService;
         _passwordCategoriesService = passwordCategoriesService;
     }
@@ -33,7 +28,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
     {
         try
         {
-            var userId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
+            var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
 
             if (userId is null)
             {

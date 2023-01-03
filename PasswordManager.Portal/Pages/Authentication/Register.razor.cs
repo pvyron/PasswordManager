@@ -4,7 +4,6 @@ using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.Services;
-using PasswordManager.Portal.ViewModels.LoginPage;
 using PasswordManager.Portal.ViewModels.RegisterPage;
 
 namespace PasswordManager.Portal.Pages.Authentication;

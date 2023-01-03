@@ -1,46 +1,38 @@
-﻿using LanguageExt.Pipes;
-using LanguageExt.Pretty;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
-using PasswordManager.DataAccess.DbModels;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
+using PasswordManager.Infrastructure.ServiceSettings;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services;
 
-public sealed class AuthorizationService : IAuthorizationService
+internal sealed class AuthorizationService : IAuthorizationService
 {
     private const int DAYS_TOKEN_ACTIVE = 15;
-    private const string USER_TABLE_NAME = "users";
 
-    private DateTime _tokenExpirationDate => DateTime.UtcNow.AddDays(DAYS_TOKEN_ACTIVE);
-    private readonly string _issuer;
-    private readonly string _audience;
-    private readonly string _jwtSignKey;
+    private static DateTime TokenExpirationDate => DateTime.UtcNow.AddDays(DAYS_TOKEN_ACTIVE);
+
     private readonly AzureMainDatabaseContext _context;
+    private readonly AuthorizationServiceSettings _settings;
 
-    public AuthorizationService(IConfiguration configuration, AzureMainDatabaseContext context)
+    public AuthorizationService(IOptions<AuthorizationServiceSettings> options, AzureMainDatabaseContext context)
     {
-        _issuer = configuration.GetValue<string>("AuthenticationServiceSettings:JwtIssuer")!;
-        _jwtSignKey = configuration.GetValue<string>("AuthenticationServiceSettings:JwtKey")!;
-        _audience = configuration.GetValue<string>("AuthenticationServiceSettings:JwtAudience")!;
+        _settings = options.Value;
+        _settings.Validate();
+
         _context = context;
     }
 
     public async Task<UserModel> Authenticate(string email, string password, CancellationToken cancellationToken)
     {
-        var userDbModel = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        var userDbModel = await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
         if (userDbModel is null || password != userDbModel.Password) { throw new AuthenticationException("Invalid credentials"); }
 
@@ -67,13 +59,13 @@ public sealed class AuthorizationService : IAuthorizationService
 
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
-        var key = Encoding.ASCII.GetBytes(_jwtSignKey);
+        var key = Encoding.ASCII.GetBytes(_settings.JwtKey);
         var signinCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
 
         var jwtToken = new JwtSecurityToken(
-            issuer: _issuer,
-            audience: _audience,
-            expires: _tokenExpirationDate,
+            issuer: _settings.JwtIssuer,
+            audience: _settings.JwtAudience,
+            expires: TokenExpirationDate,
             claims: claims,
             signingCredentials: signinCredentials
         );

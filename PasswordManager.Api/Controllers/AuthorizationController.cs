@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Authorization;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Authorization;

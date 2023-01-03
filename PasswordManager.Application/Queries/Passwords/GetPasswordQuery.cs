@@ -5,11 +5,6 @@ using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Queries.Passwords;
 
@@ -17,12 +12,12 @@ public sealed record GetPasswordQuery(Guid Id) : IRequest<Result<PasswordRespons
 
 public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, Result<PasswordResponseModel>>
 {
-    private readonly HttpContext _httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasswordService _passwordService;
 
     public GetPasswordQueryHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService)
     {
-        _httpContext = httpContextAccessor.HttpContext;
+        _httpContextAccessor = httpContextAccessor;
         _passwordService = passwordService;
     }
 
@@ -30,7 +25,7 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
     {
         try
         {
-            var userId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
+            var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.UserId)?.Value;
 
             if (userId is null)
             {

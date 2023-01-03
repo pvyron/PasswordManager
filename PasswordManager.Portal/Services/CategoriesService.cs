@@ -1,7 +1,6 @@
 ﻿using LanguageExt.Common;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.ViewModels.AddPassword;
-using PasswordManager.Portal.ViewModels.Dashboard;
 using System.Text.Json;
 
 namespace PasswordManager.Portal.Services;
@@ -12,7 +11,7 @@ public sealed class CategoriesService
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     public CategoriesService(ApiClient apiClient, JsonSerializerOptions jsonSerializerOptions)
-	{
+    {
         _apiClient = apiClient;
         _jsonSerializerOptions = jsonSerializerOptions;
     }
@@ -41,7 +40,7 @@ public sealed class CategoriesService
 
             var categoryModels = responseModel.Select(r => new AvailableCategory
             {
-                Id= r.Id,
+                Id = r.Id,
                 Name = r.Title,
                 Description = r.Description
             }).ToList();

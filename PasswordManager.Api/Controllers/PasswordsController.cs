@@ -4,10 +4,8 @@ using PasswordManager.Application.Commands;
 using PasswordManager.Application.Commands.Passwords;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;
-using PasswordManager.Application.IServices;
 using PasswordManager.Application.Queries.Passwords;
 using PasswordManager.Domain.Exceptions;
-using System.Threading;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

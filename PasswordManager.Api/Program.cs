@@ -1,18 +1,18 @@
-using PasswordManager.Infrastructure;
-using System.Reflection;
 using MediatR;
-using PasswordManager.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PasswordManager.Application;
+using PasswordManager.Infrastructure;
+using PasswordManager.Shared.Models;
+using System.Reflection;
 using System.Text;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
 services.AddDataAccess(configuration)
-        .InstallServices()
+        .InstallServices(configuration)
         .AddEndpointsApiExplorer()
         .AddSwaggerGen()
         .AddHttpContextAccessor();
@@ -34,12 +34,12 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             {
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetValue<string>("AuthenticationServiceSettings:JwtKey")!)),
-                    ValidIssuer = configuration.GetValue<string>("AuthenticationServiceSettings:JwtIssuer"),
-                    ValidAudience= configuration.GetValue<string>("AuthenticationServiceSettings:JwtAudience"),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetValue<string>("AuthenticationService:JwtKey")!)),
+                    ValidIssuer = configuration.GetValue<string>("AuthenticationService:JwtIssuer"),
+                    ValidAudience = configuration.GetValue<string>("AuthenticationService:JwtAudience"),
                     RequireExpirationTime = false,
                     ValidateIssuer = true,
-                    ValidateAudience= true,
+                    ValidateAudience = true,
                     ValidateLifetime = true
                 };
                 o.IncludeErrorDetails = true;

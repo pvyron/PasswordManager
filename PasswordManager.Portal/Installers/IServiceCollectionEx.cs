@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using PasswordManager.Portal.Services;
 using System.Text.Json;
-using PasswordManager.Portal.Services;
+using System.Text.Json.Serialization;
 
 namespace PasswordManager.Portal.Installers;
 

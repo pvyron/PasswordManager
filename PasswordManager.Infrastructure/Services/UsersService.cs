@@ -1,18 +1,9 @@
-﻿using Bogus;
-using LanguageExt.Pretty;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services;
 
@@ -27,12 +18,12 @@ internal sealed class UsersService : IUsersService
 
     public async Task<UserModel> CreateUser(UserModel user, string password, CancellationToken cancellationToken)
     {
-        var addedUserResponse = await _context.Users.AddAsync(new UserDbModel 
-        { 
-            Email= user.Email,
+        var addedUserResponse = await _context.Users.AddAsync(new UserDbModel
+        {
+            Email = user.Email,
             Password = password,
-            FirstName= user.FirstName,
-            LastName= user.LastName
+            FirstName = user.FirstName,
+            LastName = user.LastName
         }, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
@@ -76,7 +67,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<UserModel> GetUserById(Guid id, CancellationToken cancellationToken)
     {
-        var user = await _context.Users.FindAsync(id, cancellationToken);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 
         if (user is null)
         {

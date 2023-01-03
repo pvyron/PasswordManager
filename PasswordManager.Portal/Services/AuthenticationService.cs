@@ -1,6 +1,5 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
-using MudBlazor.Utilities;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.Models;
 using System.Net.Http.Json;
@@ -15,25 +14,25 @@ public sealed class AuthenticationService
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     public AuthenticationService(ClientStateData clientStateData, ApiClient apiClient, JsonSerializerOptions jsonSerializerOptions)
-	{
-		_clientStateData = clientStateData;
-		_apiClient = apiClient;
+    {
+        _clientStateData = clientStateData;
+        _apiClient = apiClient;
         _jsonSerializerOptions = jsonSerializerOptions;
     }
 
-	public async Task<Result<Unit>> Register(RegistrationModel registrationModel)
-	{
-		try
-		{
-			var request = new HttpRequestMessage
-			{
-				Content = JsonContent.Create(new RegistrationRequestModel
-				{
-					Email = registrationModel.Email,
-					FirstName = registrationModel.FirstName,
-					LastName = registrationModel.LastName,
-					Password = registrationModel.Password,
-				}),
+    public async Task<Result<Unit>> Register(RegistrationModel registrationModel)
+    {
+        try
+        {
+            var request = new HttpRequestMessage
+            {
+                Content = JsonContent.Create(new RegistrationRequestModel
+                {
+                    Email = registrationModel.Email,
+                    FirstName = registrationModel.FirstName,
+                    LastName = registrationModel.LastName,
+                    Password = registrationModel.Password,
+                }),
                 Method = HttpMethod.Post
             };
 
@@ -41,66 +40,66 @@ public sealed class AuthenticationService
 
             response.EnsureSuccessStatusCode();
 
-			return Unit.Default;
+            return Unit.Default;
         }
-		catch (Exception ex)
-		{
-			return new Result<Unit>(ex);
-		}
+        catch (Exception ex)
+        {
+            return new Result<Unit>(ex);
+        }
     }
 
-	public async Task<Result<Unit>> Login(LoginModel loginModel)
-	{
-		try
-		{
-			var request = new HttpRequestMessage
-			{
-				Method = HttpMethod.Get
-			};
+    public async Task<Result<Unit>> Login(LoginModel loginModel)
+    {
+        try
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get
+            };
 
-			request.Headers.Add("email", loginModel.Email);
-			request.Headers.Add("password", loginModel.Password);
+            request.Headers.Add("email", loginModel.Email);
+            request.Headers.Add("password", loginModel.Password);
 
-			var response = await _apiClient.SendAnonymous(request, "/api/Authorization/Login", CancellationToken.None);
+            var response = await _apiClient.SendAnonymous(request, "/api/Authorization/Login", CancellationToken.None);
 
             var responseContent = await response.Content.ReadAsStreamAsync();
 
             if (!response.IsSuccessStatusCode)
-			{
-				var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
+            {
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
 
                 return new Result<Unit>(new Exception(errorResponse?.Message));
-			}
+            }
 
-			var responseModel = await JsonSerializer.DeserializeAsync<LoginReponseModel>(responseContent, _jsonSerializerOptions);
+            var responseModel = await JsonSerializer.DeserializeAsync<LoginReponseModel>(responseContent, _jsonSerializerOptions);
 
-			if (responseModel is null)
-			{
-				return new Result<Unit>(new Exception($"Wrong model {nameof(LoginReponseModel)} is null"));
-			}
+            if (responseModel is null)
+            {
+                return new Result<Unit>(new Exception($"Wrong model {nameof(LoginReponseModel)} is null"));
+            }
 
-			var user = new User
-			{
-				AccessToken = responseModel.AccessToken,
-				Email = responseModel.Email,
-				FirstName = responseModel.FirstName,
-				LastName = responseModel.LastName,
-				RemainLoggedIn = loginModel.RememberMe
-			};
+            var user = new User
+            {
+                AccessToken = responseModel.AccessToken,
+                Email = responseModel.Email,
+                FirstName = responseModel.FirstName,
+                LastName = responseModel.LastName,
+                RemainLoggedIn = loginModel.RememberMe
+            };
 
-			_clientStateData.LoggedIn(user);
+            _clientStateData.LoggedIn(user);
 
-			return Unit.Default;
-		}
-		catch (Exception ex)
-		{
-			return new Result<Unit>(ex);
+            return Unit.Default;
         }
-	}
+        catch (Exception ex)
+        {
+            return new Result<Unit>(ex);
+        }
+    }
 
-	public Task Logout()
-	{
-		_clientStateData.Logout();
-		return Task.CompletedTask;
-	}
+    public Task Logout()
+    {
+        _clientStateData.Logout();
+        return Task.CompletedTask;
+    }
 }

@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace PasswordManager.Portal.Services;
+﻿namespace PasswordManager.Portal.Services;
 
 public sealed class ApiClient
 {
@@ -42,7 +40,7 @@ public sealed class ApiClient
         var client = GetClient();
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
         client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "https://localhost:7210");
-        
+
         return await client.GetAsync(GetUri(relativeUrl), cancellationToken);
     }
 
@@ -59,7 +57,7 @@ public sealed class ApiClient
             relativeUrl = relativeUrl.Substring(1);
 
         string url = $"{_apiBaseAddress}{relativeUrl}";
-        
+
         return new Uri(url);
     }
 }

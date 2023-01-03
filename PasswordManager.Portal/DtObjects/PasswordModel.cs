@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PasswordManager.Portal.DtObjects;
+﻿namespace PasswordManager.Portal.DtObjects;
 
 public sealed record NewPassword
 {

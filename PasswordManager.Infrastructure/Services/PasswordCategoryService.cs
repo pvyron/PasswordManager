@@ -1,15 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PasswordManager.Application.IServices;
+﻿using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
-using PasswordManager.DataAccess.DbModels;
-using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services;
 
@@ -32,9 +24,9 @@ internal sealed class PasswordCategoryService : IPasswordCategoriesService
         throw new NotImplementedException();
     }
 
-    public async IAsyncEnumerable<PasswordCategoryModel> GetAllUserCategories(Guid userId, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PasswordCategoryModel> GetAllUserCategories(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        foreach (var category in await _context.PasswordCategories.Where(p => p.User!.Id == userId).ToListAsync(cancellationToken))
+        await foreach (var category in _context.PasswordCategories.Where(p => p.User!.Id == userId).ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
             yield return new PasswordCategoryModel
             {

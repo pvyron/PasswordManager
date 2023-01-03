@@ -3,11 +3,6 @@ using MediatR;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Authorization;
 
@@ -18,14 +13,14 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     private readonly IUsersService _usersService;
 
     public RegisterUserCommandHandler(IUsersService usersService)
-	{
+    {
         _usersService = usersService;
     }
 
     public async Task<Result<UserRegistrationResponseModel>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-		try
-		{
+        try
+        {
             var newUserModel = new UserModel
             {
                 Id = Guid.Empty,
@@ -45,10 +40,10 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
             };
 
             return newUserResponse;
-		}
-		catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             return new(ex);
-		}
+        }
     }
 }
