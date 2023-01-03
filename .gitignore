@@ -348,3 +348,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/PasswordManager.Api/appsettings.Local.json
+/PasswordManager.DataAccess/Certificates/DigiCertGlobalRootCA.crt.pem
+/PasswordManager.DataAccess/Certificates
+/PasswordManager.Api/appsettings.Production.json
+/PasswordManager.DataAccess.Mongo/Certificates
