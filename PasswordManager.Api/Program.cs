@@ -11,9 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
-
-
-services.InstallServices()
+services.AddDataAccess(configuration)
+        .InstallServices()
         .AddEndpointsApiExplorer()
         .AddSwaggerGen()
         .AddHttpContextAccessor();

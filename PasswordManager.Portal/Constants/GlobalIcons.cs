@@ -2,5 +2,5 @@
 
 public static class GlobalIcons
 {
-    public const string ClipboardIcon = MudBlazor.Icons.Rounded.ContentCopy;
+    public const string ClipboardIcon = MudBlazor.Icons.Material.Rounded.ContentCopy;
 }

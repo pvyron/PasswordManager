@@ -1,19 +1,15 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PasswordManager.DataAccess.DbModels;
 
-public sealed class PasswordCategoryDbModel
+public class PasswordCategoryDbModel
 {
-    [BsonRequired]
     public required Guid Id { get; set; }
-    [BsonRequired]
+    [ForeignKey(nameof(User))]
+    public Guid UserId { get; set; }
+    public virtual UserDbModel? User { get; set; }
     public required string Title { get; set; } = null!;
     public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
-    public List<PasswordDbModel> Passwords { get; set; } = new();
+    public ICollection<PasswordDbModel>? Passwords { get; set; }
 }

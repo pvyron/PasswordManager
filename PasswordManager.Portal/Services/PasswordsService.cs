@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Reflection.Metadata.Ecma335;
+using PasswordManager.Portal.Models;
 
 namespace PasswordManager.Portal.Services;
 
@@ -25,10 +26,7 @@ public sealed class PasswordsService
     {
         try
         {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get
-            };
+            var request = new HttpRequestMessage { Method = HttpMethod.Get };
 
             var response = await _apiClient.GetAuthorized("/api/Passwords", cancellationToken);
 
@@ -57,5 +55,37 @@ public sealed class PasswordsService
         {
             return new Result<List<PasswordViewModel>>(ex);
         }
+    }
+
+    public async Task<Result<Unit>> AddNewPassword(NewPassword newPassword, CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            Content = JsonContent.Create(
+                new PasswordRequestModel
+                {
+                    CategoryId = newPassword.CategoryId,
+                    Description = newPassword.Description,
+                    Password = newPassword.Password,
+                    Title = newPassword.Title,
+                    Username = newPassword.Username,
+                },
+                typeof(PasswordRequestModel),
+                options: _jsonSerializerOptions)
+        };
+
+        var response = await _apiClient.SendAuthorized(request, "/api/Passwords", cancellationToken);
+
+        var responseContent = await response.Content.ReadAsStreamAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
+
+            return new Result<Unit>(new Exception(errorResponse?.Message));
+        }
+
+        return Unit.Default;
     }
 }

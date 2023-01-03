@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Infrastructure.Services;
+namespace PasswordManager.Infrastructure.MongoDbServices;
 
 abstract class UsersTableAccessService
 {

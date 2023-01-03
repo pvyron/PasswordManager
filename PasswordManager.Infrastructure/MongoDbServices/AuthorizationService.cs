@@ -1,8 +1,8 @@
 ﻿using LanguageExt.Pipes;
 using LanguageExt.Pretty;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
@@ -17,7 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PasswordManager.Infrastructure.Services;
+namespace PasswordManager.Infrastructure.MongoDbServices;
 
 public sealed class AuthorizationService : IAuthorizationService
 {
@@ -28,19 +28,19 @@ public sealed class AuthorizationService : IAuthorizationService
     private readonly string _issuer;
     private readonly string _audience;
     private readonly string _jwtSignKey;
-    private readonly AzureMainDatabaseContext _context;
+    private readonly MDbClient _dbClient;
 
-    public AuthorizationService(IConfiguration configuration, AzureMainDatabaseContext context)
+    public AuthorizationService(MDbClient mDbClient, IConfiguration configuration)
     {
+        _dbClient = mDbClient;
         _issuer = configuration.GetValue<string>("AuthenticationServiceSettings:JwtIssuer")!;
         _jwtSignKey = configuration.GetValue<string>("AuthenticationServiceSettings:JwtKey")!;
         _audience = configuration.GetValue<string>("AuthenticationServiceSettings:JwtAudience")!;
-        _context = context;
     }
 
     public async Task<UserModel> Authenticate(string email, string password, CancellationToken cancellationToken)
     {
-        var userDbModel = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        var userDbModel = await _dbClient.GetRecord<UserDbModel>(USER_TABLE_NAME, (nameof(UserDbModel.Email), email), cancellationToken);
 
         if (userDbModel is null || password != userDbModel.Password) { throw new AuthenticationException("Invalid credentials"); }
 

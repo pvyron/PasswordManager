@@ -32,7 +32,7 @@ public partial class Register
             var result = await _authenticationService.Register(
                 new DtObjects.RegistrationModel(_registerForm.Email, _registerForm.OriginalPassword, _registerForm.FirstName, _registerForm.LastName));
 
-            result.IfSucc(SuccessfulRegistration);
+            result.IfSucc(async u => await SuccessfulRegistration(u));
             result.IfFail(FailedRegistration);
         }
         finally
@@ -41,7 +41,7 @@ public partial class Register
         }
     }
 
-    private async void SuccessfulRegistration(Unit unit)
+    private async Task SuccessfulRegistration(Unit unit)
     {
         var options = new DialogOptions
         {
