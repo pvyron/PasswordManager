@@ -8,23 +8,27 @@ namespace PasswordManager.Portal.Pages;
 
 public partial class Dashboard
 {
-    [Inject] IDialogService _dialogService { get; set; } = default!;
-    [Inject] PasswordsService _passwordsService { get; set; } = default!;
+    [Inject] IDialogService DialogService { get; set; } = default!;
+    [Inject] PasswordsService PasswordsService { get; set; } = default!;
     public List<PasswordViewModel> Passwords { get; set; } = new();
     public List<object> Categories { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await _passwordsService.GetPasswordViewModels(CancellationToken.None);
-
-        result.IfSucc(PasswordFetchingSuccess);
+        await FetchPasswords();
 
         await base.OnInitializedAsync();
     }
 
-    private void PasswordFetchingSuccess(List<PasswordViewModel> passwords)
+    private async Task FetchPasswords()
     {
-        Passwords = passwords;
+        Passwords = new();
+
+        await foreach (var password in PasswordsService.GetPasswordViewModels(CancellationToken.None))
+        {
+            Passwords.Add(password);
+            StateHasChanged();
+        }
     }
 
     private async Task OnViewPasswordCredentials(PasswordViewModel passwordViewModel)
@@ -45,7 +49,7 @@ public partial class Dashboard
             {"Password", passwordViewModel }
         };
 
-        var dialog = _dialogService.Show<PasswordCredentialsDialog>(passwordViewModel.Title, parameters, options);
+        var dialog = DialogService.Show<PasswordCredentialsDialog>(passwordViewModel.Title, parameters, options);
 
         await dialog.Result;
     }

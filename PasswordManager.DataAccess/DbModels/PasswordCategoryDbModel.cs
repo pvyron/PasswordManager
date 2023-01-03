@@ -4,7 +4,7 @@ namespace PasswordManager.DataAccess.DbModels;
 
 public class PasswordCategoryDbModel
 {
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; }
     [ForeignKey(nameof(User))]
     public Guid UserId { get; set; }
     public virtual UserDbModel? User { get; set; }

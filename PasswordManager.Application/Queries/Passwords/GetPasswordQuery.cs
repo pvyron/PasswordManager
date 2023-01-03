@@ -34,7 +34,7 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
 
             var userGuid = Guid.Parse(userId);
 
-            var password = await _passwordService.GetPasswordById(userGuid, request.Id, cancellationToken);
+            var password = await _passwordService.GetPasswordById(request.Id, cancellationToken);
 
             if (!password.UserId.Equals(userGuid))
             {

@@ -9,7 +9,7 @@ using PasswordManager.DataAccess;
 
 namespace PasswordManager.DataAccess.Migrations
 {
-    [DbContext(typeof(AzureMainDatabaseContext))]
+    [DbContext(typeof(MySqlDatabaseContext))]
     partial class AzureMainDatabaseContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

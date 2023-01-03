@@ -6,6 +6,7 @@ using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.Queries.Passwords;
 using PasswordManager.Domain.Exceptions;
+using System.Runtime.CompilerServices;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,9 +18,12 @@ namespace PasswordManager.Api.Controllers;
 public class PasswordsController : MediatorControllerBase
 {
     [HttpGet]
-    public IAsyncEnumerable<PasswordResponseModel> Get(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PasswordResponseModel> Get([EnumeratorCancellation]CancellationToken cancellationToken)
     {
-        return Mediator.CreateStream(new GetAllPasswordsQuery(), cancellationToken);
+        await foreach (var password in Mediator.CreateStream(new GetAllPasswordsQuery(), cancellationToken))
+        {
+            yield return password;
+        }
     }
 
     [HttpGet("{id}")]
@@ -68,7 +72,7 @@ public class PasswordsController : MediatorControllerBase
             });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut]
     public async Task<IActionResult> Put([FromBody] PasswordRequestModel passwordRequestModel, CancellationToken cancellationToken)
     {
         var response = await Mediator.Send(new UpdatePasswordCommand(passwordRequestModel), cancellationToken);

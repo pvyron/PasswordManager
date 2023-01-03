@@ -14,13 +14,7 @@ public static class ServicesInstaller
     public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
         //services.AddScoped<MDbClient>();
-        services.AddDbContext<AzureMainDatabaseContext>(builder =>
-        {
-            builder.UseMySql(configuration.GetConnectionString("MainDatabase")!, new MySqlServerVersion(new Version()), options =>
-            {
-                options.EnableRetryOnFailure();
-            });
-        });
+        services.RegisterSqlDatabase(configuration.GetConnectionString("MainDatabase")!);
 
         return services;
     }

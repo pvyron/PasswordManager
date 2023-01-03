@@ -75,7 +75,7 @@ public sealed class AuthenticationService
 
             if (responseModel is null)
             {
-                return new Result<Unit>(new Exception($"Wrong model {nameof(LoginReponseModel)} is null"));
+                return new Result<Unit>(new ResultIsNullException($"Wrong model {nameof(LoginReponseModel)} is null"));
             }
 
             var user = new User

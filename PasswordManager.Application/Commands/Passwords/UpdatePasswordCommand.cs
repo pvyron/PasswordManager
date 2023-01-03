@@ -42,27 +42,29 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 return new Result<PasswordResponseModel>(new PasswordAccessException("No specified password to update"));
             }
 
-            var passwordModel = await _passwordService.GetPasswordById(userGuid, (Guid)request.PasswordRequestModel.Id, cancellationToken);
+            if (request.PasswordRequestModel.CategoryId is null)
+            {
+                return new Result<PasswordResponseModel>(new PasswordCategoryAccessException("No specified category for password"));
+            }
+
+            var passwordModel = await _passwordService.GetPasswordById(request.PasswordRequestModel.Id.Value, cancellationToken);
 
             if (!passwordModel.UserId.Equals(userGuid))
             {
                 return new Result<PasswordResponseModel>(new AuthenticationException("You are not authorized for this action"));
             }
 
-            if (request.PasswordRequestModel.CategoryId is not null)
-            {
-                //var category = await _passwordCategoriesService.GetCategoryById((Guid)request.PasswordRequestModel.CategoryId, cancellationToken);
+            var pickedCategory = await _passwordCategoriesService.GetCategoryById(request.PasswordRequestModel.CategoryId.Value, cancellationToken);
 
-                //if (!category.UserId.Equals(userGuid))
-                //{
-                //    return new Result<PasswordResponseModel>(new PasswordCategoryAccessException("You are not authorized for this action"));
-                //}
+            if (!pickedCategory.UserId.Equals(userGuid))
+            {
+                return new Result<PasswordResponseModel>(new AuthenticationException("You are not authorized for this action"));
             }
 
             passwordModel = new PasswordModel
             {
-                UserId = Guid.Empty,
-                Id = (Guid)request.PasswordRequestModel.Id,
+                UserId = userGuid,
+                Id = request.PasswordRequestModel.Id.Value,
                 Title = request.PasswordRequestModel.Title,
                 Username = request.PasswordRequestModel.Username,
                 Password = request.PasswordRequestModel.Password,
@@ -70,7 +72,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 Description = request.PasswordRequestModel.Description,
             };
 
-            passwordModel = await _passwordService.UpdatePassword(passwordModel, cancellationToken);
+            await _passwordService.UpdatePassword(passwordModel, cancellationToken);
 
             return new PasswordResponseModel
             {

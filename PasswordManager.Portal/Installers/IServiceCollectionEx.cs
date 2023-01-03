@@ -27,7 +27,8 @@ public static class IServiceCollectionEx
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             MaxDepth = 10,
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            WriteIndented = true
+            WriteIndented = true,
+            DefaultBufferSize = 128
         };
         serializerOptions.Converters.Add(new JsonStringEnumConverter());
 

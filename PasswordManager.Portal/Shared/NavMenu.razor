@@ -2,11 +2,17 @@
     @if (_clientState.IsAuthenticated)
     {
         <MudNavLink Href="@ApplicationRoutes.Dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+
         <MudNavGroup Title="Tools" @bind-Expanded="@_isToolsExpanded">
+            
             <MudNavGroup Title="Password" @bind-Expanded="@_isPasswordsExpanded">
                 <MudNavLink Href="@ApplicationRoutes.AddPassword" Match="NavLinkMatch.Prefix">Add Password</MudNavLink>
-        </MudNavGroup>
-            <MudNavLink Href="@ApplicationRoutes.Categories" Match="NavLinkMatch.Prefix">Categories</MudNavLink>
+            </MudNavGroup>
+
+            <MudNavGroup Title="Categories" @bind-Expanded="@_isCategoriesExpanded">
+                <MudNavLink Href="@ApplicationRoutes.AddCategory" Match="NavLinkMatch.Prefix">Add Category</MudNavLink>
+            </MudNavGroup>
+
         </MudNavGroup>
     }
     <MudNavLink Href="@ApplicationRoutes.About" Match="NavLinkMatch.Prefix">About</MudNavLink>

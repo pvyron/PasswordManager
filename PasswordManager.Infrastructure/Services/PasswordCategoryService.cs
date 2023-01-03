@@ -1,5 +1,7 @@
-﻿using PasswordManager.Application.IServices;
+﻿using Microsoft.EntityFrameworkCore;
+using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
+using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
 using System.Runtime.CompilerServices;
 
@@ -7,9 +9,9 @@ namespace PasswordManager.Infrastructure.Services;
 
 internal sealed class PasswordCategoryService : IPasswordCategoriesService
 {
-    private readonly AzureMainDatabaseContext _context;
+    private readonly ISqlDbContext _context;
 
-    public PasswordCategoryService(AzureMainDatabaseContext context)
+    public PasswordCategoryService(ISqlDbContext context)
     {
         _context = context;
     }
@@ -38,9 +40,22 @@ internal sealed class PasswordCategoryService : IPasswordCategoriesService
         }
     }
 
-    public Task<PasswordCategoryModel> GetCategoryById(Guid userId, Guid categoryId, CancellationToken cancellationToken)
+    public async Task<PasswordCategoryModel> GetCategoryById(Guid categoryId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var category = await _context.PasswordCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+
+        if (category is null)
+        {
+            throw new PasswordCategoryAccessException($"Category with id {categoryId} was not found");
+        }
+
+        return new PasswordCategoryModel
+        {
+            Description = category.Description,
+            Title = category.Title,
+            UserId = category.UserId,
+            Id = category.Id
+        };
     }
 
     public Task<PasswordCategoryModel> UpdateCategory(PasswordCategoryModel password, CancellationToken cancellationToken)

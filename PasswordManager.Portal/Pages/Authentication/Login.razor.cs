@@ -9,24 +9,24 @@ namespace PasswordManager.Portal.Pages.Authentication;
 
 public partial class Login
 {
-    [Inject] AuthenticationService _authenticationService { get; set; } = default!;
-    [Inject] NavigationManager _navManager { get; set; } = default!;
+    [Inject] AuthenticationService AuthenticationService { get; set; } = default!;
+    [Inject] NavigationManager NavManager { get; set; } = default!;
 
-    private LoginForm _loginForm { get; set; } = new();
-    private bool _authenticationInProgress { get; set; } = false;
+    private LoginForm LoginForm { get; set; } = new();
+    private bool AuthenticationInProgress { get; set; } = false;
 
     private async Task LoginUser()
     {
         try
         {
-            _authenticationInProgress = true;
+            AuthenticationInProgress = true;
 
-            _loginForm.ErrorMessage = "";
+            LoginForm.ErrorMessage = "";
 
-            if (!_loginForm.IsValid)
+            if (!LoginForm.IsValid)
                 return;
 
-            var result = await _authenticationService.Login(new DtObjects.LoginModel(_loginForm.Email!, _loginForm.Password!, _loginForm.RememberMe));
+            var result = await AuthenticationService.Login(new DtObjects.LoginModel(LoginForm.Email!, LoginForm.Password!, LoginForm.RememberMe));
 
             result.IfSucc(SuccessfulLogin);
 
@@ -34,7 +34,7 @@ public partial class Login
         }
         finally
         {
-            _authenticationInProgress = false;
+            AuthenticationInProgress = false;
         }
     }
 
@@ -47,11 +47,11 @@ public partial class Login
 
     private void SuccessfulLogin(Unit unit)
     {
-        _navManager.NavigateTo(ApplicationRoutes.Index);
+        NavManager.NavigateTo(ApplicationRoutes.Index);
     }
 
     private void FailedLogin(Exception ex)
     {
-        _loginForm.ErrorMessage = ex.Message;
+        LoginForm.ErrorMessage = ex.Message;
     }
 }

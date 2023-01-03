@@ -14,43 +14,43 @@
             </MudText>
         </MudItem>
         <MudItem xl="8" lg="8" md="8" sm="10" xs="12">
-            <MudForm Model="@_registerForm" @bind-IsValid="@_registerForm.IsValid" >
+            <MudForm Model="@RegisterForm" @bind-IsValid="@RegisterForm.IsValid" >
                 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" >
                     <MudGrid Spacing="5" Justify="Justify.SpaceBetween" Style="margin-left:3%; margin-right:3%" >
                         <MudItem lg="6" md="12" sm="12" xs="12">
                             <MudGrid Justify="Justify.Center" Spacing="7">
                                 <MudItem xs="12">
                                     <MudTextField 
-                                        @bind-Value="@_registerForm.Email" 
+                                        @bind-Value="@RegisterForm.Email" 
                                         Variant="Variant.Text"
                                                   Label="Email"
-                                                  For="@(() => _registerForm.Email)" />
+                                                  For="@(() => RegisterForm.Email)" />
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudTextField 
-                                        @bind-Value="@_registerForm.OriginalPassword" 
+                                        @bind-Value="@RegisterForm.OriginalPassword" 
                                         Variant="Variant.Text"
                                         Label="Password"
-                                        InputType="_registerForm.ShowOriginalPassword ? InputType.Text : InputType.Password"
+                                        InputType="RegisterForm.ShowOriginalPassword ? InputType.Text : InputType.Password"
                                         Adornment="Adornment.End"
-                                        AdornmentIcon="@(_registerForm.ShowOriginalPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
-                                        OnAdornmentClick="@(() => _registerForm.ShowOriginalPassword = !_registerForm.ShowOriginalPassword)"
+                                        AdornmentIcon="@(RegisterForm.ShowOriginalPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                                        OnAdornmentClick="@(() => RegisterForm.ShowOriginalPassword = !RegisterForm.ShowOriginalPassword)"
                                         AdornmentAriaLabel="Show password"
-                                        For="@(() => _registerForm.OriginalPassword)"/>
+                                        For="@(() => RegisterForm.OriginalPassword)"/>
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudTextField 
-                                        @bind-Value="@_registerForm.ConfirmationPassword"
+                                        @bind-Value="@RegisterForm.ConfirmationPassword"
                                         Variant="Variant.Text"
                                         Label="Confirmation Password"
-                                        InputType="_registerForm.ShowConfirmationPassword ? InputType.Text : InputType.Password"
+                                        InputType="RegisterForm.ShowConfirmationPassword ? InputType.Text : InputType.Password"
                                         Adornment="Adornment.End"
-                                        AdornmentIcon="@(_registerForm.ShowConfirmationPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
-                                        OnAdornmentClick="@(() => _registerForm.ShowConfirmationPassword = !_registerForm.ShowConfirmationPassword)"
+                                        AdornmentIcon="@(RegisterForm.ShowConfirmationPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                                        OnAdornmentClick="@(() => RegisterForm.ShowConfirmationPassword = !RegisterForm.ShowConfirmationPassword)"
                                         AdornmentAriaLabel="Show password"
                                         HelperText="Retype your password"
                                         HelperTextOnFocus="true"
-                                        For="@(() => _registerForm.ConfirmationPassword)"/>
+                                        For="@(() => RegisterForm.ConfirmationPassword)"/>
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
@@ -58,27 +58,27 @@
                             <MudGrid Justify="Justify.FlexEnd" Spacing="7">
                                 <MudItem xs="12">
                                     <MudTextField 
-                                        @bind-Value="@_registerForm.FirstName" 
+                                        @bind-Value="@RegisterForm.FirstName" 
                                         Variant="Variant.Text"
                                         Label="First Name"/>
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudTextField 
-                                        @bind-Value="@_registerForm.LastName" 
+                                        @bind-Value="@RegisterForm.LastName" 
                                         Variant="Variant.Text"
                                         Label="Last Name"/>
                                 </MudItem>
                                 <MudItem md="6" sm="12" xs="12">
-                                    <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.subtitle2">@_registerForm.ErrorMessage</MudText>
+                                    <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.subtitle2">@RegisterForm.ErrorMessage</MudText>
                                 </MudItem>
                                 <MudItem md="6" sm="12" xs="12">
                                     <MudButton 
                                         Variant="Variant.Filled"
                                         Color="Color.Primary"
                                         Size="Size.Large"
-                                        Disabled="@_registrationInProgress" 
+                                        Disabled="@RegistrationInProgress" 
                                         OnClick="RegisterUser">
-                                        @if (_registrationInProgress)
+                                        @if (RegistrationInProgress)
                                         {
                                             <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
                                             <MudText Class="ms-2" Typo="Typo.button">Registering</MudText>

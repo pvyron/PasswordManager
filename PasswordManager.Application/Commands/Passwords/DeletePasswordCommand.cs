@@ -33,7 +33,7 @@ public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswor
 
             var userGuid = Guid.Parse(userId);
 
-            await _passwordService.DeletePassword(userGuid, request.CategoryGuid, request.PasswordGuid, cancellationToken);
+            await _passwordService.DeletePassword(request.PasswordGuid, cancellationToken);
 
             return Unit.Value;
         }

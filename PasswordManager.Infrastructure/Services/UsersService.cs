@@ -9,9 +9,9 @@ namespace PasswordManager.Infrastructure.Services;
 
 internal sealed class UsersService : IUsersService
 {
-    private readonly AzureMainDatabaseContext _context;
+    private readonly ISqlDbContext _context;
 
-    public UsersService(AzureMainDatabaseContext context)
+    public UsersService(ISqlDbContext context)
     {
         _context = context;
     }
@@ -23,7 +23,15 @@ internal sealed class UsersService : IUsersService
             Email = user.Email,
             Password = password,
             FirstName = user.FirstName,
-            LastName = user.LastName
+            LastName = user.LastName,
+            Categories = new List<PasswordCategoryDbModel>
+            {
+                new PasswordCategoryDbModel
+                {
+                    Title = "Default Category",
+                    Description = "Feel free to delete it or modify it as you please, you alway need to have at least one category for your passwords to fall under",
+                }
+            }
         }, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);

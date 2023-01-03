@@ -1,19 +1,31 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
+using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.ViewModels.Dashboard;
 
 namespace PasswordManager.Portal.Components;
 
 public partial class PasswordCard
 {
+    [Inject] NavigationManager NavManager { get; set; } = default!;
+
     [Parameter] public PasswordViewModel Password { get; set; } = null!;
     [Parameter] public EventCallback<PasswordViewModel> OnViewPasswordCredentials { get; set; }
 
-    MudCard? _passwordCard { get; set; }
-    private bool _mouseOnPasswords { get; set; } = false;
+    private string FavoritePasswordMenuText
+    {
+        get => Password.Favorite.GetValueOrDefault(false) ? "Remove from favorites" : "Add to favorites";
+    }
 
-    private bool _mouseOnPasswordsBuffer = false;
+    private string FavoritePasswordMenuIcon
+    {
+        get => Password.Favorite.GetValueOrDefault(false) ? @Icons.Material.Filled.FavoriteBorder : @Icons.Material.Filled.Favorite;
+    }
+
+    private bool MouseOnPasswords { get; set; } = false;
+
+    private bool MouseOnPasswordsBuffer = false;
 
     private async Task OnPasswordsMouseOver()
     {
@@ -27,15 +39,28 @@ public partial class PasswordCard
 
     private async Task ChangeMouseOnPasswordsValue(bool changeTo)
     {
-        _mouseOnPasswordsBuffer = changeTo;
+        MouseOnPasswordsBuffer = changeTo;
 
         if (!changeTo) await Task.Delay(400);
 
-        _mouseOnPasswords = _mouseOnPasswordsBuffer;
+        MouseOnPasswords = MouseOnPasswordsBuffer;
     }
 
     private async Task ShowPasswordsButtonClicked(MouseEventArgs args)
     {
         await OnViewPasswordCredentials.InvokeAsync(Password);
+    }
+
+    private void EditPasswordClicked()
+    {
+        string url = ApplicationRoutes.Passwords + "/edit/" + Password.Id;
+
+        NavManager.NavigateTo(url);
+    }
+
+    private void FavoritesPasswordClicked()
+    {
+        Password.Favorite = !Password.Favorite.GetValueOrDefault(false);
+        StateHasChanged();
     }
 }

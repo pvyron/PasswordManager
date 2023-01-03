@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
+using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
 using System.Runtime.CompilerServices;
 
@@ -10,16 +11,11 @@ namespace PasswordManager.Infrastructure.Services;
 
 internal sealed class PasswordService : IPasswordService
 {
-    private readonly AzureMainDatabaseContext _context;
+    private readonly ISqlDbContext _context;
 
-    public PasswordService(AzureMainDatabaseContext context)
+    public PasswordService(ISqlDbContext context)
     {
         _context = context;
-    }
-
-    public Task DeletePassword(Guid userId, Guid categoryId, Guid passwordId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 
     public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -39,14 +35,23 @@ internal sealed class PasswordService : IPasswordService
         }
     }
 
-    public Task<PasswordModel> GetPasswordById(Guid userId, Guid passwordId, CancellationToken cancellationToken)
+    public async Task<PasswordModel> GetPasswordById(Guid passwordId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        var passwordResult = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == passwordId, cancellationToken);
 
-    public Task<PasswordModel> GetPasswordById(Guid userId, Guid categoryId, Guid passwordId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        if (passwordResult is null)
+            throw new PasswordAccessException($"Password with id {passwordId} was not found");
+
+        return new PasswordModel
+        {
+            CategoryId = passwordResult.CategoryId,
+            Description = passwordResult.Description,
+            Password = passwordResult.Password,
+            Title = passwordResult.Title,
+            UserId = passwordResult.UserId,
+            Id = passwordResult.Id,
+            Username = passwordResult.Username,
+        };
     }
 
     public async Task<PasswordModel> SaveNewPassword(PasswordModel password, CancellationToken cancellationToken)
@@ -75,7 +80,20 @@ internal sealed class PasswordService : IPasswordService
         };
     }
 
-    public Task<PasswordModel> UpdatePassword(PasswordModel password, CancellationToken cancellationToken)
+    public async Task UpdatePassword(PasswordModel password, CancellationToken cancellationToken)
+    {
+        var passwordToUpdate = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == password.Id, cancellationToken);
+
+        passwordToUpdate!.CategoryId = password.CategoryId!.Value;
+        passwordToUpdate!.Description = password.Description;
+        passwordToUpdate!.Title = password.Title;
+        passwordToUpdate!.Username = password.Username;
+        passwordToUpdate!.Password = password.Password;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task DeletePassword(Guid passwordId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

@@ -10,7 +10,7 @@ using PasswordManager.DataAccess;
 
 namespace PasswordManager.DataAccess.Migrations
 {
-    [DbContext(typeof(AzureMainDatabaseContext))]
+    [DbContext(typeof(MySqlDatabaseContext))]
     [Migration("20230102233156_FirstMigration")]
     partial class FirstMigration
     {

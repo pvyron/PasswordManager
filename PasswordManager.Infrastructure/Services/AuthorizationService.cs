@@ -19,10 +19,10 @@ internal sealed class AuthorizationService : IAuthorizationService
 
     private static DateTime TokenExpirationDate => DateTime.UtcNow.AddDays(DAYS_TOKEN_ACTIVE);
 
-    private readonly AzureMainDatabaseContext _context;
+    private readonly ISqlDbContext _context;
     private readonly AuthorizationServiceSettings _settings;
 
-    public AuthorizationService(IOptions<AuthorizationServiceSettings> options, AzureMainDatabaseContext context)
+    public AuthorizationService(IOptions<AuthorizationServiceSettings> options, ISqlDbContext context)
     {
         _settings = options.Value;
         _settings.Validate();

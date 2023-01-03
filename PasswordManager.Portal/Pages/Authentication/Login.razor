@@ -14,30 +14,30 @@
             </MudText>
         </MudItem>
         <MudItem xl="4" lg="6" md="8" sm="10" xs="12">
-            <MudForm Model="@_loginForm" @bind-IsValid="@_loginForm.IsValid">
+            <MudForm Model="@LoginForm" @bind-IsValid="@LoginForm.IsValid">
                 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
                     <MudGrid Spacing="5" Justify="Justify.Center" Style="margin-left:3%; margin-right:3%">
                         <MudItem sm="12" xs="12" >
-                            <MudTextField @bind-Value="@_loginForm.Email"
+                            <MudTextField @bind-Value="@LoginForm.Email"
                                             Variant="Variant.Text"
                                             Label="Email"
-                                            For="@(() => _loginForm.Email)" />
+                                            For="@(() => LoginForm.Email)" />
                         </MudItem>
                         <MudItem sm="12" xs="12">
-                            <MudTextField @bind-Value="@_loginForm.Password"
+                            <MudTextField @bind-Value="@LoginForm.Password"
                                             Variant="Variant.Text"
                                             Label="Password"
-                                            InputType="_loginForm.ShowPassword ? InputType.Text : InputType.Password"
+                                            InputType="LoginForm.ShowPassword ? InputType.Text : InputType.Password"
                                             Adornment="Adornment.End"
-                                            AdornmentIcon="@(_loginForm.ShowPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
-                                            OnAdornmentClick="@(() => _loginForm.ShowPassword = !_loginForm.ShowPassword)"
+                                            AdornmentIcon="@(LoginForm.ShowPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                                            OnAdornmentClick="@(() => LoginForm.ShowPassword = !LoginForm.ShowPassword)"
                                             AdornmentAriaLabel="Show password"
                                             OnKeyPress="PasswordFieldOnKeyPress"
-                                            For="@(() => _loginForm.Password)"
+                                            For="@(() => LoginForm.Password)"
                                             Immediate="true"/>
                         </MudItem>
                         <MudItem md="6" sm="12" xs="12">
-                            <MudCheckBox @bind-Checked="@_loginForm.RememberMe"
+                            <MudCheckBox @bind-Checked="@LoginForm.RememberMe"
                                          Color="Color.Primary"
                                          LabelPosition="LabelPosition.End"
                                          Label="Remember me"
@@ -49,9 +49,9 @@
                                     Variant="Variant.Filled"
                                     Color="Color.Primary"
                                     Size="Size.Large"
-                                    Disabled="@_authenticationInProgress" 
+                                    Disabled="@AuthenticationInProgress" 
                                     OnClick="LoginUser">
-                                    @if (_authenticationInProgress)
+                                    @if (AuthenticationInProgress)
                                     {
                                         <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
                                         <MudText Class="ms-2" Typo="Typo.button">Authenticating</MudText>
@@ -63,7 +63,7 @@
                                 </MudButton>
                         </MudItem>
                         <MudItem md="12" sm="12" xs="12">
-                            <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.subtitle2">@_loginForm.ErrorMessage</MudText>
+                            <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.subtitle2">@LoginForm.ErrorMessage</MudText>
                         </MudItem>
                     </MudGrid>
                 </MudPaper>

@@ -1,4 +1,6 @@
-﻿namespace PasswordManager.Portal.Services;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
+
+namespace PasswordManager.Portal.Services;
 
 public sealed class ApiClient
 {
@@ -26,22 +28,33 @@ public sealed class ApiClient
 
     public async Task<HttpResponseMessage> SendAuthorized(HttpRequestMessage requestMessage, string relativeUrl, CancellationToken cancellationToken)
     {
+        return await SendAuthorized(requestMessage, relativeUrl, HttpCompletionOption.ResponseContentRead, cancellationToken);
+    }
+
+    public async Task<HttpResponseMessage> SendAuthorized(HttpRequestMessage requestMessage, string relativeUrl, HttpCompletionOption httpCompletionOption, CancellationToken cancellationToken)
+    {
         requestMessage.RequestUri = GetUri(relativeUrl);
         requestMessage.Headers.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
         requestMessage.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7210");
+        requestMessage.SetBrowserResponseStreamingEnabled(true);
 
-        var response = await GetClient().SendAsync(requestMessage, cancellationToken);
+        var response = await GetClient().SendAsync(requestMessage, httpCompletionOption, cancellationToken);
 
         return response;
     }
 
     public async Task<HttpResponseMessage> GetAuthorized(string relativeUrl, CancellationToken cancellationToken)
     {
+        return await GetAuthorized(relativeUrl, HttpCompletionOption.ResponseContentRead, cancellationToken);
+    }
+
+    public async Task<HttpResponseMessage> GetAuthorized(string relativeUrl, HttpCompletionOption httpCompletionOption, CancellationToken cancellationToken)
+    {
         var client = GetClient();
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
         client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "https://localhost:7210");
 
-        return await client.GetAsync(GetUri(relativeUrl), cancellationToken);
+        return await client.GetAsync(GetUri(relativeUrl), httpCompletionOption, cancellationToken);
     }
 
     HttpClient GetClient()

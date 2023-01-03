@@ -34,9 +34,9 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             {
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetValue<string>("AuthenticationService:JwtKey")!)),
-                    ValidIssuer = configuration.GetValue<string>("AuthenticationService:JwtIssuer"),
-                    ValidAudience = configuration.GetValue<string>("AuthenticationService:JwtAudience"),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetValue<string>("AuthorizationService:JwtKey")!)),
+                    ValidIssuer = configuration.GetValue<string>("AuthorizationService:JwtIssuer"),
+                    ValidAudience = configuration.GetValue<string>("AuthorizationService:JwtAudience"),
                     RequireExpirationTime = false,
                     ValidateIssuer = true,
                     ValidateAudience = true,

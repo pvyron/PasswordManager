@@ -10,33 +10,33 @@ namespace PasswordManager.Portal.Pages.Authentication;
 
 public partial class Register
 {
-    [Inject] AuthenticationService _authenticationService { get; set; } = default!;
-    [Inject] NavigationManager _navManager { get; set; } = default!;
-    [Inject] IDialogService _dialogService { get; set; } = default!;
+    [Inject] AuthenticationService AuthenticationService { get; set; } = default!;
+    [Inject] NavigationManager NavManager { get; set; } = default!;
+    [Inject] IDialogService DialogService { get; set; } = default!;
 
-    private RegisterForm _registerForm = new();
-    private bool _registrationInProgress = false;
+    private RegisterForm RegisterForm = new();
+    private bool RegistrationInProgress = false;
 
     private async Task RegisterUser()
     {
         try
         {
-            _registrationInProgress = true;
+            RegistrationInProgress = true;
 
-            if (!_registerForm.IsValid)
+            if (!RegisterForm.IsValid)
             {
                 return;
             }
 
-            var result = await _authenticationService.Register(
-                new DtObjects.RegistrationModel(_registerForm.Email, _registerForm.OriginalPassword, _registerForm.FirstName, _registerForm.LastName));
+            var result = await AuthenticationService.Register(
+                new DtObjects.RegistrationModel(RegisterForm.Email, RegisterForm.OriginalPassword, RegisterForm.FirstName, RegisterForm.LastName));
 
             result.IfSucc(async u => await SuccessfulRegistration(u));
             result.IfFail(FailedRegistration);
         }
         finally
         {
-            _registrationInProgress = false;
+            RegistrationInProgress = false;
         }
     }
 
@@ -54,15 +54,15 @@ public partial class Register
             { "Message", "Registration was successfull, please login" }
         };
 
-        var dialog = _dialogService.Show<NotifyDialog>("Success", parameters, options);
+        var dialog = DialogService.Show<NotifyDialog>("Success", parameters, options);
 
         await dialog.Result;
 
-        _navManager.NavigateTo(ApplicationRoutes.Login);
+        NavManager.NavigateTo(ApplicationRoutes.Login);
     }
 
     private void FailedRegistration(Exception ex)
     {
-        _registerForm.ErrorMessage = ex.Message;
+        RegisterForm.ErrorMessage = ex.Message;
     }
 }

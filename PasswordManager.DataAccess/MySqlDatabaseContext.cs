@@ -3,14 +3,14 @@ using PasswordManager.DataAccess.DbModels;
 
 namespace PasswordManager.DataAccess;
 
-public class AzureMainDatabaseContext : DbContext
+internal class MySqlDatabaseContext : DbContext, ISqlDbContext
 {
 
     public DbSet<UserDbModel> Users { get; set; } = default!;
     public DbSet<PasswordDbModel> Passwords { get; set; } = default!;
     public DbSet<PasswordCategoryDbModel> PasswordCategories { get; set; } = default!;
 
-    public AzureMainDatabaseContext(DbContextOptions<AzureMainDatabaseContext> dbContextOptions) : base(dbContextOptions)
+    public MySqlDatabaseContext(DbContextOptions<MySqlDatabaseContext> dbContextOptions) : base(dbContextOptions)
     {
     }
 }

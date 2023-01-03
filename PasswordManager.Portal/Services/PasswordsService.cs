@@ -1,9 +1,11 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using LanguageExt.Pipes;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace PasswordManager.Portal.Services;
@@ -19,47 +21,84 @@ public sealed class PasswordsService
         _jsonSerializerOptions = jsonSerializerOptions;
     }
 
-    public async Task<Result<List<PasswordViewModel>>> GetPasswordViewModels(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PasswordViewModel> GetPasswordViewModels([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage { Method = HttpMethod.Get };
+
+        var response = await _apiClient.SendAuthorized(request, "/api/Passwords", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+        await foreach (var passwordResponse in JsonSerializer.DeserializeAsyncEnumerable<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken))
+        {
+            if (passwordResponse is null)
+                continue;
+
+            yield return new PasswordViewModel
+            {
+                Id = passwordResponse.Id,
+                CategoryId = passwordResponse.CategoryId,
+                Description = passwordResponse.Description,
+                Password = passwordResponse.Password,
+                Title = passwordResponse.Title,
+                Username = passwordResponse.Username,
+            };
+        }
+    }
+
+    public async Task<Result<PasswordViewModel>> GetPasswordById(string? passwordId, CancellationToken cancellationToken)
     {
         try
         {
-            var request = new HttpRequestMessage { Method = HttpMethod.Get };
-
-            var response = await _apiClient.GetAuthorized("/api/Passwords", cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
-            var responseContent = await response.Content.ReadAsStreamAsync();
-
-            var responseModel = await JsonSerializer.DeserializeAsync<List<PasswordResponseModel>>(responseContent, _jsonSerializerOptions);
-
-            if (responseModel is null)
+            if (string.IsNullOrWhiteSpace(passwordId))
             {
-                return new Result<List<PasswordViewModel>>(new Exception($"Wrong model {nameof(PasswordResponseModel)} is null"));
+                return new Result<PasswordViewModel>(new ValueIsNullException("No password found"));
             }
 
-            var passwordViewModels = responseModel.Select(r => new PasswordViewModel
-            {
-                Description = r.Description,
-                Password = r.Password,
-                Title = r.Title,
-                Username = r.Username,
-            }).ToList();
+            var response = await _apiClient.GetAuthorized($"/api/Passwords/{passwordId}", cancellationToken);
 
-            return passwordViewModels;
+            var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+                return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
+            }
+
+            var passwordResponse = await JsonSerializer.DeserializeAsync<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+            if (passwordResponse is null)
+            {
+                return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
+            }
+
+            return new PasswordViewModel
+            {
+                Id = passwordResponse.Id,
+                CategoryId = passwordResponse.CategoryId,
+                Description = passwordResponse.Description,
+                Password = passwordResponse.Password,
+                Title = passwordResponse.Title,
+                Username = passwordResponse.Username,
+            };
         }
         catch (Exception ex)
         {
-            return new Result<List<PasswordViewModel>>(ex);
+            return new Result<PasswordViewModel>(ex);
         }
     }
 
     public async Task<Result<Unit>> AddNewPassword(NewPassword newPassword, CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage
+        try
         {
-            Method = HttpMethod.Post,
-            Content = JsonContent.Create(
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                Content = JsonContent.Create(
                 new PasswordRequestModel
                 {
                     CategoryId = newPassword.CategoryId,
@@ -70,19 +109,79 @@ public sealed class PasswordsService
                 },
                 typeof(PasswordRequestModel),
                 options: _jsonSerializerOptions)
-        };
+            };
 
-        var response = await _apiClient.SendAuthorized(request, "/api/Passwords", cancellationToken);
+            var response = await _apiClient.SendAuthorized(request, "/api/Passwords", cancellationToken);
 
-        var responseContent = await response.Content.ReadAsStreamAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
-            return new Result<Unit>(new Exception(errorResponse?.Message));
+                return new Result<Unit>(new Exception(errorResponse?.Message));
+            }
+
+            return Unit.Default;
         }
+        catch (Exception ex)
+        {
+            return new Result<Unit>(ex);
+        }
+    }
 
-        return Unit.Default;
+    public async Task<Result<PasswordViewModel>> UpdatePassword(Guid id, NewPassword newPassword, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                Content = JsonContent.Create(
+                new PasswordRequestModel
+                {
+                    Id = id,
+                    CategoryId = newPassword.CategoryId,
+                    Description = newPassword.Description,
+                    Password = newPassword.Password,
+                    Title = newPassword.Title,
+                    Username = newPassword.Username,
+                },
+                typeof(PasswordRequestModel),
+                options: _jsonSerializerOptions)
+            };
+
+            var response = await _apiClient.SendAuthorized(request, "/api/Passwords", cancellationToken);
+
+            var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+                return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
+            }
+
+            var passwordResponse = await JsonSerializer.DeserializeAsync<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+            if (passwordResponse is null)
+            {
+                return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
+            }
+
+            return new PasswordViewModel
+            {
+                Id = passwordResponse.Id,
+                CategoryId = passwordResponse.CategoryId,
+                Description = passwordResponse.Description,
+                Password = passwordResponse.Password,
+                Title = passwordResponse.Title,
+                Username = passwordResponse.Username,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Result<PasswordViewModel>(ex);
+        }
     }
 }
