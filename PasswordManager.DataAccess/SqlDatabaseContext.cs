@@ -3,14 +3,14 @@ using PasswordManager.DataAccess.DbModels;
 
 namespace PasswordManager.DataAccess;
 
-internal class MySqlDatabaseContext : DbContext, ISqlDbContext
+internal class SqlDatabaseContext : DbContext, ISqlDbContext
 {
 
     public DbSet<UserDbModel> Users { get; set; } = default!;
     public DbSet<PasswordDbModel> Passwords { get; set; } = default!;
     public DbSet<PasswordCategoryDbModel> PasswordCategories { get; set; } = default!;
 
-    public MySqlDatabaseContext(DbContextOptions<MySqlDatabaseContext> dbContextOptions) : base(dbContextOptions)
+    public SqlDatabaseContext(DbContextOptions<SqlDatabaseContext> dbContextOptions) : base(dbContextOptions)
     {
     }
 }

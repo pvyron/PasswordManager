@@ -1,7 +1,11 @@
-﻿namespace PasswordManager.DataAccess.DbModels;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace PasswordManager.DataAccess.DbModels;
 
 public class UserDbModel
 {
+    [Key]
     public Guid Id { get; set; }
     public required string Email { get; set; } = null!;
     public required string Password { get; set; } = null!;

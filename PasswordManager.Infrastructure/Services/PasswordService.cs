@@ -29,7 +29,7 @@ internal sealed class PasswordService : IPasswordService
                 Description = passwordDbModel.Description,
                 Password = passwordDbModel.Password,
                 Title = passwordDbModel.Title,
-                UserId = passwordDbModel.UserId,
+                UserId = passwordDbModel.UserId!.Value,
                 Username = passwordDbModel.Username,
             };
         }
@@ -48,7 +48,7 @@ internal sealed class PasswordService : IPasswordService
             Description = passwordResult.Description,
             Password = passwordResult.Password,
             Title = passwordResult.Title,
-            UserId = passwordResult.UserId,
+            UserId = passwordResult.UserId!.Value,
             Id = passwordResult.Id,
             Username = passwordResult.Username,
         };
@@ -75,7 +75,7 @@ internal sealed class PasswordService : IPasswordService
             Description = addPasswordResult.Entity.Description,
             Password = addPasswordResult.Entity.Password,
             Title = addPasswordResult.Entity.Title,
-            UserId = addPasswordResult.Entity.UserId,
+            UserId = addPasswordResult.Entity.UserId!.Value,
             Username = addPasswordResult.Entity.Username,
         };
     }

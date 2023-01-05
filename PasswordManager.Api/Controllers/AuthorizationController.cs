@@ -25,7 +25,7 @@ public class AuthorizationController : MediatorControllerBase
             {
                 if (ex is AccessException<object>)
                 {
-                    return Unauthorized(new ErrorResponse(ex.Message, ex));
+                    return BadRequest(new ErrorResponse(ex.Message, ex));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -33,20 +33,20 @@ public class AuthorizationController : MediatorControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(UserLoginResponseModel), StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest, MediaTypeNames.Text.Plain)]
+    [ProducesResponseType(typeof(UserLoginResponseModel), StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized, MediaTypeNames.Text.Plain)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromHeader] string? email, [FromHeader] string? password, CancellationToken cancellationToken)
     {
         var response = await Mediator.Send(new LoginUserQuery(email, password), cancellationToken);
 
         return response.Match<IActionResult>(
-            Succ => CreatedAtAction(nameof(Register), Succ),
+            Ok,
             ex =>
             {
                 if (ex is AuthenticationException)
                 {
-                    return BadRequest(new ErrorResponse(ex.Message, ex));
+                    return Unauthorized(new ErrorResponse(ex.Message, ex));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);

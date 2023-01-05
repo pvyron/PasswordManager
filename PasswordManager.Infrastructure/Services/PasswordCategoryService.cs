@@ -42,7 +42,7 @@ internal sealed class PasswordCategoryService : IPasswordCategoriesService
 
     public async Task<PasswordCategoryModel> GetCategoryById(Guid categoryId, CancellationToken cancellationToken)
     {
-        var category = await _context.PasswordCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+        var category = await _context.PasswordCategories.FirstOrDefaultAsync(c => c.Id == categoryId, cancellationToken);
 
         if (category is null)
         {
@@ -53,7 +53,7 @@ internal sealed class PasswordCategoryService : IPasswordCategoriesService
         {
             Description = category.Description,
             Title = category.Title,
-            UserId = category.UserId,
+            UserId = category.UserId!.Value,
             Id = category.Id
         };
     }

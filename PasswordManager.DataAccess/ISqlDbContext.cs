@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.DataAccess.DbModels;
 using System;
@@ -23,11 +22,11 @@ public static class IServiceCollectionEx
 {
     public static IServiceCollection RegisterSqlDatabase(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<ISqlDbContext, MySqlDatabaseContext>(builder =>
+        services.AddDbContext<ISqlDbContext, SqlDatabaseContext>(builder =>
         {
-            builder.UseMySql(connectionString, new MySqlServerVersion(new Version()), options =>
+            builder.UseSqlServer(connectionString, options =>
             {
-                options.EnableRetryOnFailure();
+                options.EnableRetryOnFailure(5);
             });
         });
 
