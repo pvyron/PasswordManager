@@ -37,12 +37,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
+                    return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
+                    return BadRequest(new ErrorResponse(Fail.Message));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -60,12 +60,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
+                    return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
+                    return BadRequest(new ErrorResponse(Fail.Message));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -83,12 +83,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
+                    return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
+                    return BadRequest(new ErrorResponse(Fail.Message));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
@@ -106,12 +106,12 @@ public class PasswordsController : MediatorControllerBase
             {
                 if (Fail is AuthenticationException)
                 {
-                    return Unauthorized(new ErrorResponse(Fail.Message, Fail));
+                    return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
                 if (Fail is AccessException<object>)
                 {
-                    return BadRequest(new ErrorResponse(Fail.Message, Fail));
+                    return BadRequest(new ErrorResponse(Fail.Message));
                 }
 
                 return StatusCode(StatusCodes.Status500InternalServerError);

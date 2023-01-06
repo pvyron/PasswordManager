@@ -51,8 +51,7 @@ services.AddCors(o =>
                       {
                           policy.AllowAnyHeader();
                           policy.AllowAnyMethod();
-                          policy.WithOrigins("https://localhost:7210");
-                          policy.AllowCredentials();
+                          policy.AllowAnyOrigin();
                           policy.Build();
                       });
 });
@@ -69,8 +68,7 @@ app.UseCors(policy =>
 {
     policy.AllowAnyHeader();
     policy.AllowAnyMethod();
-    policy.WithOrigins("https://localhost:7210");
-    policy.AllowCredentials();
+    policy.AllowAnyOrigin();
     policy.Build();
 });
 

@@ -10,13 +10,10 @@ public sealed class ErrorResponse
     }
 
     [SetsRequiredMembers]
-    public ErrorResponse(string message, Exception exception)
+    public ErrorResponse(string message)
     {
         Message = message;
-        Exception = exception;
     }
 
     public required string Message { get; init; }
-
-    public required Exception Exception { get; init; }
 }
