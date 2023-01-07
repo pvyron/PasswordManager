@@ -38,7 +38,19 @@ public sealed class AuthenticationService
 
             var response = await _apiClient.SendAnonymous(request, "/api/Authorization/Register", CancellationToken.None);
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<Unit>(new Exception("InternalServerError"));
+                }
+
+                var responseContent = await response.Content.ReadAsStreamAsync();
+
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
+
+                return new Result<Unit>(new Exception(errorResponse?.Message));
+            }
 
             return Unit.Default;
         }
@@ -66,6 +78,11 @@ public sealed class AuthenticationService
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<Unit>(new Exception("InternalServerError"));
+                }
+
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions);
 
                 return new Result<Unit>(new Exception(errorResponse?.Message));

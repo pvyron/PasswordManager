@@ -4,6 +4,8 @@ using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.Queries.Authorization;
 using PasswordManager.Domain.Exceptions;
+using PasswordManager.Domain.Models;
+using PasswordManager.Shared;
 using System.Net.Mime;
 
 namespace PasswordManager.Api.Controllers;
@@ -23,7 +25,7 @@ public class AuthorizationController : MediatorControllerBase
             Succ => CreatedAtAction(nameof(Register), Succ),
             ex =>
             {
-                if (ex is AccessException<object>)
+                if (ex is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(ex.Message));
                 }

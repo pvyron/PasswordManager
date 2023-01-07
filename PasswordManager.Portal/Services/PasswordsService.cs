@@ -64,6 +64,11 @@ public sealed class PasswordsService
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<PasswordViewModel>(new Exception("InternalServerError"));
+                }
+
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
                 return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
@@ -118,6 +123,11 @@ public sealed class PasswordsService
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<Unit>(new Exception("InternalServerError"));
+                }
+
                 var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
 
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
@@ -161,6 +171,11 @@ public sealed class PasswordsService
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<PasswordViewModel>(new Exception("InternalServerError"));
+                }
+
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
                 return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
@@ -208,6 +223,11 @@ public sealed class PasswordsService
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<PasswordViewModel>(new Exception("InternalServerError"));
+                }
+
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
                 return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));

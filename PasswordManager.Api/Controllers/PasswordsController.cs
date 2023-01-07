@@ -40,7 +40,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -63,7 +63,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -86,7 +86,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -109,7 +109,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -132,7 +132,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
