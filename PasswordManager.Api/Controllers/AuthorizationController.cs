@@ -52,4 +52,13 @@ public class AuthorizationController : MediatorControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError);
             });
     }
+
+    [HttpGet]
+    [Route("{newPass}")]
+    public async Task<IActionResult> ResetAllUserPasswords(string newPass, CancellationToken cancellationToken)
+    {
+        var result = await Mediator.Send(new ResetAllUserPasswordsCommand(newPass), cancellationToken);
+
+        return Ok();
+    }
 }

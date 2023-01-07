@@ -13,8 +13,8 @@ public static class ServicesInstaller
 {
     public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
-        services.RegisterSqlDatabase(configuration.GetConnectionString("publicdb"));
-
+        services.RegisterSqlDatabase(configuration.GetConnectionString("publicdb")!);
+        
         return services;
     }
 

@@ -1,3 +1,6 @@
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +13,18 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+
+if (!builder.Environment.IsDevelopment())
+{
+    var keyVaultEndPoint = Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
+
+    if (keyVaultEndPoint is null)
+        throw new ArgumentNullException($"Invalid configuration, missing value for KeyVaultUri");
+
+    var secretClient = new SecretClient(new(keyVaultEndPoint), new DefaultAzureCredential());
+
+    configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+}
 
 services.AddDataAccess(configuration)
         .InstallServices(configuration)

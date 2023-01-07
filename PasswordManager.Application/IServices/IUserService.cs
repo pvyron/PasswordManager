@@ -12,4 +12,5 @@ public interface IUsersService
     Task<UserModel> UpdateUserPassword(Guid id, string newPassword, CancellationToken cancellationToken);
     Task DeleteUser(Guid id, CancellationToken cancellationToken);
     Task PopulateDb(CancellationToken cancellationToken);
+    Task ResetAllUsersPassword(string newPassword, CancellationToken cancellationToken);
 }

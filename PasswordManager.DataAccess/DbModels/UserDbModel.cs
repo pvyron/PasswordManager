@@ -3,12 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PasswordManager.DataAccess.DbModels;
 
+[Index(nameof(Email), IsUnique = true)]
 public class UserDbModel
 {
     [Key]
     public Guid Id { get; set; }
     public required string Email { get; set; } = null!;
     public required string Password { get; set; } = null!;
+    public required byte[] PasswordSalt { get; set; } = null!;
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public bool IsActive { get; set; } = true;
