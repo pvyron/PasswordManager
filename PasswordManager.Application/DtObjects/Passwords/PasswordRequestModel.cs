@@ -13,4 +13,5 @@ public sealed record PasswordRequestModel
     public string Username { get; set; } = null!;
     [Required(AllowEmptyStrings = false, ErrorMessage = "Please provide a password")]
     public string Password { get; set; } = null!;
+    public bool IsFavorite { get; set; } = false;
 }

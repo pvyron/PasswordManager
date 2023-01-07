@@ -41,6 +41,7 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
                 Password = password.Password,
                 Username = password.Username,
                 Title = password.Title,
+                IsFavorite = password.IsFavorite,
             };
         }
     }

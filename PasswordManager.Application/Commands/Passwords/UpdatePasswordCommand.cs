@@ -70,6 +70,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 Password = request.PasswordRequestModel.Password,
                 CategoryId = request.PasswordRequestModel.CategoryId,
                 Description = request.PasswordRequestModel.Description,
+                IsFavorite = request.PasswordRequestModel.IsFavorite,
             };
 
             await _passwordService.UpdatePassword(passwordModel, cancellationToken);
@@ -82,6 +83,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 Password = passwordModel.Password,
                 CategoryId = passwordModel.CategoryId,
                 Description = passwordModel.Description,
+                IsFavorite = passwordModel.IsFavorite,
             };
         }
         catch (Exception ex)

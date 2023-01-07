@@ -12,6 +12,7 @@ public partial class PasswordCard
 
     [Parameter] public PasswordViewModel Password { get; set; } = null!;
     [Parameter] public EventCallback<PasswordViewModel> OnViewPasswordCredentials { get; set; }
+    [Parameter] public EventCallback<PasswordViewModel> OnFavoriteChanged { get; set; }
 
     private string FavoritePasswordMenuText
     {
@@ -25,7 +26,7 @@ public partial class PasswordCard
 
     private bool MouseOnPasswords { get; set; } = false;
 
-    private bool MouseOnPasswordsBuffer = false;
+    private bool _mouseOnPasswordsBuffer = false;
 
     private async Task OnPasswordsMouseOver()
     {
@@ -39,11 +40,11 @@ public partial class PasswordCard
 
     private async Task ChangeMouseOnPasswordsValue(bool changeTo)
     {
-        MouseOnPasswordsBuffer = changeTo;
+        _mouseOnPasswordsBuffer = changeTo;
 
         if (!changeTo) await Task.Delay(400);
 
-        MouseOnPasswords = MouseOnPasswordsBuffer;
+        MouseOnPasswords = _mouseOnPasswordsBuffer;
     }
 
     private async Task ShowPasswordsButtonClicked(MouseEventArgs args)
@@ -58,9 +59,9 @@ public partial class PasswordCard
         NavManager.NavigateTo(url);
     }
 
-    private void FavoritesPasswordClicked()
+    private async void FavoritesPasswordClicked()
     {
-        Password.Favorite = !Password.Favorite.GetValueOrDefault(false);
+        await OnFavoriteChanged.InvokeAsync(Password);
         StateHasChanged();
     }
 }

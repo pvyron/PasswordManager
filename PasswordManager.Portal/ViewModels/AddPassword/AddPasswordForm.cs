@@ -19,6 +19,8 @@ public sealed class AddPasswordForm
     [DataType(DataType.MultilineText)]
     public string? Description { get; set; }
 
+    public bool? Favorite { get; set; } = false;
+
     [Required(ErrorMessage = "Category is mandatory")]
     public AvailableCategory Category { get; set; } = null!;
 

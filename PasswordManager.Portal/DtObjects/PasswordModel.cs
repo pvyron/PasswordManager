@@ -7,6 +7,7 @@ public sealed record NewPassword
     public string? Description { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
+    public required bool IsFavorite { get; set; }
 }
 
 public sealed class PasswordRequestModel
@@ -17,6 +18,7 @@ public sealed class PasswordRequestModel
     public string? Description { get; set; }
     public string Username { get; set; } = null!;
     public string Password { get; set; } = null!;
+    public bool IsFavorite { get; set; } = false;
 }
 
 public sealed class PasswordResponseModel
@@ -27,4 +29,5 @@ public sealed class PasswordResponseModel
     public string? Description { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
+    public required bool IsFavorite { get; set; }
 }

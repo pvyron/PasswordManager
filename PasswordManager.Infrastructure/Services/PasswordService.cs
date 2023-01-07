@@ -31,6 +31,7 @@ internal sealed class PasswordService : IPasswordService
                 Title = passwordDbModel.Title,
                 UserId = passwordDbModel.UserId!.Value,
                 Username = passwordDbModel.Username,
+                IsFavorite = passwordDbModel.IsFavorite,
             };
         }
     }
@@ -51,6 +52,7 @@ internal sealed class PasswordService : IPasswordService
             UserId = passwordResult.UserId!.Value,
             Id = passwordResult.Id,
             Username = passwordResult.Username,
+            IsFavorite = passwordResult.IsFavorite,
         };
     }
 
@@ -63,7 +65,8 @@ internal sealed class PasswordService : IPasswordService
             Password = password.Password,
             Title = password.Title,
             Username = password.Username,
-            UserId = password.UserId
+            UserId = password.UserId,
+            IsFavorite = password.IsFavorite,
         }, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
@@ -77,6 +80,7 @@ internal sealed class PasswordService : IPasswordService
             Title = addPasswordResult.Entity.Title,
             UserId = addPasswordResult.Entity.UserId!.Value,
             Username = addPasswordResult.Entity.Username,
+            IsFavorite = addPasswordResult.Entity.IsFavorite,
         };
     }
 
@@ -89,8 +93,32 @@ internal sealed class PasswordService : IPasswordService
         passwordToUpdate!.Title = password.Title;
         passwordToUpdate!.Username = password.Username;
         passwordToUpdate!.Password = password.Password;
+        passwordToUpdate!.IsFavorite = password.IsFavorite;
+        passwordToUpdate!.EditedAt = DateTimeOffset.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<PasswordModel> FavoritePassword(Guid id, bool isFavorite, CancellationToken cancellationToken)
+    {
+        var passwordToUpdate = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+
+        passwordToUpdate!.IsFavorite = isFavorite;
+        passwordToUpdate!.EditedAt = DateTimeOffset.UtcNow;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new PasswordModel
+        {
+            Id = passwordToUpdate.Id,
+            IsFavorite = passwordToUpdate.IsFavorite,
+            CategoryId = passwordToUpdate.CategoryId,
+            Description = passwordToUpdate.Description,
+            Password = passwordToUpdate.Password,
+            Title = passwordToUpdate.Title,
+            UserId = passwordToUpdate.UserId!.Value,
+            Username = passwordToUpdate.Username,
+        };
     }
 
     public Task DeletePassword(Guid passwordId, CancellationToken cancellationToken)

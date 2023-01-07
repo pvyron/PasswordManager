@@ -112,7 +112,8 @@ public partial class EditPassword
                 Title = EditPasswordForm.Title,
                 Username = EditPasswordForm.Username,
                 Description = EditPasswordForm.Description,
-                Password = EditPasswordForm.Password
+                Password = EditPasswordForm.Password,
+                IsFavorite = EditPasswordForm.Favorite.GetValueOrDefault(false)
             }, CancellationToken.None);
 
             result.IfSucc(async p => await SuccessfullUpdatePassword(p));

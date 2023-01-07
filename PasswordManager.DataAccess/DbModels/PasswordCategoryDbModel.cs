@@ -13,5 +13,7 @@ public class PasswordCategoryDbModel
     public required string Title { get; set; } = null!;
     public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset EditedAt { get; set; } = DateTimeOffset.UtcNow;
     public ICollection<PasswordDbModel>? Passwords { get; set; }
 }

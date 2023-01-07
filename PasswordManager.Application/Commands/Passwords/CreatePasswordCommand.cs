@@ -44,6 +44,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 Title = request.PasswordRequestModel.Title,
                 UserId = userGuid,
                 Username = request.PasswordRequestModel.Username,
+                IsFavorite = request.PasswordRequestModel.IsFavorite,
             };
 
             var createdPassword = await _passwordService.SaveNewPassword(passwordModel, cancellationToken);
@@ -56,6 +57,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 Password = createdPassword.Password,
                 Title = createdPassword.Title,
                 Username = createdPassword.Username,
+                IsFavorite = createdPassword.IsFavorite,
             };
         }
         catch (Exception ex)

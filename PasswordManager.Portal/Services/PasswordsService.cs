@@ -44,6 +44,7 @@ public sealed class PasswordsService
                 Password = passwordResponse.Password,
                 Title = passwordResponse.Title,
                 Username = passwordResponse.Username,
+                Favorite = passwordResponse.IsFavorite
             };
         }
     }
@@ -83,6 +84,7 @@ public sealed class PasswordsService
                 Password = passwordResponse.Password,
                 Title = passwordResponse.Title,
                 Username = passwordResponse.Username,
+                Favorite = passwordResponse.IsFavorite
             };
         }
         catch (Exception ex)
@@ -106,6 +108,7 @@ public sealed class PasswordsService
                     Password = newPassword.Password,
                     Title = newPassword.Title,
                     Username = newPassword.Username,
+                    IsFavorite = newPassword.IsFavorite
                 },
                 typeof(PasswordRequestModel),
                 options: _jsonSerializerOptions)
@@ -146,6 +149,7 @@ public sealed class PasswordsService
                     Password = newPassword.Password,
                     Title = newPassword.Title,
                     Username = newPassword.Username,
+                    IsFavorite = newPassword.IsFavorite,
                 },
                 typeof(PasswordRequestModel),
                 options: _jsonSerializerOptions)
@@ -177,6 +181,54 @@ public sealed class PasswordsService
                 Password = passwordResponse.Password,
                 Title = passwordResponse.Title,
                 Username = passwordResponse.Username,
+                Favorite = passwordResponse.IsFavorite,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Result<PasswordViewModel>(ex);
+        }
+    }
+
+    public async Task<Result<PasswordViewModel>> ChangeFavorability(Guid id, bool isFavorite, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                Content = JsonContent.Create(isFavorite,
+                typeof(bool),
+                options: _jsonSerializerOptions)
+            };
+
+            var response = await _apiClient.SendAuthorized(request, $"/api/Passwords/{id}", cancellationToken);
+
+            var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+                return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
+            }
+
+            var passwordResponse = await JsonSerializer.DeserializeAsync<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+            if (passwordResponse is null)
+            {
+                return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
+            }
+
+            return new PasswordViewModel
+            {
+                Id = passwordResponse.Id,
+                CategoryId = passwordResponse.CategoryId,
+                Description = passwordResponse.Description,
+                Password = passwordResponse.Password,
+                Title = passwordResponse.Title,
+                Username = passwordResponse.Username,
+                Favorite = passwordResponse.IsFavorite,
             };
         }
         catch (Exception ex)

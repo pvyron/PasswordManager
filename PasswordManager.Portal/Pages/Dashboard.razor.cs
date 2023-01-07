@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using LanguageExt;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Services;
@@ -52,5 +53,24 @@ public partial class Dashboard
         var dialog = DialogService.Show<PasswordCredentialsDialog>(passwordViewModel.Title, parameters, options);
 
         await dialog.Result;
+    }
+
+    private async Task OnFavoriteChanged(PasswordViewModel passwordViewModel)
+    {
+        var updatedPasswordResult = await PasswordsService.ChangeFavorability(passwordViewModel.Id.GetValueOrDefault(Guid.NewGuid()), !passwordViewModel.Favorite.GetValueOrDefault(false), CancellationToken.None);
+
+        updatedPasswordResult.IfSucc(
+            pm =>
+            {
+                var outedatedPassword = Passwords.FirstOrDefault(pvm => pvm.Id == pm.Id);
+
+                if (outedatedPassword is null)
+                    return;
+
+                Passwords.Remove(outedatedPassword);
+
+                Passwords.Add(pm);
+            });
+        updatedPasswordResult.IfFail(ex => Console.WriteLine(ex.Message));
     }
 }

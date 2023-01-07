@@ -8,4 +8,5 @@ public sealed record PasswordResponseModel
     public string? Description { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
+    public required bool IsFavorite { get; set; }
 }

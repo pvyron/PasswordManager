@@ -17,5 +17,8 @@ public class PasswordDbModel
     public string? Description { get; set; }
     public required string Username { get; set; } = null!;
     public required string Password { get; set; } = null!;
+    public required bool IsFavorite { get; set; } = false;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset EditedAt { get; set; } = DateTimeOffset.UtcNow;
     public bool IsActive { get; set; } = true;
 }

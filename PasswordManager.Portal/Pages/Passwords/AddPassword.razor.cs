@@ -63,7 +63,8 @@ public partial class AddPassword
                 Title = AddPasswordForm.Title,
                 Username = AddPasswordForm.Username,
                 Description = AddPasswordForm.Description,
-                Password = AddPasswordForm.Password
+                Password = AddPasswordForm.Password,
+                IsFavorite = AddPasswordForm.Favorite.GetValueOrDefault(false)
             }, CancellationToken.None);
 
             result.IfSucc(async _ => await SuccessfullAddPassword());

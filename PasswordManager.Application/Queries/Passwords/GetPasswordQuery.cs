@@ -49,6 +49,7 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
                 Password = password.Password,
                 Title = password.Title,
                 Username = password.Username,
+                IsFavorite = password.IsFavorite,
             };
         }
         catch (Exception ex)
