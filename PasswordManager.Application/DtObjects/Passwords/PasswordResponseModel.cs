@@ -6,7 +6,7 @@ public sealed record PasswordResponseModel
     public Guid? CategoryId { get; set; }
     public required string Title { get; set; }
     public string? Description { get; set; }
-    public required string Username { get; set; }
-    public required string Password { get; set; }
+    public required byte[] Username { get; set; }
+    public required byte[] Password { get; set; }
     public required bool IsFavorite { get; set; }
 }

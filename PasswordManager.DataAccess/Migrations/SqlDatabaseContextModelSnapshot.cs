@@ -78,9 +78,9 @@ namespace PasswordManager.DataAccess.Migrations
                     b.Property<bool>("IsFavorite")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -89,9 +89,9 @@ namespace PasswordManager.DataAccess.Migrations
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Username")
+                    b.Property<byte[]>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 

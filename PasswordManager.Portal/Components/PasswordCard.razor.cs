@@ -13,6 +13,7 @@ public partial class PasswordCard
     [Parameter] public PasswordViewModel Password { get; set; } = null!;
     [Parameter] public EventCallback<PasswordViewModel> OnViewPasswordCredentials { get; set; }
     [Parameter] public EventCallback<PasswordViewModel> OnFavoriteChanged { get; set; }
+    [Parameter] public EventCallback<PasswordViewModel> OnDeletePassword { get; set; }
 
     private string FavoritePasswordMenuText
     {
@@ -62,6 +63,10 @@ public partial class PasswordCard
     private async void FavoritesPasswordClicked()
     {
         await OnFavoriteChanged.InvokeAsync(Password);
-        StateHasChanged();
+    }
+
+    private async void DeletePasswordClicked()
+    {
+        await OnDeletePassword.InvokeAsync(Password);
     }
 }

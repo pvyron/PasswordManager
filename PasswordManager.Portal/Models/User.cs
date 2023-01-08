@@ -7,6 +7,7 @@ public sealed class User
     public string? LastName { get; set; }
     public required bool RemainLoggedIn { get; set; }
     public required string AccessToken { get; set; }
+    public required byte[] DecryptionToken { get; set; }
 
     public string FullName => $"{FirstName} {LastName}".Trim();
 }

@@ -29,9 +29,9 @@ public sealed class CategoriesService
 
             response.EnsureSuccessStatusCode();
 
-            var responseContent = await response.Content.ReadAsStreamAsync();
+            var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-            var responseModel = await JsonSerializer.DeserializeAsync<List<CategoryResponseModel>>(responseContent, _jsonSerializerOptions);
+            var responseModel = await JsonSerializer.DeserializeAsync<List<CategoryResponseModel>>(responseContent, _jsonSerializerOptions, cancellationToken);
 
             if (responseModel is null)
             {

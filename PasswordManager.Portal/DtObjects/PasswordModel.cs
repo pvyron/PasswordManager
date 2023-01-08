@@ -16,8 +16,8 @@ public sealed class PasswordRequestModel
     public Guid? CategoryId { get; set; }
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
-    public string Username { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public byte[] Username { get; set; } = null!;
+    public byte[] Password { get; set; } = null!;
     public bool IsFavorite { get; set; } = false;
 }
 
@@ -27,7 +27,7 @@ public sealed class PasswordResponseModel
     public Guid? CategoryId { get; set; }
     public required string Title { get; set; }
     public string? Description { get; set; }
-    public required string Username { get; set; }
-    public required string Password { get; set; }
+    public required byte[] Username { get; set; }
+    public required byte[] Password { get; set; }
     public required bool IsFavorite { get; set; }
 }

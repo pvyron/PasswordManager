@@ -10,8 +10,8 @@ public sealed record PasswordRequestModel
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
     [Required(AllowEmptyStrings = false, ErrorMessage = "Please provide a username")]
-    public string Username { get; set; } = null!;
+    public byte[] Username { get; set; } = null!;
     [Required(AllowEmptyStrings = false, ErrorMessage = "Please provide a password")]
-    public string Password { get; set; } = null!;
+    public byte[] Password { get; set; } = null!;
     public bool IsFavorite { get; set; } = false;
 }

@@ -67,10 +67,50 @@ public partial class Dashboard
                 if (outedatedPassword is null)
                     return;
 
-                Passwords.Remove(outedatedPassword);
+                Passwords[Passwords.IndexOf(outedatedPassword)] = pm;
 
-                Passwords.Add(pm);
+                StateHasChanged();
             });
+
         updatedPasswordResult.IfFail(ex => Console.WriteLine(ex.Message));
+    }
+
+    private async Task OnDeletePasswordClicked(PasswordViewModel passwordViewModel)
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            CloseOnEscapeKey = true,
+            DisableBackdropClick = false,
+            FullWidth = true,
+            FullScreen = false,
+            NoHeader = false,
+            Position = DialogPosition.Center
+        };
+
+        var parameters = new DialogParameters
+        {
+            {"Password", passwordViewModel }
+        };
+
+        var dialog = DialogService.Show<DeletePasswordDialog>("Warning", parameters, options);
+
+        var dialogResult = await dialog.Result;
+
+        if (dialogResult?.Canceled ?? true)
+        {
+            return;
+        }
+
+        var deletePasswordResult = await PasswordsService.DeletePassword(passwordViewModel.Id.GetValueOrDefault(Guid.NewGuid()), CancellationToken.None);
+
+        deletePasswordResult.IfSucc(async _ =>
+        {
+            await FetchPasswords();
+
+            StateHasChanged();
+        });
+
+        deletePasswordResult.IfFail(ex => Console.WriteLine(ex.Message));
     }
 }

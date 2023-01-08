@@ -16,11 +16,14 @@ namespace PasswordManager.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    EditedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,7 +38,9 @@ namespace PasswordManager.DataAccess.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    EditedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,8 +61,11 @@ namespace PasswordManager.DataAccess.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Username = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Password = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    IsFavorite = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    EditedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -89,6 +97,12 @@ namespace PasswordManager.DataAccess.Migrations
                 name: "IX_Passwords_UserId",
                 table: "Passwords",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />

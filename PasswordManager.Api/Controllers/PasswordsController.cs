@@ -95,10 +95,10 @@ public class PasswordsController : MediatorControllerBase
             });
     }
 
-    [HttpDelete("{categoryId}/{id}")]
-    public async Task<IActionResult> Delete(Guid categoryId, Guid id, CancellationToken cancellationToken)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var response = await Mediator.Send(new DeletePasswordCommand(categoryId, id), cancellationToken);
+        var response = await Mediator.Send(new DeletePasswordCommand(id), cancellationToken);
 
         return response.Match<IActionResult>(
             _ => Ok(),

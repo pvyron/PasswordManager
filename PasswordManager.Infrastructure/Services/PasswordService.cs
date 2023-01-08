@@ -20,7 +20,7 @@ internal sealed class PasswordService : IPasswordService
 
     public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var passwordDbModel in _context.Passwords.Where(p => p.UserId == userId).AsAsyncEnumerable().WithCancellation(cancellationToken))
+        await foreach (var passwordDbModel in _context.Passwords.Where(p => p.UserId == userId && p.IsActive).AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
             yield return new PasswordModel
             {
@@ -38,7 +38,7 @@ internal sealed class PasswordService : IPasswordService
 
     public async Task<PasswordModel> GetPasswordById(Guid passwordId, CancellationToken cancellationToken)
     {
-        var passwordResult = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == passwordId, cancellationToken);
+        var passwordResult = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == passwordId && p.IsActive, cancellationToken);
 
         if (passwordResult is null)
             throw new PasswordAccessException($"Password with id {passwordId} was not found");
@@ -86,7 +86,7 @@ internal sealed class PasswordService : IPasswordService
 
     public async Task UpdatePassword(PasswordModel password, CancellationToken cancellationToken)
     {
-        var passwordToUpdate = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == password.Id, cancellationToken);
+        var passwordToUpdate = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == password.Id && p.IsActive, cancellationToken);
 
         passwordToUpdate!.CategoryId = password.CategoryId!.Value;
         passwordToUpdate!.Description = password.Description;
@@ -121,8 +121,13 @@ internal sealed class PasswordService : IPasswordService
         };
     }
 
-    public Task DeletePassword(Guid passwordId, CancellationToken cancellationToken)
+    public async Task DeletePassword(Guid passwordId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var passwordToDelete = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == passwordId, cancellationToken);
+
+        passwordToDelete!.EditedAt = DateTimeOffset.UtcNow;
+        passwordToDelete!.IsActive = false;
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

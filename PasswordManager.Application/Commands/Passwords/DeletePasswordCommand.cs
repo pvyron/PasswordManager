@@ -7,7 +7,7 @@ using PasswordManager.Domain.Exceptions;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
-public sealed record DeletePasswordCommand(Guid CategoryGuid, Guid PasswordGuid) : IRequest<Result<Unit>>;
+public sealed record DeletePasswordCommand(Guid PasswordGuid) : IRequest<Result<Unit>>;
 
 public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswordCommand, Result<Unit>>
 {
@@ -32,6 +32,13 @@ public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswor
             }
 
             var userGuid = Guid.Parse(userId);
+
+            var passwordToDelete = await _passwordService.GetPasswordById(request.PasswordGuid, cancellationToken);
+
+            if (!passwordToDelete.UserId.Equals(userGuid))
+            {
+                return new Result<Unit>(new AuthenticationException("You are not authorized for this action"));
+            }
 
             await _passwordService.DeletePassword(request.PasswordGuid, cancellationToken);
 

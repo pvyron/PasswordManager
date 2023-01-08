@@ -12,8 +12,8 @@ using PasswordManager.DataAccess;
 namespace PasswordManager.DataAccess.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    [Migration("20230107175830_timestamp_tracking_202301071958")]
-    partial class timestamptracking202301071958
+    [Migration("20230108231453_Initial-Migration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,9 +81,9 @@ namespace PasswordManager.DataAccess.Migrations
                     b.Property<bool>("IsFavorite")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -92,9 +92,9 @@ namespace PasswordManager.DataAccess.Migrations
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Username")
+                    b.Property<byte[]>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 

@@ -2,10 +2,18 @@
 using LanguageExt.Common;
 using LanguageExt.Pipes;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Paddings;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Utilities;
 using PasswordManager.Portal.DtObjects;
+using PasswordManager.Portal.Pages.Passwords;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace PasswordManager.Portal.Services;
@@ -13,11 +21,13 @@ namespace PasswordManager.Portal.Services;
 public sealed class PasswordsService
 {
     private readonly ApiClient _apiClient;
+    private readonly ClientStateData _clientStateData;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-    public PasswordsService(ApiClient apiClient, JsonSerializerOptions jsonSerializerOptions)
+    public PasswordsService(ApiClient apiClient, ClientStateData clientStateData, JsonSerializerOptions jsonSerializerOptions)
     {
         _apiClient = apiClient;
+        _clientStateData = clientStateData;
         _jsonSerializerOptions = jsonSerializerOptions;
     }
 
@@ -41,9 +51,9 @@ public sealed class PasswordsService
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = passwordResponse.Password,
+                Password = DecryptedPasswordData(passwordResponse.Password),
                 Title = passwordResponse.Title,
-                Username = passwordResponse.Username,
+                Username = DecryptedPasswordData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite
             };
         }
@@ -86,9 +96,9 @@ public sealed class PasswordsService
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = passwordResponse.Password,
+                Password = DecryptedPasswordData(passwordResponse.Password),
                 Title = passwordResponse.Title,
-                Username = passwordResponse.Username,
+                Username = DecryptedPasswordData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite
             };
         }
@@ -110,9 +120,9 @@ public sealed class PasswordsService
                 {
                     CategoryId = newPassword.CategoryId,
                     Description = newPassword.Description,
-                    Password = newPassword.Password,
+                    Password = EncryptedPasswordData(newPassword.Password),
                     Title = newPassword.Title,
-                    Username = newPassword.Username,
+                    Username = EncryptedPasswordData(newPassword.Username),
                     IsFavorite = newPassword.IsFavorite
                 },
                 typeof(PasswordRequestModel),
@@ -156,9 +166,9 @@ public sealed class PasswordsService
                     Id = id,
                     CategoryId = newPassword.CategoryId,
                     Description = newPassword.Description,
-                    Password = newPassword.Password,
+                    Password = EncryptedPasswordData(newPassword.Password),
                     Title = newPassword.Title,
-                    Username = newPassword.Username,
+                    Username = EncryptedPasswordData(newPassword.Username),
                     IsFavorite = newPassword.IsFavorite,
                 },
                 typeof(PasswordRequestModel),
@@ -193,9 +203,9 @@ public sealed class PasswordsService
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = passwordResponse.Password,
+                Password = DecryptedPasswordData(passwordResponse.Password),
                 Title = passwordResponse.Title,
-                Username = passwordResponse.Username,
+                Username = DecryptedPasswordData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite,
             };
         }
@@ -245,9 +255,9 @@ public sealed class PasswordsService
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = passwordResponse.Password,
+                Password = DecryptedPasswordData(passwordResponse.Password),
                 Title = passwordResponse.Title,
-                Username = passwordResponse.Username,
+                Username = DecryptedPasswordData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite,
             };
         }
@@ -255,5 +265,73 @@ public sealed class PasswordsService
         {
             return new Result<PasswordViewModel>(ex);
         }
+    }
+
+    public async Task<Result<Unit>> DeletePassword(Guid passwordId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete
+            };
+
+            var response = await _apiClient.SendAuthorized(request, $"/api/Passwords/{passwordId}", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<Unit>(new Exception("InternalServerError"));
+                }
+
+                var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+                return new Result<Unit>(new Exception(errorResponse?.Message));
+            }
+
+            return Unit.Default;
+        }
+        catch (Exception ex)
+        {
+            return new Result<Unit>(ex);
+        }
+    }
+
+    byte[] EncryptedPasswordData(string password)
+    {
+        var input = Encoding.UTF8.GetBytes(password);
+
+        var engine = new AesEngine();
+        var blockCipher = new CbcBlockCipher(engine);
+        var cipher = new PaddedBufferedBlockCipher(blockCipher); // PKCS5/7 padding
+        var keyParam = new KeyParameter(_clientStateData.DecryptionToken);
+
+        // Encrypt
+        cipher.Init(true, keyParam);
+        var encrypted = new byte[cipher.GetOutputSize(input.Length)];
+        var length = cipher.ProcessBytes(input, encrypted, 0);
+        cipher.DoFinal(encrypted, length);
+
+
+        return encrypted;
+    }
+
+    string DecryptedPasswordData(byte[] encryptedPassword)
+    {
+        var engine = new AesEngine();
+        var blockCipher = new CbcBlockCipher(engine);
+        var cipher = new PaddedBufferedBlockCipher(blockCipher); // PKCS5/7 padding
+        var keyParam = new KeyParameter(_clientStateData.DecryptionToken);
+
+        // Decrypt
+        cipher.Init(false, keyParam);
+        var decrypted = new byte[cipher.GetOutputSize(encryptedPassword.Length)];
+        var length = cipher.ProcessBytes(encryptedPassword, decrypted, 0);
+        cipher.DoFinal(decrypted, length);
+
+        return Encoding.UTF8.GetString(decrypted).TrimEnd('\0');
     }
 }

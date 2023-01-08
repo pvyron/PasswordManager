@@ -28,7 +28,7 @@ internal sealed class PasswordCategoryService : IPasswordCategoriesService
 
     public async IAsyncEnumerable<PasswordCategoryModel> GetAllUserCategories(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var category in _context.PasswordCategories.Where(p => p.User!.Id == userId).ToAsyncEnumerable().WithCancellation(cancellationToken))
+        await foreach (var category in _context.PasswordCategories.Where(c => c.UserId == userId && c.IsActive).ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
             yield return new PasswordCategoryModel
             {
@@ -42,7 +42,7 @@ internal sealed class PasswordCategoryService : IPasswordCategoriesService
 
     public async Task<PasswordCategoryModel> GetCategoryById(Guid categoryId, CancellationToken cancellationToken)
     {
-        var category = await _context.PasswordCategories.FirstOrDefaultAsync(c => c.Id == categoryId, cancellationToken);
+        var category = await _context.PasswordCategories.FirstOrDefaultAsync(c => c.Id == categoryId && c.IsActive, cancellationToken);
 
         if (category is null)
         {

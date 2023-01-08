@@ -48,6 +48,8 @@ public sealed class ClientStateData
         }
     }
 
+    public byte[] DecryptionToken => User?.DecryptionToken ?? throw new NullReferenceException();
+
     public ClientStateData(ISyncLocalStorageService localStorage, ISyncSessionStorageService sessionStorage)
     {
         _localStorage = localStorage;

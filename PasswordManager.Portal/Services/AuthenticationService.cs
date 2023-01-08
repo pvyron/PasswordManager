@@ -3,6 +3,8 @@ using LanguageExt.Common;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.Models;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace PasswordManager.Portal.Services;
@@ -95,13 +97,16 @@ public sealed class AuthenticationService
                 return new Result<Unit>(new ResultIsNullException($"Wrong model {nameof(LoginReponseModel)} is null"));
             }
 
+            var decryptionToken = SHA256.HashData(Encoding.UTF8.GetBytes(loginModel.Password));
+
             var user = new User
             {
                 AccessToken = responseModel.AccessToken,
                 Email = responseModel.Email,
                 FirstName = responseModel.FirstName,
                 LastName = responseModel.LastName,
-                RemainLoggedIn = loginModel.RememberMe
+                RemainLoggedIn = loginModel.RememberMe,
+                DecryptionToken = decryptionToken
             };
 
             _clientStateData.LoggedIn(user);
