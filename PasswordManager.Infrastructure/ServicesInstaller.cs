@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
@@ -13,8 +12,10 @@ public static class ServicesInstaller
 {
     public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
-        services.RegisterSqlDatabase(configuration.GetConnectionString("publicdb")!);
-        
+        //services.AddScoped<MDbClient>();
+        //services.RegisterSqlDatabase(configuration.GetConnectionString("MainSqlDatabase")!);
+        services.RegisterSqlDatabase("");
+
         return services;
     }
 

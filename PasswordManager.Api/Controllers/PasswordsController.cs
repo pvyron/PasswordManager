@@ -18,7 +18,7 @@ namespace PasswordManager.Api.Controllers;
 public class PasswordsController : MediatorControllerBase
 {
     [HttpGet]
-    public async IAsyncEnumerable<PasswordResponseModel> Get([EnumeratorCancellation]CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PasswordResponseModel> Get([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var password in Mediator.CreateStream(new GetAllPasswordsQuery(), cancellationToken))
         {
@@ -40,7 +40,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is IAccessException)
+                if (Fail is AccessException<object>)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -63,7 +63,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is IAccessException)
+                if (Fail is AccessException<object>)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -86,7 +86,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is IAccessException)
+                if (Fail is AccessException<object>)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -109,7 +109,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is IAccessException)
+                if (Fail is AccessException<object>)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -118,36 +118,13 @@ public class PasswordsController : MediatorControllerBase
             });
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> Patch(Guid id, [FromBody] bool IsFavorite, CancellationToken cancellationToken)
+    [HttpPatch]
+    [AllowAnonymous]
+    public async Task<IActionResult> Patch(CancellationToken cancellationToken)
     {
-        var response = await Mediator.Send(new AlternateFavorabilityCommand(id, IsFavorite), cancellationToken);
+        await Mediator.Send(new PopulateDbWithRandomDataCommand(), cancellationToken);
 
-        return response.Match<IActionResult>(
-            Ok,
-            Fail =>
-            {
-                if (Fail is AuthenticationException)
-                {
-                    return Unauthorized(new ErrorResponse(Fail.Message));
-                }
 
-                if (Fail is IAccessException)
-                {
-                    return BadRequest(new ErrorResponse(Fail.Message));
-                }
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            });
+        return Ok();
     }
-
-    //[HttpPatch]
-    //[AllowAnonymous]
-    //public async Task<IActionResult> Patch(CancellationToken cancellationToken)
-    //{
-    //    await Mediator.Send(new PopulateDbWithRandomDataCommand(), cancellationToken);
-
-
-    //    return Ok();
-    //}
 }

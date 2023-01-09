@@ -1,14 +1,10 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
-using LanguageExt.Pipes;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Utilities;
 using PasswordManager.Portal.DtObjects;
-using PasswordManager.Portal.Pages.Passwords;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
@@ -328,7 +324,7 @@ public sealed class PasswordsService
 
         var engine = new AesEngine();
         var blockCipher = new CbcBlockCipher(engine);
-        var cipher = new PaddedBufferedBlockCipher(blockCipher); // PKCS5/7 padding
+        var cipher = new PaddedBufferedBlockCipher(blockCipher);
         var keyParam = new KeyParameter(key);
 
         cipher.Init(true, keyParam);
@@ -346,7 +342,7 @@ public sealed class PasswordsService
     {
         var engine = new AesEngine();
         var blockCipher = new CbcBlockCipher(engine);
-        var cipher = new PaddedBufferedBlockCipher(blockCipher); // PKCS5/7 padding
+        var cipher = new PaddedBufferedBlockCipher(blockCipher);
         var keyParam = new KeyParameter(key);
 
         cipher.Init(false, keyParam);

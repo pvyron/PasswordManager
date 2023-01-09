@@ -5,11 +5,6 @@ using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
@@ -48,8 +43,8 @@ public sealed class AlternateFavorabilityCommandHandler : IRequestHandler<Altern
 
             var updatedPassword = await _passwordService.FavoritePassword(request.Id, request.Favorite, cancellationToken);
 
-            return new PasswordResponseModel 
-            { 
+            return new PasswordResponseModel
+            {
                 Username = updatedPassword.Username,
                 CategoryId = updatedPassword.CategoryId,
                 Description = updatedPassword.Description,
