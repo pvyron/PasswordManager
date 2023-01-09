@@ -46,14 +46,15 @@ public sealed class PasswordsService
             if (passwordResponse is null)
                 continue;
 
+            var password = DecryptedPasswordData(passwordResponse.Password);
             yield return new PasswordViewModel
             {
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = DecryptedPasswordData(passwordResponse.Password),
+                Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedPasswordData(passwordResponse.Username),
+                Username = DecryptedUsernameData(passwordResponse.Username, password),
                 Favorite = passwordResponse.IsFavorite
             };
         }
@@ -91,14 +92,15 @@ public sealed class PasswordsService
                 return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
             }
 
+            var password = DecryptedPasswordData(passwordResponse.Password);
             return new PasswordViewModel
             {
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = DecryptedPasswordData(passwordResponse.Password),
+                Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedPasswordData(passwordResponse.Username),
+                Username = DecryptedUsernameData(passwordResponse.Username, password),
                 Favorite = passwordResponse.IsFavorite
             };
         }
@@ -122,7 +124,7 @@ public sealed class PasswordsService
                     Description = newPassword.Description,
                     Password = EncryptedPasswordData(newPassword.Password),
                     Title = newPassword.Title,
-                    Username = EncryptedPasswordData(newPassword.Username),
+                    Username = EncryptedUsernameData(newPassword.Username, newPassword.Password),
                     IsFavorite = newPassword.IsFavorite
                 },
                 typeof(PasswordRequestModel),
@@ -168,7 +170,7 @@ public sealed class PasswordsService
                     Description = newPassword.Description,
                     Password = EncryptedPasswordData(newPassword.Password),
                     Title = newPassword.Title,
-                    Username = EncryptedPasswordData(newPassword.Username),
+                    Username = EncryptedUsernameData(newPassword.Username, newPassword.Password),
                     IsFavorite = newPassword.IsFavorite,
                 },
                 typeof(PasswordRequestModel),
@@ -198,14 +200,15 @@ public sealed class PasswordsService
                 return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
             }
 
+            string password = DecryptedPasswordData(passwordResponse.Password);
             return new PasswordViewModel
             {
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = DecryptedPasswordData(passwordResponse.Password),
+                Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedPasswordData(passwordResponse.Username),
+                Username = DecryptedUsernameData(passwordResponse.Username, password),
                 Favorite = passwordResponse.IsFavorite,
             };
         }
@@ -250,14 +253,15 @@ public sealed class PasswordsService
                 return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
             }
 
+            string password = DecryptedPasswordData(passwordResponse.Password);
             return new PasswordViewModel
             {
                 Id = passwordResponse.Id,
                 CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
-                Password = DecryptedPasswordData(passwordResponse.Password),
+                Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedPasswordData(passwordResponse.Username),
+                Username = DecryptedUsernameData(passwordResponse.Username, password),
                 Favorite = passwordResponse.IsFavorite,
             };
         }
@@ -300,17 +304,36 @@ public sealed class PasswordsService
         }
     }
 
-    byte[] EncryptedPasswordData(string password)
+    byte[] EncryptedPasswordData(string password) => Encrypt(password, _clientStateData.DecryptionToken);
+
+    string DecryptedPasswordData(byte[] encryptedPassword) => Decrypt(encryptedPassword, _clientStateData.DecryptionToken);
+
+    static byte[] EncryptedUsernameData(string username, string password)
     {
-        var input = Encoding.UTF8.GetBytes(password);
+        var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+
+        return Encrypt(username, passwordToken);
+    }
+
+    static string DecryptedUsernameData(byte[] encryptedUsername, string password)
+    {
+        var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+
+        return Decrypt(encryptedUsername, passwordToken);
+    }
+
+    static byte[] Encrypt(string toEncrypt, byte[] key)
+    {
+        var input = Encoding.UTF8.GetBytes(toEncrypt);
 
         var engine = new AesEngine();
         var blockCipher = new CbcBlockCipher(engine);
         var cipher = new PaddedBufferedBlockCipher(blockCipher); // PKCS5/7 padding
-        var keyParam = new KeyParameter(_clientStateData.DecryptionToken);
+        var keyParam = new KeyParameter(key);
+
+        cipher.Init(true, keyParam);
 
         // Encrypt
-        cipher.Init(true, keyParam);
         var encrypted = new byte[cipher.GetOutputSize(input.Length)];
         var length = cipher.ProcessBytes(input, encrypted, 0);
         cipher.DoFinal(encrypted, length);
@@ -319,17 +342,18 @@ public sealed class PasswordsService
         return encrypted;
     }
 
-    string DecryptedPasswordData(byte[] encryptedPassword)
+    static string Decrypt(byte[] toDecrypt, byte[] key)
     {
         var engine = new AesEngine();
         var blockCipher = new CbcBlockCipher(engine);
         var cipher = new PaddedBufferedBlockCipher(blockCipher); // PKCS5/7 padding
-        var keyParam = new KeyParameter(_clientStateData.DecryptionToken);
+        var keyParam = new KeyParameter(key);
+
+        cipher.Init(false, keyParam);
 
         // Decrypt
-        cipher.Init(false, keyParam);
-        var decrypted = new byte[cipher.GetOutputSize(encryptedPassword.Length)];
-        var length = cipher.ProcessBytes(encryptedPassword, decrypted, 0);
+        var decrypted = new byte[cipher.GetOutputSize(toDecrypt.Length)];
+        var length = cipher.ProcessBytes(toDecrypt, decrypted, 0);
         cipher.DoFinal(decrypted, length);
 
         return Encoding.UTF8.GetString(decrypted).TrimEnd('\0');
