@@ -12,9 +12,7 @@ public static class ServicesInstaller
 {
     public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
-        //services.AddScoped<MDbClient>();
-        //services.RegisterSqlDatabase(configuration.GetConnectionString("MainSqlDatabase")!);
-        services.RegisterSqlDatabase("");
+        services.RegisterSqlDatabase(configuration.GetConnectionString("publicdb")!);
 
         return services;
     }

@@ -40,7 +40,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -63,7 +63,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -86,7 +86,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -109,7 +109,7 @@ public class PasswordsController : MediatorControllerBase
                     return Unauthorized(new ErrorResponse(Fail.Message));
                 }
 
-                if (Fail is AccessException<object>)
+                if (Fail is IAccessException)
                 {
                     return BadRequest(new ErrorResponse(Fail.Message));
                 }
@@ -118,13 +118,36 @@ public class PasswordsController : MediatorControllerBase
             });
     }
 
-    [HttpPatch]
-    [AllowAnonymous]
-    public async Task<IActionResult> Patch(CancellationToken cancellationToken)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch(Guid id, [FromBody] bool IsFavorite, CancellationToken cancellationToken)
     {
-        await Mediator.Send(new PopulateDbWithRandomDataCommand(), cancellationToken);
+        var response = await Mediator.Send(new AlternateFavorabilityCommand(id, IsFavorite), cancellationToken);
 
+        return response.Match<IActionResult>(
+            Ok,
+            Fail =>
+            {
+                if (Fail is AuthenticationException)
+                {
+                    return Unauthorized(new ErrorResponse(Fail.Message));
+                }
 
-        return Ok();
+                if (Fail is IAccessException)
+                {
+                    return BadRequest(new ErrorResponse(Fail.Message));
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            });
     }
+
+    //[HttpPatch]
+    //[AllowAnonymous]
+    //public async Task<IActionResult> Patch(CancellationToken cancellationToken)
+    //{
+    //    await Mediator.Send(new PopulateDbWithRandomDataCommand(), cancellationToken);
+
+
+    //    return Ok();
+    //}
 }

@@ -1,3 +1,7 @@
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using LanguageExt;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +13,18 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+
+if (!builder.Environment.IsDevelopment())
+{
+    var keyVaultEndPoint = Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
+
+    if (keyVaultEndPoint is null)
+        throw new ValueIsNullException($"Invalid configuration, missing value for KEYVAULT_ENDPOINT");
+
+    var secretClient = new SecretClient(new(keyVaultEndPoint), new DefaultAzureCredential());
+
+    configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+}
 
 services.AddDataAccess(configuration)
         .InstallServices(configuration)
@@ -50,8 +66,7 @@ services.AddCors(o =>
                       {
                           policy.AllowAnyHeader();
                           policy.AllowAnyMethod();
-                          policy.WithOrigins("https://localhost:7210");
-                          policy.AllowCredentials();
+                          policy.AllowAnyOrigin();
                           policy.Build();
                       });
 });
@@ -68,8 +83,7 @@ app.UseCors(policy =>
 {
     policy.AllowAnyHeader();
     policy.AllowAnyMethod();
-    policy.WithOrigins("https://localhost:7210");
-    policy.AllowCredentials();
+    policy.AllowAnyOrigin();
     policy.Build();
 });
 
