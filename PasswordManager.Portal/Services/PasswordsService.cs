@@ -304,19 +304,19 @@ public sealed class PasswordsService
 
     string DecryptedPasswordData(byte[] encryptedPassword) => Decrypt(encryptedPassword, _clientStateData.DecryptionToken);
 
-    static byte[] EncryptedUsernameData(string username, string password)
-    {
-        var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+    static byte[] EncryptedUsernameData(string username, string password) => Encoding.UTF8.GetBytes(username);
+    //{
+    //    var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
 
-        return Encrypt(username, passwordToken);
-    }
+    //    return Encrypt(username, passwordToken);
+    //}
 
-    static string DecryptedUsernameData(byte[] encryptedUsername, string password)
-    {
-        var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+    static string DecryptedUsernameData(byte[] encryptedUsername, string password) => Encoding.UTF8.GetString(encryptedUsername);
+    //{
+    //    var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
 
-        return Decrypt(encryptedUsername, passwordToken);
-    }
+    //    return Decrypt(encryptedUsername, passwordToken);
+    //}
 
     static byte[] Encrypt(string toEncrypt, byte[] key)
     {
