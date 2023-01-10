@@ -7,6 +7,7 @@ using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using PasswordManager.Portal.ViewModels.EditPassword;
+using PasswordManager.Shared;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 
@@ -24,14 +25,25 @@ public partial class EditPassword
     EditPasswordForm EditPasswordForm { get; set; } = new();
     PasswordViewModel Password { get; set; } = new();
     List<AvailableCategory> AvailableCategories { get; set; } = new();
+    bool SaveButtonDisabled => FormComponentsDisabled || !EditPasswordForm.IsPasswordChanged;
+    bool FormComponentsDisabled => PasswordFetchingInProgress && SavingPasswordInProgress;
     bool SavingPasswordInProgress { get; set; } = false;
+    bool PasswordFetchingInProgress { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
         var passwordFetching = PasswordFetching();
         var categoriesFetching = CategoriesFetching();
 
-        await Task.WhenAll(passwordFetching, categoriesFetching);
+        try
+        {
+            PasswordFetchingInProgress = true;
+            await Task.WhenAll(passwordFetching, categoriesFetching);
+        }
+        finally
+        {
+            PasswordFetchingInProgress = false;
+        }
 
         EditPasswordForm.LoadPassword(Password, AvailableCategories);
 
@@ -90,7 +102,7 @@ public partial class EditPassword
         EditPasswordForm.Category = availableCategory;
     }
 
-    private async Task SavePassword()
+    private async Task SavePasswordButtonClicked()
     {
         if (UiForm is null)
             return;
@@ -124,6 +136,20 @@ public partial class EditPassword
             SavingPasswordInProgress = false;
         }
     }
+    private async Task GenerateRandomPasswordButtonClicked()
+    {
+        var dialog = DialogService.Show<RandomPasswordDialog>();
+
+        var result = await dialog.Result;
+
+        if (result.Canceled)
+            return;
+
+        if (result.Data is string generatedPassword)
+            EditPasswordForm.Password = generatedPassword;
+
+        StateHasChanged();
+    }
 
     async Task SuccessfullUpdatePassword(PasswordViewModel passwordViewModel)
     {
@@ -144,6 +170,8 @@ public partial class EditPassword
         await dialog.Result;
 
         EditPasswordForm.LoadPassword(Password = passwordViewModel, AvailableCategories);
+
+        StateHasChanged();
     }
 
     async Task FailedUpdatePassword(Exception ex)

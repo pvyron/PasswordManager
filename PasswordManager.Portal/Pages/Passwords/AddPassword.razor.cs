@@ -5,6 +5,7 @@ using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
+using PasswordManager.Portal.ViewModels.EditPassword;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 
@@ -19,14 +20,24 @@ public partial class AddPassword
 
     AddPasswordForm AddPasswordForm { get; set; } = new();
     List<AvailableCategory> AvailableCategories { get; set; } = new();
+    bool FormComponentsDisabled => PasswordFetchingInProgress && AddingPasswordInProgress;
     bool AddingPasswordInProgress { get; set; } = false;
+    bool PasswordFetchingInProgress { get; set; } = false;
 
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await CategoriesService.GetAllCategories(CancellationToken.None);
+        try
+        {
+            PasswordFetchingInProgress = true;
+            var result = await CategoriesService.GetAllCategories(CancellationToken.None);
 
-        result.IfSucc(CategoriesFetchingSuccess);
+            result.IfSucc(CategoriesFetchingSuccess);
+        }
+        finally
+        {
+            PasswordFetchingInProgress = false;
+        }
 
         await base.OnInitializedAsync();
     }
@@ -74,6 +85,20 @@ public partial class AddPassword
         {
             AddingPasswordInProgress = false;
         }
+    }
+    private async Task GenerateRandomPasswordButtonClicked()
+    {
+        var dialog = DialogService.Show<RandomPasswordDialog>();
+
+        var result = await dialog.Result;
+
+        if (result.Canceled)
+            return;
+
+        if (result.Data is string generatedPassword)
+            AddPasswordForm.Password = generatedPassword;
+
+        StateHasChanged();
     }
 
     async Task SuccessfullAddPassword()
