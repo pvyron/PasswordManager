@@ -4,8 +4,9 @@
         <MudNavLink Href="@ApplicationRoutes.Dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
 
         <MudNavGroup Title="Tools" @bind-Expanded="@_isToolsExpanded">
-            
-            <MudNavGroup Title="Password" @bind-Expanded="@_isPasswordsExpanded">
+
+            <MudNavGroup Title="Passwords" @bind-Expanded="@_isPasswordsExpanded">
+                <MudNavLink Href="@ApplicationRoutes.ViewPasswords" Match="NavLinkMatch.Prefix">My Passwords</MudNavLink>
                 <MudNavLink Href="@ApplicationRoutes.AddPassword" Match="NavLinkMatch.Prefix">Add Password</MudNavLink>
             </MudNavGroup>
 

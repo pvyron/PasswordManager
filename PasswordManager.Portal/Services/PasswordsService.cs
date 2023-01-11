@@ -6,6 +6,7 @@ using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.ViewModels.Dashboard;
+using PasswordManager.Portal.ViewModels.ViewPasswords;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -53,6 +54,54 @@ public sealed class PasswordsService
                 Username = DecryptedUsernameData(passwordResponse.Username, password),
                 Favorite = passwordResponse.IsFavorite
             };
+        }
+    }
+
+    public async Task<Result<List<PasswordRowViewModel>>> GetPasswordRows(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage { Method = HttpMethod.Get };
+
+            var response = await _apiClient.SendAuthorized(request, "/api/Reporting/GetPublicPasswordData", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new Result<List<PasswordRowViewModel>>(new Exception("InternalServerError"));
+                }
+
+                var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+                return new Result<List<PasswordRowViewModel>>(new Exception(errorResponse?.Message));
+            }
+
+            var passwordResponse = await JsonSerializer.DeserializeAsync<List<PublicPasswordDataResponseModel>>(responseContent, _jsonSerializerOptions, cancellationToken);
+
+            if (passwordResponse is null)
+            {
+                return new Result<List<PasswordRowViewModel>>(new ResultIsNullException($"Wrong model {nameof(PublicPasswordDataResponseModel)} is null"));
+            }
+
+            return passwordResponse
+                .Select(p => new PasswordRowViewModel
+                {
+                    CategoryName = p.CategoryName,
+                    Description = p.Description,
+                    IsFavorite = p.IsFavorite,
+                    PasswordId = p.PasswordId,
+                    PasswordTitle = p.PasswordTitle,
+                    Username = DecryptedUsernameData(p.Username)
+                }).ToList();
+        }
+        catch (Exception ex)
+        {
+            return new Result<List<PasswordRowViewModel>>(ex);
         }
     }
 
@@ -304,14 +353,14 @@ public sealed class PasswordsService
 
     string DecryptedPasswordData(byte[] encryptedPassword) => Decrypt(encryptedPassword, _clientStateData.DecryptionToken);
 
-    static byte[] EncryptedUsernameData(string username, string password) => Encoding.UTF8.GetBytes(username);
+    static byte[] EncryptedUsernameData(string username, string password = "") => Encoding.UTF8.GetBytes(username);
     //{
     //    var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
 
     //    return Encrypt(username, passwordToken);
     //}
 
-    static string DecryptedUsernameData(byte[] encryptedUsername, string password) => Encoding.UTF8.GetString(encryptedUsername);
+    static string DecryptedUsernameData(byte[] encryptedUsername, string password = "") => Encoding.UTF8.GetString(encryptedUsername);
     //{
     //    var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
 

@@ -9,7 +9,7 @@ public partial class RandomPasswordDialog
 {
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     RandomPasswordViewModel RandomPasswordViewModel { get; set; } = new();
-    void PasswordLengthHasChanged(object? sender, int e) => InputsChanged().Wait();
+    void PasswordLengthHasChanged(object? sender, int e) => InputsChanged();
 
     protected override Task OnInitializedAsync()
     {
@@ -60,14 +60,14 @@ public partial class RandomPasswordDialog
         StateHasChanged();
     }
 
-    async Task ChipsChanged(MudChip[] selectedChips)
+    void ChipsChanged(MudChip[] selectedChips)
     {
         RandomPasswordViewModel.IncludedCharacterSets = selectedChips.Select(c => (PasswordGenerationCharacters)c.Value).ToHashSet();
 
-        await InputsChanged();
+        InputsChanged();
     }
 
-    async Task InputsChanged()
+    void InputsChanged()
     {
         RefreshPassword();
     }
