@@ -96,7 +96,7 @@ public sealed class PasswordsService
                     IsFavorite = p.IsFavorite,
                     PasswordId = p.PasswordId,
                     PasswordTitle = p.PasswordTitle,
-                    Username = DecryptedUsernameData(p.Username)
+                    Username = DecryptedUsernameData(p.Username!)
                 }).ToList();
         }
         catch (Exception ex)
