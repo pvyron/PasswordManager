@@ -5,13 +5,16 @@ using Microsoft.AspNetCore.Components;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.ViewPasswords;
 using System.Runtime.CompilerServices;
+using PasswordManager.Portal.Components;
+using PasswordManager.Portal.Constants;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 
 public partial class ViewPasswords
 {
     [Inject] PasswordsService PasswordsService { get; set; } = default!;
-    MudDataGrid<PasswordRowViewModel>? DataGrid { get; set; }
+    [Inject] IDialogService DialogService { get; set; } = default!;
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
 
     List<PasswordRowViewModel> _passwords = new();
     bool _isLoading = false;
@@ -33,6 +36,14 @@ public partial class ViewPasswords
         }
     }
 
+    async Task OnViewPasswordClicked(Guid passwordId)
+    {
+        var passwordResponse = await PasswordsService.GetPasswordById(passwordId.ToString(), CancellationToken.None);
+
+        passwordResponse.IfSucc(async succ => await SuccessfullPasswordFetching(succ));
+        passwordResponse.IfFail(async ex => await FailedFetching(ex));
+    }
+
     bool SearchFilter(PasswordRowViewModel passwordRow)
     {
         if (string.IsNullOrWhiteSpace(SearchText))
@@ -50,8 +61,52 @@ public partial class ViewPasswords
         return false;
     }
 
-    void OnSearch()
+    static void OnSearch()
     {
-        DataGrid?.ExpandAllGroups();
+        
+    }
+
+    async Task SuccessfullPasswordFetching(PasswordViewModel password)
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = false,
+            CloseOnEscapeKey = true,
+            DisableBackdropClick = false,
+            FullWidth = true,
+            FullScreen = false,
+            NoHeader = false,
+            Position = DialogPosition.Center
+        };
+
+        var parameters = new DialogParameters
+        {
+            {"Password", password }
+        };
+
+        var dialog = DialogService.Show<PasswordCredentialsDialog>(password.Title, parameters, options);
+
+        await dialog.Result;
+    }
+
+    async Task FailedFetching(Exception ex)
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            Position = DialogPosition.Center,
+            MaxWidth = MaxWidth.Medium
+        };
+
+        var parameters = new DialogParameters
+        {
+            { "Message", $"{ex.Message}" }
+        };
+
+        var dialog = DialogService.Show<NotifyDialog>("Failed", parameters, options);
+
+        await dialog.Result;
+
+        NavigationManager.NavigateTo(ApplicationRoutes.ViewPasswords);
     }
 }
