@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
-using PasswordManager.DataAccess;
+using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
 using PasswordManager.Infrastructure.ServiceSettings;

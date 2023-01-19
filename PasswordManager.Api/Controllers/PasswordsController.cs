@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Application.Commands;
 using PasswordManager.Application.Commands.Passwords;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Passwords;

@@ -3,14 +3,14 @@
 public sealed class RandomPasswordViewModel
 {
     private int _passwordLength = 12;
-    public int PasswordLength 
-    { 
+    public int PasswordLength
+    {
         get => _passwordLength;
         set
         {
             _passwordLength = value;
             PasswordLengthHasChanged?.Invoke(this, _passwordLength);
-        } 
+        }
     }
     public string? PasswordText { get; set; }
     public HashSet<PasswordGenerationCharacters> IncludedCharacterSets { get; set; } = new()

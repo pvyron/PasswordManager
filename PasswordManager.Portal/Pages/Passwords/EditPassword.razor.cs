@@ -7,7 +7,6 @@ using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using PasswordManager.Portal.ViewModels.EditPassword;
-using PasswordManager.Shared;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 

@@ -4,8 +4,6 @@ using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.Queries.Authorization;
 using PasswordManager.Domain.Exceptions;
-using PasswordManager.Domain.Models;
-using PasswordManager.Shared;
 using System.Net.Mime;
 
 namespace PasswordManager.Api.Controllers;

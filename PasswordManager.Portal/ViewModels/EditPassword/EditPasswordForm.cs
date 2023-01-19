@@ -1,5 +1,4 @@
-﻿using PasswordManager.Portal.Pages.Passwords;
-using PasswordManager.Portal.ViewModels.AddPassword;
+﻿using PasswordManager.Portal.ViewModels.AddPassword;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using System.ComponentModel.DataAnnotations;
 

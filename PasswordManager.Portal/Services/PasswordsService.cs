@@ -9,7 +9,6 @@ using PasswordManager.Portal.ViewModels.Dashboard;
 using PasswordManager.Portal.ViewModels.ViewPasswords;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 

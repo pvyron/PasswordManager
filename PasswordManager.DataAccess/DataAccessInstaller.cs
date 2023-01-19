@@ -1,19 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PasswordManager.DataAccess.DbModels;
+using PasswordManager.DataAccess.Implementations;
+using PasswordManager.DataAccess.Interfaces;
 
 namespace PasswordManager.DataAccess;
 
-public interface ISqlDbContext
-{
-    DbSet<UserDbModel> Users { get; set; }
-    DbSet<PasswordDbModel> Passwords { get; set; }
-    DbSet<PasswordCategoryDbModel> PasswordCategories { get; set; }
-    int SaveChanges();
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
-}
-
-public static class IServiceCollectionEx
+public static class DataAccessInstaller
 {
     public static IServiceCollection RegisterSqlDatabase(this IServiceCollection services, string connectionString)
     {
@@ -24,6 +16,13 @@ public static class IServiceCollectionEx
                 options.EnableRetryOnFailure(5);
             });
         });
+
+        return services;
+    }
+
+    public static IServiceCollection RegisterBulkStorage(this IServiceCollection services, string connectionString)
+    {
+        services.AddSingleton<IBulkStorageService>(new BulkStorageService(connectionString));
 
         return services;
     }

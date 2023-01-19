@@ -5,7 +5,6 @@ using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.DtObjects;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
-using PasswordManager.Portal.ViewModels.EditPassword;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 

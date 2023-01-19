@@ -1,8 +1,8 @@
 ﻿using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.IServices;
-using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.DbModels;
+using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
 using System.Runtime.CompilerServices;

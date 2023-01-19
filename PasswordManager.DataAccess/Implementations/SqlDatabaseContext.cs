@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.DataAccess.DbModels;
+using PasswordManager.DataAccess.Interfaces;
 
-namespace PasswordManager.DataAccess;
+namespace PasswordManager.DataAccess.Implementations;
 
 internal class SqlDatabaseContext : DbContext, ISqlDbContext
 {

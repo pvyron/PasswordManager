@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.Application.IServices;
-using PasswordManager.DataAccess;
 using PasswordManager.Infrastructure.Services;
 using PasswordManager.Infrastructure.ServiceSettings;
 using PasswordManager.Shared;
@@ -13,6 +12,7 @@ public static class ServicesInstaller
     public static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
         services.RegisterSqlDatabase(configuration.GetConnectionString("publicdb")!);
+        services.RegisterBulkStorage(configuration.GetConnectionString("bulkstorage")!);
 
         return services;
     }

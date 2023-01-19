@@ -1,12 +1,10 @@
-﻿using MudBlazor;
-using System.Net.Http.Json;
-using PasswordManager.Portal.ViewModels.Dashboard;
-using Microsoft.AspNetCore.Components;
-using PasswordManager.Portal.Services;
-using PasswordManager.Portal.ViewModels.ViewPasswords;
-using System.Runtime.CompilerServices;
+﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Constants;
+using PasswordManager.Portal.Services;
+using PasswordManager.Portal.ViewModels.Dashboard;
+using PasswordManager.Portal.ViewModels.ViewPasswords;
 
 namespace PasswordManager.Portal.Pages.Passwords;
 
@@ -49,7 +47,7 @@ public partial class ViewPasswords
         if (string.IsNullOrWhiteSpace(SearchText))
             return true;
 
-        if (passwordRow.PasswordTitle?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) 
+        if (passwordRow.PasswordTitle?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false)
             return true;
 
         if (passwordRow.Description?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false)
@@ -63,7 +61,7 @@ public partial class ViewPasswords
 
     static void OnSearch()
     {
-        
+
     }
 
     async Task SuccessfullPasswordFetching(PasswordViewModel password)

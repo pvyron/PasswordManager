@@ -57,7 +57,7 @@ public static class RandomPasswordGenerator
         var availableCharacters = availableCharactersEnum.ToArray();
 
         var builder = new StringBuilder();
-        
+
         for (int i = 0; i < length; i++)
         {
             var characterIndex = Random.Shared.Next(availableCharactersLength);

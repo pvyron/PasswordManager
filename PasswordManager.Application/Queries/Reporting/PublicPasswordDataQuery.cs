@@ -5,11 +5,6 @@ using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Reporting;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Queries.Reporting;
 
