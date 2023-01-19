@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.Application.IServices;
+using PasswordManager.DataAccess;
+using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.Infrastructure.Services;
 using PasswordManager.Infrastructure.ServiceSettings;
 using PasswordManager.Shared;
@@ -23,6 +25,7 @@ public static class ServicesInstaller
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IPasswordCategoriesService, PasswordCategoryService>();
 
+        services.AddScopedWithSettings<IImagesService, ImagesService, ImagesServiceSettings>(configuration);
         services.AddScopedWithSettings<IAuthorizationService, AuthorizationService, AuthorizationServiceSettings>(configuration);
 
         return services;

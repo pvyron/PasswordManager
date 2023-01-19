@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using PasswordManager.DataAccess.Interfaces;
+using System.IO;
 using System.IO.Compression;
 
 namespace PasswordManager.DataAccess.Implementations;
@@ -19,7 +20,8 @@ internal sealed class BulkStorageService : IBulkStorageService
 
         var container = _blobServiceClient.GetBlobContainerClient(containerName);
 
-        await container.UploadBlobAsync(fileName.ToString(), Compress(stream), cancellationToken);
+        using var gZipStream = new GZipStream(stream, CompressionMode.Compress);
+        await container.UploadBlobAsync(fileName.ToString(), gZipStream, cancellationToken);
 
         return fileName;
     }
@@ -31,20 +33,7 @@ internal sealed class BulkStorageService : IBulkStorageService
         var client = container.GetBlobClient(fileName.ToString());
 
         var result = await client.DownloadStreamingAsync(cancellationToken: cancellationToken);
-
-        return Decompress(result.Value.Content);
-    }
-
-    Stream Compress(Stream stream)
-    {
-        using var gZipStream = new GZipStream(stream, CompressionMode.Compress);
-
-        return gZipStream;
-    }
-
-    Stream Decompress(Stream stream)
-    {
-        using var gZipStream = new GZipStream(stream, CompressionMode.Decompress);
+        using var gZipStream = new GZipStream(result.Value.Content, CompressionMode.Decompress);
 
         return gZipStream;
     }

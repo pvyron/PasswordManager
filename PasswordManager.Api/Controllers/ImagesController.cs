@@ -10,6 +10,7 @@ namespace PasswordManager.Api.Controllers;
 public class ImagesController : MediatorControllerBase
 {
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> UploadPasswordLogo(IFormFile formFile, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new UploadPasswordLogoCommand(formFile), cancellationToken);

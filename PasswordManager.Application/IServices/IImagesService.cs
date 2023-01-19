@@ -2,6 +2,6 @@
 
 public interface IImagesService
 {
-    Task<Guid> UploadImage(Stream stream);
-    Task<Stream> DownloadImage();
+    Task<Guid> UploadImage(Stream stream, CancellationToken cancellationToken);
+    Task<Stream> DownloadImage(Guid imageId, CancellationToken cancellationToken);
 }
