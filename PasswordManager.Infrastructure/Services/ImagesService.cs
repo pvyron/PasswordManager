@@ -26,7 +26,7 @@ internal sealed class ImagesService : IImagesService
         _sqlDbContext = sqlDbContext;
     }
 
-    public async Task<Stream> DownloadImage(Guid imageId, CancellationToken cancellationToken)
+    public async Task<byte[]> DownloadImage(Guid imageId, CancellationToken cancellationToken)
     {
         return await _bulkStorageService.DownloadFile(_settings.PasswordLogoContainerName, imageId, cancellationToken);
     }

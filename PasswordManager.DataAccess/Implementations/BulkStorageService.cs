@@ -19,22 +19,22 @@ internal sealed class BulkStorageService : IBulkStorageService
         var fileName = Guid.NewGuid();
 
         var container = _blobServiceClient.GetBlobContainerClient(containerName);
-
-        using var gZipStream = new GZipStream(stream, CompressionMode.Compress);
-        await container.UploadBlobAsync(fileName.ToString(), gZipStream, cancellationToken);
+        
+        await container.UploadBlobAsync(fileName.ToString(), stream, cancellationToken);
 
         return fileName;
     }
 
-    public async Task<Stream> DownloadFile(string containerName, Guid fileName, CancellationToken cancellationToken)
+    public async Task<byte[]> DownloadFile(string containerName, Guid fileName, CancellationToken cancellationToken)
     {
         var container = _blobServiceClient.GetBlobContainerClient(containerName);
 
         var client = container.GetBlobClient(fileName.ToString());
 
-        var result = await client.DownloadStreamingAsync(cancellationToken: cancellationToken);
-        using var gZipStream = new GZipStream(result.Value.Content, CompressionMode.Decompress);
+        using var compressedStream = new MemoryStream();
 
-        return gZipStream;
+        await client.DownloadToAsync(compressedStream, cancellationToken);
+
+        return compressedStream.ToArray();
     }
 }

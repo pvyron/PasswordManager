@@ -24,6 +24,8 @@ public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPas
 
             await request.File.CopyToAsync(memoryStream, cancellationToken);
 
+            memoryStream.Position = 0;
+
             var fileId = await _imagesService.UploadImage(memoryStream, cancellationToken);
 
             return fileId;
