@@ -30,6 +30,8 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
             throw new AuthenticationException("You are not authorized for this action");
         }
 
+
+
         await foreach (var password in _passwordService.GetAllUserPasswords(Guid.Parse(userId), cancellationToken))
         {
 

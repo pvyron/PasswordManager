@@ -16,12 +16,14 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasswordService _passwordService;
     private readonly IPasswordCategoriesService _passwordCategoriesService;
+    private readonly IImagesService _imagesService;
 
-    public UpdatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService, IPasswordCategoriesService passwordCategoriesService)
+    public UpdatePasswordCommandHandler(IHttpContextAccessor httpContextAccessor, IPasswordService passwordService, IPasswordCategoriesService passwordCategoriesService, IImagesService imagesService)
     {
         _httpContextAccessor = httpContextAccessor;
         _passwordService = passwordService;
         _passwordCategoriesService = passwordCategoriesService;
+        _imagesService = imagesService;
     }
 
     public async Task<Result<PasswordResponseModel>> Handle(UpdatePasswordCommand request, CancellationToken cancellationToken)
@@ -71,8 +73,10 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 CategoryId = request.PasswordRequestModel.CategoryId,
                 Description = request.PasswordRequestModel.Description,
                 IsFavorite = request.PasswordRequestModel.IsFavorite,
+                ImageId = request.PasswordRequestModel.ImageId,
             };
 
+            var imageInBase64 = await _imagesService.DownloadImageInBase64(request.PasswordRequestModel.ImageId.GetValueOrDefault(Guid.Empty), cancellationToken);
             await _passwordService.UpdatePassword(passwordModel, cancellationToken);
 
             return new PasswordResponseModel
@@ -84,6 +88,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 CategoryId = passwordModel.CategoryId,
                 Description = passwordModel.Description,
                 IsFavorite = passwordModel.IsFavorite,
+                ImageId = passwordModel.ImageId,
             };
         }
         catch (Exception ex)

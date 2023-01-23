@@ -5,6 +5,7 @@ using PasswordManager.DataAccess;
 using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.Infrastructure.Services;
 using PasswordManager.Infrastructure.ServiceSettings;
+using PasswordManager.Infrastructure.ToolServices;
 using PasswordManager.Shared;
 
 namespace PasswordManager.Infrastructure;
@@ -21,6 +22,8 @@ public static class ServicesInstaller
 
     public static IServiceCollection InstallServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<ImageManipulationService>();
+
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IPasswordCategoriesService, PasswordCategoryService>();

@@ -11,12 +11,15 @@ public class PasswordDbModel
     public Guid? CategoryId { get; set; }
     [ForeignKey(nameof(User))]
     public Guid? UserId { get; set; }
+    [ForeignKey(nameof(Image))]
+    public Guid? ImageId { get; set; }
     public virtual UserDbModel? User { get; set; }
     public virtual PasswordCategoryDbModel? Category { get; set; }
-    public required string Title { get; set; } = null!;
+    public virtual PasswordLogoDbModel? Image { get; set; }
+    public required string Title { get; set; }
     public string? Description { get; set; }
-    public required byte[] Username { get; set; } = null!;
-    public required byte[] Password { get; set; } = null!;
+    public required byte[] Username { get; set; }
+    public required byte[] Password { get; set; }
     public required bool IsFavorite { get; set; } = false;
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset EditedAt { get; set; } = DateTimeOffset.UtcNow;

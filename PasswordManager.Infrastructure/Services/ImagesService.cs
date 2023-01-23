@@ -1,9 +1,24 @@
 ﻿using Microsoft.Extensions.Options;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess.Interfaces;
+using PasswordManager.Domain.Exceptions;
+using PasswordManager.Domain.Models;
 using PasswordManager.Infrastructure.ServiceSettings;
+using PasswordManager.Infrastructure.ToolServices;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Pbm;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Tga;
+using SixLabors.ImageSharp.Formats.Tiff;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime;
 using System.Text;
@@ -13,17 +28,35 @@ namespace PasswordManager.Infrastructure.Services;
 
 internal sealed class ImagesService : IImagesService
 {
+    private readonly ImageManipulationService _imageManipulationService;
     private readonly IBulkStorageService _bulkStorageService;
     private readonly ISqlDbContext _sqlDbContext;
     private readonly ImagesServiceSettings _settings;
 
-    public ImagesService(IOptions<ImagesServiceSettings> options, IBulkStorageService bulkStorageService, ISqlDbContext sqlDbContext)
+    public ImagesService(IOptions<ImagesServiceSettings> options, ImageManipulationService imageManipulationService, IBulkStorageService bulkStorageService, ISqlDbContext sqlDbContext)
     {
         _settings = options.Value;
         _settings.Validate();
 
+        _imageManipulationService = imageManipulationService;
         _bulkStorageService = bulkStorageService;
         _sqlDbContext = sqlDbContext;
+    }
+
+    public async Task<string> DownloadImageInBase64(Guid imageId, CancellationToken cancellationToken)
+    {
+        var stream = await _bulkStorageService.DownloadFileAsStream(_settings.PasswordLogoContainerName, imageId, cancellationToken);
+
+        try
+        {
+            using var img = await Image.LoadAsync(stream, _imageManipulationService.ImageDecoder, cancellationToken);
+            
+            return img.ToBase64String(_imageManipulationService.ImageFormat);
+        }
+        finally
+        {
+            await stream.DisposeAsync();
+        }
     }
 
     public async Task<byte[]> DownloadImage(Guid imageId, CancellationToken cancellationToken)
@@ -31,8 +64,46 @@ internal sealed class ImagesService : IImagesService
         return await _bulkStorageService.DownloadFile(_settings.PasswordLogoContainerName, imageId, cancellationToken);
     }
 
-    public async Task<Guid> UploadImage(Stream stream, CancellationToken cancellationToken)
+    public async Task<PasswordLogoModel> UploadImage(Stream stream, string imageName, string fileExtension, CancellationToken cancellationToken)
     {
-        return await _bulkStorageService.UploadNewFile(_settings.PasswordLogoContainerName, stream, cancellationToken);
+        var decoder = _imageManipulationService.GetImageDecoder(fileExtension);
+
+        stream.Position = 0;
+
+        using var img = await Image.LoadAsync(stream, decoder, cancellationToken);
+
+        img.Size().Deconstruct(out int originalWidth, out int originalHeight);
+        var ratio = decimal.Divide(originalWidth, originalHeight);
+
+        img.Mutate(i => i.Resize((int)Math.Round(150 * ratio, 0, MidpointRounding.AwayFromZero), 150));
+
+        using var jpegStream = new MemoryStream();
+        await img.SaveAsync(jpegStream, _imageManipulationService.ImageEncoder, cancellationToken);
+
+        var uploadedImage = await _bulkStorageService.UploadNewFile(_settings.PasswordLogoContainerName, jpegStream, cancellationToken);
+
+        img.Mutate(i => i.Resize((int)Math.Round(25 * ratio, 0, MidpointRounding.AwayFromZero), 25));
+        await img.SaveAsync(jpegStream, _imageManipulationService.ImageEncoder, cancellationToken);
+
+        var uploadedThumbnail = await _bulkStorageService.UploadNewFile(_settings.PasswordLogoContainerName, jpegStream, cancellationToken);
+
+        await _sqlDbContext.PasswordLogos.AddAsync(new DataAccess.DbModels.PasswordLogoDbModel
+        {
+            BulkStorageImageName = uploadedImage.FileName,
+            BulkStorageThumbnailName= uploadedThumbnail.FileName,
+            ImageUrl = uploadedImage.PublicUrl,
+            ThumbnailUrl= uploadedThumbnail.PublicUrl,
+            Title = imageName
+        }, cancellationToken);
+
+        await _sqlDbContext.SaveChangesAsync(cancellationToken);
+
+        return new PasswordLogoModel
+        {
+            FileUrl = uploadedImage.PublicUrl,
+            FileExtension = "jpg",
+            ThuumbnailUrl = uploadedThumbnail.PublicUrl,
+            ThuumbnailExtension = "jpg"
+        };
     }
 }

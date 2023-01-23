@@ -2,12 +2,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.IServices;
+using PasswordManager.Shared.ResponseModels;
 
 namespace PasswordManager.Application.Commands.Images;
 
-public sealed record UploadPasswordLogoCommand(IFormFile File) : IRequest<Result<Guid>>;
+public sealed record UploadPasswordLogoCommand(IFormFile File, string ImageTitle) : IRequest<Result<ImageLogoResponseModel>>;
 
-public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPasswordLogoCommand, Result<Guid>>
+public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPasswordLogoCommand, Result<ImageLogoResponseModel>>
 {
     private readonly IImagesService _imagesService;
 
@@ -16,23 +17,27 @@ public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPas
         _imagesService = imagesService;
     }
 
-    public async Task<Result<Guid>> Handle(UploadPasswordLogoCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ImageLogoResponseModel>> Handle(UploadPasswordLogoCommand request, CancellationToken cancellationToken)
     {
         try
         {
+            var extension = Path.GetExtension(request.File.FileName);
+
             using var memoryStream = new MemoryStream();
 
             await request.File.CopyToAsync(memoryStream, cancellationToken);
 
-            memoryStream.Position = 0;
+            var uploadedImage = await _imagesService.UploadImage(memoryStream, request.ImageTitle, extension, cancellationToken);
 
-            var fileId = await _imagesService.UploadImage(memoryStream, cancellationToken);
-
-            return fileId;
+            return new ImageLogoResponseModel
+            {
+                PublicUrl = uploadedImage.FileUrl,
+                ThumbnailUrl = uploadedImage.ThuumbnailUrl
+            };
         }
         catch (Exception ex)
         {
-            return new Result<Guid>(ex);
+            return new Result<ImageLogoResponseModel>(ex);
         }
     }
 }

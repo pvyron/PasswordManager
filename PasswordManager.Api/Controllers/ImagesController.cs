@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Images;
 using PasswordManager.Application.Queries.Images;
+using System.Net.Mime;
 
 namespace PasswordManager.Api.Controllers;
 
@@ -11,13 +12,18 @@ namespace PasswordManager.Api.Controllers;
 public class ImagesController : MediatorControllerBase
 {
     [HttpPost]
-    [AllowAnonymous]
-    public async Task<IActionResult> UploadPasswordLogo(IFormFile formFile, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadPasswordLogo([FromHeader] string imageTitle, IFormFile formFile, CancellationToken cancellationToken)
     {
-        var result = await Mediator.Send(new UploadPasswordLogoCommand(formFile), cancellationToken);
+        var result = await Mediator.Send(new UploadPasswordLogoCommand(formFile, imageTitle), cancellationToken);
 
         return result.Match<IActionResult>(
-            Succ => Ok(Succ),
+            Succ =>
+            {
+                if (string.IsNullOrWhiteSpace(Succ.PublicUrl))
+                    return CreatedAtAction(nameof(UploadPasswordLogo), Succ);
+
+                return Created(Succ.PublicUrl ?? "", Succ);
+            },
             Fail => StatusCode(500));
     }
 
@@ -28,7 +34,7 @@ public class ImagesController : MediatorControllerBase
         var result = await Mediator.Send(new GetPasswordLogoQuery(guid), cancellationToken);
 
         return result.Match<IActionResult>(
-            Succ => File(Succ, System.Net.Mime.MediaTypeNames.Image.Jpeg),
+            Succ => File(Succ, MediaTypeNames.Image.Jpeg),
             Fail => StatusCode(500));
     }
 }

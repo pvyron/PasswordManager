@@ -20,7 +20,7 @@ internal sealed class PasswordService : IPasswordService
 
     public async IAsyncEnumerable<PasswordModel> GetAllUserPasswords(Guid userId, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var passwordDbModel in _context.Passwords.Where(p => p.UserId == userId && p.IsActive).AsAsyncEnumerable().WithCancellation(cancellationToken))
+        await foreach (var passwordDbModel in _context.Passwords.Include(p => p.Image).Where(p => p.UserId == userId && p.IsActive).AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
             yield return new PasswordModel
             {
@@ -32,13 +32,14 @@ internal sealed class PasswordService : IPasswordService
                 UserId = passwordDbModel.UserId!.Value,
                 Username = passwordDbModel.Username,
                 IsFavorite = passwordDbModel.IsFavorite,
+                ImageId = passwordDbModel.ImageId,
             };
         }
     }
 
     public async Task<PasswordModel> GetPasswordById(Guid passwordId, CancellationToken cancellationToken)
     {
-        var passwordResult = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == passwordId && p.IsActive, cancellationToken);
+        var passwordResult = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == passwordId && p.IsActive, cancellationToken);
 
         if (passwordResult is null)
             throw new PasswordAccessException($"Password with id {passwordId} was not found");
@@ -53,6 +54,7 @@ internal sealed class PasswordService : IPasswordService
             Id = passwordResult.Id,
             Username = passwordResult.Username,
             IsFavorite = passwordResult.IsFavorite,
+            ImageId = passwordResult.ImageId,
         };
     }
 
@@ -67,6 +69,7 @@ internal sealed class PasswordService : IPasswordService
             Username = password.Username,
             UserId = password.UserId,
             IsFavorite = password.IsFavorite,
+            ImageId = password.ImageId,
         }, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
@@ -81,6 +84,7 @@ internal sealed class PasswordService : IPasswordService
             UserId = addPasswordResult.Entity.UserId!.Value,
             Username = addPasswordResult.Entity.Username,
             IsFavorite = addPasswordResult.Entity.IsFavorite,
+            ImageId = addPasswordResult.Entity.ImageId,
         };
     }
 
@@ -94,6 +98,7 @@ internal sealed class PasswordService : IPasswordService
         passwordToUpdate!.Username = password.Username;
         passwordToUpdate!.Password = password.Password;
         passwordToUpdate!.IsFavorite = password.IsFavorite;
+        passwordToUpdate!.ImageId = password.ImageId;
         passwordToUpdate!.EditedAt = DateTimeOffset.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
@@ -101,7 +106,7 @@ internal sealed class PasswordService : IPasswordService
 
     public async Task<PasswordModel> FavoritePassword(Guid id, bool isFavorite, CancellationToken cancellationToken)
     {
-        var passwordToUpdate = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        var passwordToUpdate = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
         passwordToUpdate!.IsFavorite = isFavorite;
         passwordToUpdate!.EditedAt = DateTimeOffset.UtcNow;
@@ -118,6 +123,7 @@ internal sealed class PasswordService : IPasswordService
             Title = passwordToUpdate.Title,
             UserId = passwordToUpdate.UserId!.Value,
             Username = passwordToUpdate.Username,
+            ImageId= passwordToUpdate.ImageId,
         };
     }
 

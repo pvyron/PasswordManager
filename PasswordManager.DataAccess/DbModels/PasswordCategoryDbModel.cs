@@ -10,7 +10,7 @@ public class PasswordCategoryDbModel
     [ForeignKey(nameof(User))]
     public Guid? UserId { get; set; }
     public virtual UserDbModel? User { get; set; }
-    public required string Title { get; set; } = null!;
+    public required string Title { get; set; }
     public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
