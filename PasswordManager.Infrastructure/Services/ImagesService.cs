@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess.DbModels;
 using PasswordManager.DataAccess.Interfaces;
