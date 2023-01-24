@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Images;
 using PasswordManager.Application.Queries.Images;
+using PasswordManager.Shared.ResponseModels;
 using System.Net.Mime;
+using System.Runtime.CompilerServices;
 
 namespace PasswordManager.Api.Controllers;
 
@@ -25,6 +27,15 @@ public class ImagesController : MediatorControllerBase
                 return Created(Succ.PublicUrl ?? "", Succ);
             },
             Fail => StatusCode(500));
+    }
+
+    [HttpGet]
+    public async IAsyncEnumerable<ImageLogoResponseModel> GetPasswordLogos([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await foreach (var responseModel in Mediator.CreateStream(new GetPasswordLogosQuery(), cancellationToken))
+        {
+            yield return responseModel;
+        }
     }
 
     [HttpGet("{guid}")]
