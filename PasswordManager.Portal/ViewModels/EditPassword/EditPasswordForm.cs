@@ -26,7 +26,7 @@ public sealed class EditPasswordForm
     [Required(ErrorMessage = "Category is mandatory")]
     public AvailableCategory Category { get; set; } = null!;
 
-    private PasswordViewModel? _password;
+    private PasswordCardViewModel? _password;
     public bool IsPasswordChanged
     {
         get
@@ -41,7 +41,7 @@ public sealed class EditPasswordForm
 
     public bool IsValid { get; set; }
 
-    public void LoadPassword(PasswordViewModel password, List<AvailableCategory> availableCategories)
+    public void LoadPassword(PasswordCardViewModel password, List<AvailableCategory> availableCategories)
     {
         _password = password;
 
@@ -49,6 +49,6 @@ public sealed class EditPasswordForm
         Username = password.Username!;
         Password = password.Password!;
         Description = password.Description;
-        Category = availableCategories.First(c => c.Id == password.CategoryId);
+        Category = availableCategories.First();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using PasswordManager.Portal.Components;
+using PasswordManager.Portal.Models;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.Dashboard;
 
@@ -10,7 +11,7 @@ public partial class Dashboard
 {
     [Inject] IDialogService DialogService { get; set; } = default!;
     [Inject] PasswordsService PasswordsService { get; set; } = default!;
-    public List<PasswordViewModel> Passwords { get; set; } = new();
+    public List<PasswordModel> Passwords { get; set; } = new();
     public List<object> Categories { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
@@ -24,14 +25,14 @@ public partial class Dashboard
     {
         Passwords = new();
 
-        await foreach (var password in PasswordsService.GetPasswordViewModels(CancellationToken.None))
+        await foreach (var password in PasswordsService.GetAllPasswords(CancellationToken.None))
         {
             Passwords.Add(password);
             StateHasChanged();
         }
     }
 
-    private async Task OnViewPasswordCredentials(PasswordViewModel passwordViewModel)
+    private async Task OnViewPasswordCredentials(PasswordCardViewModel passwordViewModel)
     {
         var options = new DialogOptions
         {
@@ -54,7 +55,7 @@ public partial class Dashboard
         await dialog.Result;
     }
 
-    private async Task OnFavoriteChanged(PasswordViewModel passwordViewModel)
+    private async Task OnFavoriteChanged(PasswordCardViewModel passwordViewModel)
     {
         var updatedPasswordResult = await PasswordsService.ChangeFavorability(passwordViewModel.Id.GetValueOrDefault(Guid.NewGuid()), !passwordViewModel.Favorite.GetValueOrDefault(false), CancellationToken.None);
 
@@ -66,7 +67,7 @@ public partial class Dashboard
                 if (outedatedPassword is null)
                     return;
 
-                Passwords[Passwords.IndexOf(outedatedPassword)] = pm;
+                Passwords[Passwords.IndexOf(outedatedPassword)].IsFavorite = pm.Favorite.GetValueOrDefault(false);
 
                 StateHasChanged();
             });
@@ -74,7 +75,7 @@ public partial class Dashboard
         updatedPasswordResult.IfFail(ex => Console.WriteLine(ex.Message));
     }
 
-    private async Task OnDeletePasswordClicked(PasswordViewModel passwordViewModel)
+    private async Task OnDeletePasswordClicked(PasswordCardViewModel passwordViewModel)
     {
         var options = new DialogOptions
         {

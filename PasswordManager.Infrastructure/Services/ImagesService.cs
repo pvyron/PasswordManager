@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using PasswordManager.Application.IServices;
+using PasswordManager.DataAccess.DbModels;
 using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
@@ -45,6 +46,8 @@ internal sealed class ImagesService : IImagesService
 
     public async Task<string> DownloadImageInBase64(Guid imageId, CancellationToken cancellationToken)
     {
+        //var logo = await _sqlDbContext.PasswordLogos.FindAsync(imageId);
+
         var stream = await _bulkStorageService.DownloadFileAsStream(_settings.PasswordLogoContainerName, imageId, cancellationToken);
 
         try
@@ -75,7 +78,7 @@ internal sealed class ImagesService : IImagesService
         img.Size().Deconstruct(out int originalWidth, out int originalHeight);
         var ratio = decimal.Divide(originalWidth, originalHeight);
 
-        img.Mutate(i => i.Resize((int)Math.Round(150 * ratio, 0, MidpointRounding.AwayFromZero), 150));
+        img.Mutate(i => i.Resize((int)Math.Round(200 * ratio, 0, MidpointRounding.AwayFromZero), 200));
 
         using var jpegStream = new MemoryStream();
         await img.SaveAsync(jpegStream, _imageManipulationService.ImageEncoder, cancellationToken);
@@ -87,7 +90,7 @@ internal sealed class ImagesService : IImagesService
 
         var uploadedThumbnail = await _bulkStorageService.UploadNewFile(_settings.PasswordLogoContainerName, jpegStream, cancellationToken);
 
-        await _sqlDbContext.PasswordLogos.AddAsync(new DataAccess.DbModels.PasswordLogoDbModel
+        var logoDbModelResult = await _sqlDbContext.PasswordLogos.AddAsync(new PasswordLogoDbModel
         {
             BulkStorageImageName = uploadedImage.FileName,
             BulkStorageThumbnailName= uploadedThumbnail.FileName,
@@ -98,12 +101,15 @@ internal sealed class ImagesService : IImagesService
 
         await _sqlDbContext.SaveChangesAsync(cancellationToken);
 
+        var logoDbModel = logoDbModelResult.Entity;
+
         return new PasswordLogoModel
         {
-            FileUrl = uploadedImage.PublicUrl,
+            Title = logoDbModel.Title,
+            FileUrl = logoDbModel.ImageUrl,
             FileExtension = "jpg",
-            ThuumbnailUrl = uploadedThumbnail.PublicUrl,
-            ThuumbnailExtension = "jpg"
+            ThumbnailUrl = logoDbModel.ThumbnailUrl,
+            ThumbnailExtension = "jpg"
         };
     }
 }

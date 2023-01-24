@@ -7,7 +7,7 @@ namespace PasswordManager.Portal.Components;
 public partial class DeletePasswordDialog
 {
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
-    [Parameter] public PasswordViewModel? Password { get; set; }
+    [Parameter] public PasswordCardViewModel? Password { get; set; }
 
     string? Message => $"Are you sure about deleting the password {Password?.Title}?";
 

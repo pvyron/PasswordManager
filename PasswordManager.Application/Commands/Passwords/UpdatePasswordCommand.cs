@@ -2,10 +2,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
+using PasswordManager.Shared.RequestModels;
+using PasswordManager.Shared.ResponseModels;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
@@ -74,10 +75,10 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 Description = request.PasswordRequestModel.Description,
                 IsFavorite = request.PasswordRequestModel.IsFavorite,
                 ImageId = request.PasswordRequestModel.ImageId,
+                Logo = null
             };
 
-            var imageInBase64 = await _imagesService.DownloadImageInBase64(request.PasswordRequestModel.ImageId.GetValueOrDefault(Guid.Empty), cancellationToken);
-            await _passwordService.UpdatePassword(passwordModel, cancellationToken);
+            passwordModel = await _passwordService.UpdatePassword(passwordModel, cancellationToken);
 
             return new PasswordResponseModel
             {
@@ -89,6 +90,9 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 Description = passwordModel.Description,
                 IsFavorite = passwordModel.IsFavorite,
                 ImageId = passwordModel.ImageId,
+                ImageTitle = passwordModel.Logo?.Title,
+                PublicUrl = passwordModel.Logo?.FileUrl,
+                ThumbnailUrl= passwordModel.Logo?.ThumbnailUrl
             };
         }
         catch (Exception ex)

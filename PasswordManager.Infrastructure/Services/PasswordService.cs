@@ -33,28 +33,44 @@ internal sealed class PasswordService : IPasswordService
                 Username = passwordDbModel.Username,
                 IsFavorite = passwordDbModel.IsFavorite,
                 ImageId = passwordDbModel.ImageId,
+                Logo = new PasswordLogoModel
+                {
+                    Title = passwordDbModel.Image!.Title,
+                    FileExtension = "jpg",
+                    FileUrl = passwordDbModel.Image!.ImageUrl,
+                    ThumbnailExtension = "jpg",
+                    ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+                }
             };
         }
     }
 
     public async Task<PasswordModel> GetPasswordById(Guid passwordId, CancellationToken cancellationToken)
     {
-        var passwordResult = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == passwordId && p.IsActive, cancellationToken);
+        var passwordDbModel = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == passwordId && p.IsActive, cancellationToken);
 
-        if (passwordResult is null)
+        if (passwordDbModel is null)
             throw new PasswordAccessException($"Password with id {passwordId} was not found");
 
         return new PasswordModel
         {
-            CategoryId = passwordResult.CategoryId,
-            Description = passwordResult.Description,
-            Password = passwordResult.Password,
-            Title = passwordResult.Title,
-            UserId = passwordResult.UserId!.Value,
-            Id = passwordResult.Id,
-            Username = passwordResult.Username,
-            IsFavorite = passwordResult.IsFavorite,
-            ImageId = passwordResult.ImageId,
+            CategoryId = passwordDbModel.CategoryId,
+            Description = passwordDbModel.Description,
+            Password = passwordDbModel.Password,
+            Title = passwordDbModel.Title,
+            UserId = passwordDbModel.UserId!.Value,
+            Id = passwordDbModel.Id,
+            Username = passwordDbModel.Username,
+            IsFavorite = passwordDbModel.IsFavorite,
+            ImageId = passwordDbModel.ImageId,
+            Logo = new PasswordLogoModel
+            {
+                Title = passwordDbModel.Image!.Title,
+                FileExtension = "jpg",
+                FileUrl = passwordDbModel.Image!.ImageUrl,
+                ThumbnailExtension = "jpg",
+                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+            }
         };
     }
 
@@ -68,63 +84,103 @@ internal sealed class PasswordService : IPasswordService
             Title = password.Title,
             Username = password.Username,
             UserId = password.UserId,
-            IsFavorite = password.IsFavorite,
+            IsFavorite = password.IsFavorite.GetValueOrDefault(false),
             ImageId = password.ImageId,
         }, cancellationToken);
+        
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var passwordDbModel = addPasswordResult.Entity;
+        passwordDbModel.Image = await _context.PasswordLogos.FindAsync(new object[] { passwordDbModel.ImageId.GetValueOrDefault() }, cancellationToken: cancellationToken);
+
+        return new PasswordModel
+        {
+            CategoryId = passwordDbModel.CategoryId,
+            Description = passwordDbModel.Description,
+            Password = passwordDbModel.Password,
+            Title = passwordDbModel.Title,
+            UserId = passwordDbModel.UserId!.Value,
+            Id = passwordDbModel.Id,
+            Username = passwordDbModel.Username,
+            IsFavorite = passwordDbModel.IsFavorite,
+            ImageId = passwordDbModel.ImageId,
+            Logo = new PasswordLogoModel
+            {
+                Title = passwordDbModel.Image!.Title,
+                FileExtension = "jpg",
+                FileUrl = passwordDbModel.Image!.ImageUrl,
+                ThumbnailExtension = "jpg",
+                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+            }
+        };
+    }
+
+    public async Task<PasswordModel> UpdatePassword(PasswordModel password, CancellationToken cancellationToken)
+    {
+        var passwordDbModel = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == password.Id && p.IsActive, cancellationToken);
+
+        passwordDbModel!.CategoryId = password.CategoryId!.Value;
+        passwordDbModel!.Description = password.Description;
+        passwordDbModel!.Title = password.Title;
+        passwordDbModel!.Username = password.Username;
+        passwordDbModel!.Password = password.Password;
+        passwordDbModel!.IsFavorite = password.IsFavorite.GetValueOrDefault(false);
+        passwordDbModel!.ImageId = password.ImageId;
+        passwordDbModel!.EditedAt = DateTimeOffset.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
 
         return new PasswordModel
         {
-            Id = addPasswordResult.Entity.Id,
-            CategoryId = addPasswordResult.Entity.CategoryId,
-            Description = addPasswordResult.Entity.Description,
-            Password = addPasswordResult.Entity.Password,
-            Title = addPasswordResult.Entity.Title,
-            UserId = addPasswordResult.Entity.UserId!.Value,
-            Username = addPasswordResult.Entity.Username,
-            IsFavorite = addPasswordResult.Entity.IsFavorite,
-            ImageId = addPasswordResult.Entity.ImageId,
+            CategoryId = passwordDbModel.CategoryId,
+            Description = passwordDbModel.Description,
+            Password = passwordDbModel.Password,
+            Title = passwordDbModel.Title,
+            UserId = passwordDbModel.UserId!.Value,
+            Id = passwordDbModel.Id,
+            Username = passwordDbModel.Username,
+            IsFavorite = passwordDbModel.IsFavorite,
+            ImageId = passwordDbModel.ImageId,
+            Logo = new PasswordLogoModel
+            {
+                Title = passwordDbModel.Image!.Title,
+                FileExtension = "jpg",
+                FileUrl = passwordDbModel.Image!.ImageUrl,
+                ThumbnailExtension = "jpg",
+                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+            }
         };
-    }
-
-    public async Task UpdatePassword(PasswordModel password, CancellationToken cancellationToken)
-    {
-        var passwordToUpdate = await _context.Passwords.FirstOrDefaultAsync(p => p.Id == password.Id && p.IsActive, cancellationToken);
-
-        passwordToUpdate!.CategoryId = password.CategoryId!.Value;
-        passwordToUpdate!.Description = password.Description;
-        passwordToUpdate!.Title = password.Title;
-        passwordToUpdate!.Username = password.Username;
-        passwordToUpdate!.Password = password.Password;
-        passwordToUpdate!.IsFavorite = password.IsFavorite;
-        passwordToUpdate!.ImageId = password.ImageId;
-        passwordToUpdate!.EditedAt = DateTimeOffset.UtcNow;
-
-        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<PasswordModel> FavoritePassword(Guid id, bool isFavorite, CancellationToken cancellationToken)
     {
-        var passwordToUpdate = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        var passwordDbModel = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
-        passwordToUpdate!.IsFavorite = isFavorite;
-        passwordToUpdate!.EditedAt = DateTimeOffset.UtcNow;
+        passwordDbModel!.IsFavorite = isFavorite;
+        passwordDbModel!.EditedAt = DateTimeOffset.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
 
         return new PasswordModel
         {
-            Id = passwordToUpdate.Id,
-            IsFavorite = passwordToUpdate.IsFavorite,
-            CategoryId = passwordToUpdate.CategoryId,
-            Description = passwordToUpdate.Description,
-            Password = passwordToUpdate.Password,
-            Title = passwordToUpdate.Title,
-            UserId = passwordToUpdate.UserId!.Value,
-            Username = passwordToUpdate.Username,
-            ImageId= passwordToUpdate.ImageId,
-        };
+            Id = passwordDbModel.Id,
+            CategoryId = passwordDbModel.CategoryId,
+            Description = passwordDbModel.Description,
+            Password = passwordDbModel.Password,
+            Title = passwordDbModel.Title,
+            UserId = passwordDbModel.UserId!.Value,
+            Username = passwordDbModel.Username,
+            IsFavorite = passwordDbModel.IsFavorite,
+            ImageId = passwordDbModel.ImageId,
+            Logo = new PasswordLogoModel
+            {
+                Title = passwordDbModel.Image!.Title,
+                FileExtension = "jpg",
+                FileUrl = passwordDbModel.Image!.ImageUrl,
+                ThumbnailExtension = "jpg",
+                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+            }
+        }; ;
     }
 
     public async Task DeletePassword(Guid passwordId, CancellationToken cancellationToken)

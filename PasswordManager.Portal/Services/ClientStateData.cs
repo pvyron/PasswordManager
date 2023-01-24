@@ -30,14 +30,14 @@ public sealed class ClientStateData
         }
     }
 
-    public User? User
+    public UserModel? User
     {
         get
         {
             if (!_localStorage.ContainKey("user"))
                 return null;
 
-            return _localStorage.GetItem<User>("user");
+            return _localStorage.GetItem<UserModel>("user");
         }
         private set
         {
@@ -56,7 +56,7 @@ public sealed class ClientStateData
         _sessionStorage = sessionStorage;
     }
 
-    public void LoggedIn(User user)
+    public void LoggedIn(UserModel user)
     {
         if (string.IsNullOrWhiteSpace(user.AccessToken) || string.IsNullOrWhiteSpace(user.Email))
         {

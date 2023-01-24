@@ -10,10 +10,10 @@ public partial class PasswordCard
 {
     [Inject] NavigationManager NavManager { get; set; } = default!;
 
-    [Parameter] public PasswordViewModel Password { get; set; } = null!;
-    [Parameter] public EventCallback<PasswordViewModel> OnViewPasswordCredentials { get; set; }
-    [Parameter] public EventCallback<PasswordViewModel> OnFavoriteChanged { get; set; }
-    [Parameter] public EventCallback<PasswordViewModel> OnDeletePassword { get; set; }
+    [Parameter] public PasswordCardViewModel Password { get; set; } = null!;
+    [Parameter] public EventCallback<PasswordCardViewModel> OnViewPasswordCredentials { get; set; }
+    [Parameter] public EventCallback<PasswordCardViewModel> OnFavoriteChanged { get; set; }
+    [Parameter] public EventCallback<PasswordCardViewModel> OnDeletePassword { get; set; }
 
     private string FavoritePasswordMenuText
     {

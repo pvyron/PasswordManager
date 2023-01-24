@@ -1,6 +1,6 @@
 ﻿namespace PasswordManager.Portal.Models;
 
-public sealed class User
+public sealed class UserModel
 {
     public required string Email { get; set; }
     public string? FirstName { get; set; }

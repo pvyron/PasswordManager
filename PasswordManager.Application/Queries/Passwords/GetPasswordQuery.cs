@@ -2,9 +2,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
+using PasswordManager.Shared.ResponseModels;
 
 namespace PasswordManager.Application.Queries.Passwords;
 
@@ -50,6 +50,10 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
                 Title = password.Title,
                 Username = password.Username,
                 IsFavorite = password.IsFavorite,
+                ImageId= password.ImageId,
+                ImageTitle = password.Logo?.Title,
+                PublicUrl = password.Logo?.FileUrl,
+                ThumbnailUrl = password.Logo?.ThumbnailUrl
             };
         }
         catch (Exception ex)

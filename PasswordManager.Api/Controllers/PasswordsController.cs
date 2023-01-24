@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Commands.Passwords;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.Queries.Passwords;
 using PasswordManager.Domain.Exceptions;
+using PasswordManager.Shared.RequestModels;
+using PasswordManager.Shared.ResponseModels;
 using System.Runtime.CompilerServices;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -54,7 +55,7 @@ public class PasswordsController : MediatorControllerBase
         var response = await Mediator.Send(new CreatePasswordCommand(passwordRequestModel), cancellationToken);
 
         return response.Match<IActionResult>(
-            Ok,
+            Succ => CreatedAtAction(nameof(Post), Succ),
             Fail =>
             {
                 if (Fail is AuthenticationException)

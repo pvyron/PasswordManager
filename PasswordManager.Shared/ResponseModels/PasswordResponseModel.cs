@@ -1,4 +1,4 @@
-﻿namespace PasswordManager.Application.DtObjects.Passwords;
+﻿namespace PasswordManager.Shared.ResponseModels;
 
 public sealed record PasswordResponseModel
 {
@@ -9,5 +9,8 @@ public sealed record PasswordResponseModel
     public string? Description { get; set; }
     public required byte[] Username { get; set; }
     public required byte[] Password { get; set; }
-    public required bool IsFavorite { get; set; }
+    public bool? IsFavorite { get; set; }
+    public string? ImageTitle { get; set; }
+    public string? PublicUrl { get; set; }
+    public string? ThumbnailUrl { get; set; }
 }

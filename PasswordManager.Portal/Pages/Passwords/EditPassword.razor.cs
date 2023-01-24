@@ -22,7 +22,7 @@ public partial class EditPassword
     MudForm? UiForm { get; set; }
 
     EditPasswordForm EditPasswordForm { get; set; } = new();
-    PasswordViewModel Password { get; set; } = new();
+    PasswordCardViewModel Password { get; set; } = new();
     List<AvailableCategory> AvailableCategories { get; set; } = new();
     bool SaveButtonDisabled => FormComponentsDisabled || !EditPasswordForm.IsPasswordChanged;
     bool FormComponentsDisabled => PasswordFetchingInProgress && SavingPasswordInProgress;
@@ -65,7 +65,7 @@ public partial class EditPassword
         categoriesResponse.IfFail(async ex => await FailedFetching(ex));
     }
 
-    void SuccessfullPasswordFetching(PasswordViewModel password)
+    void SuccessfullPasswordFetching(PasswordCardViewModel password)
     {
         Password = password;
     }
@@ -150,7 +150,7 @@ public partial class EditPassword
         StateHasChanged();
     }
 
-    async Task SuccessfullUpdatePassword(PasswordViewModel passwordViewModel)
+    async Task SuccessfullUpdatePassword(PasswordCardViewModel passwordViewModel)
     {
         var options = new DialogOptions
         {

@@ -11,7 +11,7 @@ public partial class PasswordCredentialsDialog
     [Inject] ClipboardService _clipboardService { get; set; } = default!;
     [Inject] ISnackbar _snackbarService { get; set; } = default!;
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
-    [Parameter] public PasswordViewModel? Password { get; set; } = default!;
+    [Parameter] public PasswordCardViewModel? Password { get; set; } = default!;
 
     void OkButtonClicked() => MudDialog?.Close(DialogResult.Ok(true));
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PasswordManager.Application.DtObjects.Passwords;
+namespace PasswordManager.Shared.RequestModels;
 
 public sealed record PasswordRequestModel
 {
@@ -14,5 +14,5 @@ public sealed record PasswordRequestModel
     public byte[] Username { get; set; } = null!;
     [Required(AllowEmptyStrings = false, ErrorMessage = "Please provide a password")]
     public byte[] Password { get; set; } = null!;
-    public bool IsFavorite { get; set; } = false;
+    public bool IsFavorite { get; set; }
 }

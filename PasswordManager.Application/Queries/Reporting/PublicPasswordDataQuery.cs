@@ -46,7 +46,7 @@ public sealed class PublicPasswordDataQueryHandler : IRequestHandler<PublicPassw
                 {
                     CategoryName = categories[password.CategoryId!.Value].Title,
                     Description = password.Description,
-                    IsFavorite = password.IsFavorite,
+                    IsFavorite = password.IsFavorite.GetValueOrDefault(false),
                     PasswordId = password.Id,
                     PasswordTitle = password.Title,
                     Username = password.Username,

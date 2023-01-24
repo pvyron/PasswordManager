@@ -32,7 +32,7 @@ public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPas
             return new ImageLogoResponseModel
             {
                 PublicUrl = uploadedImage.FileUrl,
-                ThumbnailUrl = uploadedImage.ThuumbnailUrl
+                ThumbnailUrl = uploadedImage.ThumbnailUrl
             };
         }
         catch (Exception ex)

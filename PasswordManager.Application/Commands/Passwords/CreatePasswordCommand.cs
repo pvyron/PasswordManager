@@ -2,10 +2,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
+using PasswordManager.Shared.RequestModels;
+using PasswordManager.Shared.ResponseModels;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
@@ -46,6 +47,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 Username = request.PasswordRequestModel.Username,
                 IsFavorite = request.PasswordRequestModel.IsFavorite,
                 ImageId = request.PasswordRequestModel.ImageId,
+                Logo = null
             };
 
             var createdPassword = await _passwordService.SaveNewPassword(passwordModel, cancellationToken);
@@ -60,6 +62,9 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 Username = createdPassword.Username,
                 IsFavorite = createdPassword.IsFavorite,
                 ImageId = createdPassword.ImageId,
+                ImageTitle = createdPassword.Logo?.Title,
+                PublicUrl = createdPassword.Logo?.FileUrl,
+                ThumbnailUrl= createdPassword.Logo?.ThumbnailUrl,
             };
         }
         catch (Exception ex)

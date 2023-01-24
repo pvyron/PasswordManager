@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
+using PasswordManager.Shared.ResponseModels;
 using System.Runtime.CompilerServices;
 using System.Security.Authentication;
 
@@ -30,8 +30,6 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
             throw new AuthenticationException("You are not authorized for this action");
         }
 
-
-
         await foreach (var password in _passwordService.GetAllUserPasswords(Guid.Parse(userId), cancellationToken))
         {
 
@@ -44,6 +42,10 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
                 Username = password.Username,
                 Title = password.Title,
                 IsFavorite = password.IsFavorite,
+                ImageId= password.ImageId,
+                ImageTitle = password.Logo?.Title,
+                PublicUrl = password.Logo?.FileUrl,
+                ThumbnailUrl = password.Logo?.ThumbnailUrl
             };
         }
     }

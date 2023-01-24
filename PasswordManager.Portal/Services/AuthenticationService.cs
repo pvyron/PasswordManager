@@ -99,7 +99,7 @@ public sealed class AuthenticationService
 
             var decryptionToken = SHA256.HashData(Encoding.UTF8.GetBytes(loginModel.Password));
 
-            var user = new User
+            var user = new UserModel
             {
                 AccessToken = responseModel.AccessToken,
                 Email = responseModel.Email,

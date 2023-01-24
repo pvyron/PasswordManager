@@ -5,8 +5,11 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
 using PasswordManager.Portal.DtObjects;
+using PasswordManager.Portal.Models;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using PasswordManager.Portal.ViewModels.ViewPasswords;
+using PasswordManager.Shared.RequestModels;
+using PasswordManager.Shared.ResponseModels;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -27,7 +30,7 @@ public sealed class PasswordsService
         _jsonSerializerOptions = jsonSerializerOptions;
     }
 
-    public async IAsyncEnumerable<PasswordViewModel> GetPasswordViewModels([EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<PasswordModel> GetAllPasswords([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage { Method = HttpMethod.Get };
 
@@ -43,15 +46,22 @@ public sealed class PasswordsService
                 continue;
 
             var password = DecryptedPasswordData(passwordResponse.Password);
-            yield return new PasswordViewModel
+            yield return new PasswordModel
             {
                 Id = passwordResponse.Id,
-                CategoryId = passwordResponse.CategoryId,
+                CategoryId = passwordResponse.CategoryId.GetValueOrDefault(),
                 Description = passwordResponse.Description,
                 Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedUsernameData(passwordResponse.Username, password),
-                Favorite = passwordResponse.IsFavorite
+                Username = DecryptedUsernameData(passwordResponse.Username),
+                IsFavorite = passwordResponse.IsFavorite,
+                Logo = new LogoModel
+                {
+                    Title = passwordResponse.ImageTitle!,
+                    FileUrl = passwordResponse.PublicUrl!,
+                    ImageId = passwordResponse.ImageId.GetValueOrDefault(),
+                    ThumbnailUrl = passwordResponse.ThumbnailUrl!
+                }
             };
         }
     }
@@ -104,13 +114,13 @@ public sealed class PasswordsService
         }
     }
 
-    public async Task<Result<PasswordViewModel>> GetPasswordById(string? passwordId, CancellationToken cancellationToken)
+    public async Task<Result<PasswordCardViewModel>> GetPasswordById(string? passwordId, CancellationToken cancellationToken)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(passwordId))
             {
-                return new Result<PasswordViewModel>(new ValueIsNullException("No password found"));
+                return new Result<PasswordCardViewModel>(new ValueIsNullException("No password found"));
             }
 
             var response = await _apiClient.GetAuthorized($"/api/Passwords/{passwordId}", cancellationToken);
@@ -121,36 +131,35 @@ public sealed class PasswordsService
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
-                    return new Result<PasswordViewModel>(new Exception("InternalServerError"));
+                    return new Result<PasswordCardViewModel>(new Exception("InternalServerError"));
                 }
 
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
-                return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
+                return new Result<PasswordCardViewModel>(new Exception(errorResponse?.Message));
             }
 
             var passwordResponse = await JsonSerializer.DeserializeAsync<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
             if (passwordResponse is null)
             {
-                return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
+                return new Result<PasswordCardViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
             }
 
             var password = DecryptedPasswordData(passwordResponse.Password);
-            return new PasswordViewModel
+            return new PasswordCardViewModel
             {
                 Id = passwordResponse.Id,
-                CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
                 Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedUsernameData(passwordResponse.Username, password),
+                Username = DecryptedUsernameData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite
             };
         }
         catch (Exception ex)
         {
-            return new Result<PasswordViewModel>(ex);
+            return new Result<PasswordCardViewModel>(ex);
         }
     }
 
@@ -168,7 +177,7 @@ public sealed class PasswordsService
                     Description = newPassword.Description,
                     Password = EncryptedPasswordData(newPassword.Password),
                     Title = newPassword.Title,
-                    Username = EncryptedUsernameData(newPassword.Username, newPassword.Password),
+                    Username = EncryptedUsernameData(newPassword.Username),
                     IsFavorite = newPassword.IsFavorite
                 },
                 typeof(PasswordRequestModel),
@@ -199,7 +208,7 @@ public sealed class PasswordsService
         }
     }
 
-    public async Task<Result<PasswordViewModel>> UpdatePassword(Guid id, NewPassword newPassword, CancellationToken cancellationToken)
+    public async Task<Result<PasswordCardViewModel>> UpdatePassword(Guid id, NewPassword newPassword, CancellationToken cancellationToken)
     {
         try
         {
@@ -214,7 +223,7 @@ public sealed class PasswordsService
                     Description = newPassword.Description,
                     Password = EncryptedPasswordData(newPassword.Password),
                     Title = newPassword.Title,
-                    Username = EncryptedUsernameData(newPassword.Username, newPassword.Password),
+                    Username = EncryptedUsernameData(newPassword.Username),
                     IsFavorite = newPassword.IsFavorite,
                 },
                 typeof(PasswordRequestModel),
@@ -229,40 +238,39 @@ public sealed class PasswordsService
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
-                    return new Result<PasswordViewModel>(new Exception("InternalServerError"));
+                    return new Result<PasswordCardViewModel>(new Exception("InternalServerError"));
                 }
 
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
-                return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
+                return new Result<PasswordCardViewModel>(new Exception(errorResponse?.Message));
             }
 
             var passwordResponse = await JsonSerializer.DeserializeAsync<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
             if (passwordResponse is null)
             {
-                return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
+                return new Result<PasswordCardViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
             }
 
             string password = DecryptedPasswordData(passwordResponse.Password);
-            return new PasswordViewModel
+            return new PasswordCardViewModel
             {
                 Id = passwordResponse.Id,
-                CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
                 Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedUsernameData(passwordResponse.Username, password),
+                Username = DecryptedUsernameData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite,
             };
         }
         catch (Exception ex)
         {
-            return new Result<PasswordViewModel>(ex);
+            return new Result<PasswordCardViewModel>(ex);
         }
     }
 
-    public async Task<Result<PasswordViewModel>> ChangeFavorability(Guid id, bool isFavorite, CancellationToken cancellationToken)
+    public async Task<Result<PasswordCardViewModel>> ChangeFavorability(Guid id, bool isFavorite, CancellationToken cancellationToken)
     {
         try
         {
@@ -282,36 +290,35 @@ public sealed class PasswordsService
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                 {
-                    return new Result<PasswordViewModel>(new Exception("InternalServerError"));
+                    return new Result<PasswordCardViewModel>(new Exception("InternalServerError"));
                 }
 
                 var errorResponse = await JsonSerializer.DeserializeAsync<ErrorResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
-                return new Result<PasswordViewModel>(new Exception(errorResponse?.Message));
+                return new Result<PasswordCardViewModel>(new Exception(errorResponse?.Message));
             }
 
             var passwordResponse = await JsonSerializer.DeserializeAsync<PasswordResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken);
 
             if (passwordResponse is null)
             {
-                return new Result<PasswordViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
+                return new Result<PasswordCardViewModel>(new ResultIsNullException($"Wrong model {nameof(PasswordResponseModel)} is null"));
             }
 
             string password = DecryptedPasswordData(passwordResponse.Password);
-            return new PasswordViewModel
+            return new PasswordCardViewModel
             {
                 Id = passwordResponse.Id,
-                CategoryId = passwordResponse.CategoryId,
                 Description = passwordResponse.Description,
                 Password = password,
                 Title = passwordResponse.Title,
-                Username = DecryptedUsernameData(passwordResponse.Username, password),
+                Username = DecryptedUsernameData(passwordResponse.Username),
                 Favorite = passwordResponse.IsFavorite,
             };
         }
         catch (Exception ex)
         {
-            return new Result<PasswordViewModel>(ex);
+            return new Result<PasswordCardViewModel>(ex);
         }
     }
 
@@ -352,19 +359,9 @@ public sealed class PasswordsService
 
     string DecryptedPasswordData(byte[] encryptedPassword) => Decrypt(encryptedPassword, _clientStateData.DecryptionToken);
 
-    static byte[] EncryptedUsernameData(string username, string password = "") => Encoding.UTF8.GetBytes(username);
-    //{
-    //    var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+    static byte[] EncryptedUsernameData(string username) => Encoding.UTF8.GetBytes(username);
 
-    //    return Encrypt(username, passwordToken);
-    //}
-
-    static string DecryptedUsernameData(byte[] encryptedUsername, string password = "") => Encoding.UTF8.GetString(encryptedUsername);
-    //{
-    //    var passwordToken = SHA256.HashData(Encoding.UTF8.GetBytes(password));
-
-    //    return Decrypt(encryptedUsername, passwordToken);
-    //}
+    static string DecryptedUsernameData(byte[] encryptedUsername) => Encoding.UTF8.GetString(encryptedUsername);
 
     static byte[] Encrypt(string toEncrypt, byte[] key)
     {
@@ -381,7 +378,6 @@ public sealed class PasswordsService
         var encrypted = new byte[cipher.GetOutputSize(input.Length)];
         var length = cipher.ProcessBytes(input, encrypted, 0);
         cipher.DoFinal(encrypted, length);
-
 
         return encrypted;
     }

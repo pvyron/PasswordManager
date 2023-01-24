@@ -2,9 +2,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
-using PasswordManager.Application.DtObjects.Passwords;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
+using PasswordManager.Shared.ResponseModels;
 
 namespace PasswordManager.Application.Commands.Passwords;
 
@@ -52,6 +52,10 @@ public sealed class AlternateFavorabilityCommandHandler : IRequestHandler<Altern
                 IsFavorite = updatedPassword.IsFavorite,
                 Password = updatedPassword.Password,
                 Title = updatedPassword.Title,
+                ImageId = updatedPassword.ImageId,
+                ImageTitle = updatedPassword.Logo?.Title,
+                PublicUrl = updatedPassword.Logo?.FileUrl,
+                ThumbnailUrl = updatedPassword.Logo?.ThumbnailUrl
             };
         }
         catch (Exception ex)

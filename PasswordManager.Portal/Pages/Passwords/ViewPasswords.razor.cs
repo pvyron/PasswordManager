@@ -64,7 +64,7 @@ public partial class ViewPasswords
 
     }
 
-    async Task SuccessfullPasswordFetching(PasswordViewModel password)
+    async Task SuccessfullPasswordFetching(PasswordCardViewModel password)
     {
         var options = new DialogOptions
         {
