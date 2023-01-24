@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Exceptions;
@@ -17,7 +17,7 @@ public sealed class LoginUserQueryHandler : IRequestHandler<LoginUserQuery, Resu
         _authorizationService = authorizationService;
     }
 
-    public async Task<Result<UserLoginResponseModel>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
+    public async ValueTask<Result<UserLoginResponseModel>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
         try
         {

@@ -1,11 +1,6 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using PasswordManager.Application.IServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Application.Queries.Images;
 
@@ -20,7 +15,7 @@ public sealed class GetPasswordLogoQueryHandler : IRequestHandler<GetPasswordLog
         _imagesService = imagesService;
     }
 
-    public async Task<Result<byte[]>> Handle(GetPasswordLogoQuery request, CancellationToken cancellationToken)
+    public async ValueTask<Result<byte[]>> Handle(GetPasswordLogoQuery request, CancellationToken cancellationToken)
     {
         try
         {

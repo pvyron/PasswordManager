@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using PasswordManager.Application.IServices;
 
 namespace PasswordManager.Application.Commands;
@@ -15,7 +15,7 @@ public sealed class PopulateDbWithRandomDataCommandHandler : IRequestHandler<Pop
         _usersService = usersService;
     }
 
-    public async Task<Result<Unit>> Handle(PopulateDbWithRandomDataCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<Unit>> Handle(PopulateDbWithRandomDataCommand request, CancellationToken cancellationToken)
     {
         await _usersService.PopulateDb(cancellationToken);
 

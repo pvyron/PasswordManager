@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Categories;

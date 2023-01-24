@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
@@ -21,7 +21,7 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
         _passwordService = passwordService;
     }
 
-    public async Task<Result<PasswordResponseModel>> Handle(GetPasswordQuery request, CancellationToken cancellationToken)
+    public async ValueTask<Result<PasswordResponseModel>> Handle(GetPasswordQuery request, CancellationToken cancellationToken)
     {
         try
         {
@@ -50,7 +50,7 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
                 Title = password.Title,
                 Username = password.Username,
                 IsFavorite = password.IsFavorite,
-                ImageId= password.ImageId,
+                ImageId = password.ImageId,
                 ImageTitle = password.Logo?.Title,
                 PublicUrl = password.Logo?.FileUrl,
                 ThumbnailUrl = password.Logo?.ThumbnailUrl

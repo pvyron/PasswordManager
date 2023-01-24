@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.IServices;
 using PasswordManager.Shared.ResponseModels;
@@ -17,7 +17,7 @@ public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPas
         _imagesService = imagesService;
     }
 
-    public async Task<Result<ImageLogoResponseModel>> Handle(UploadPasswordLogoCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<ImageLogoResponseModel>> Handle(UploadPasswordLogoCommand request, CancellationToken cancellationToken)
     {
         try
         {

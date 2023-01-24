@@ -2,12 +2,9 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using LanguageExt;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using PasswordManager.Application;
 using PasswordManager.Infrastructure;
-using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,13 +29,11 @@ services.AddDataAccess(configuration)
         .AddSwaggerGen()
         .AddHttpContextAccessor();
 
-services.AddMediatR(Assembly.GetAssembly(typeof(ApplicationAssembly))!);
-
-//.AddMediator(o =>
-//{
-//    o.ServiceLifetime = ServiceLifetime.Transient;
-//    o.Namespace = "PasswordManager.Application.MediatorCode";
-//})
+services.AddMediator(o =>
+{
+    o.Namespace = "PasswordManager.Application.MediatorCode";
+    o.ServiceLifetime = ServiceLifetime.Transient;
+});
 
 services.AddControllers();
 

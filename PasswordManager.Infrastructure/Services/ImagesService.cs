@@ -2,28 +2,11 @@
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess.DbModels;
 using PasswordManager.DataAccess.Interfaces;
-using PasswordManager.Domain.Exceptions;
 using PasswordManager.Domain.Models;
 using PasswordManager.Infrastructure.ServiceSettings;
 using PasswordManager.Infrastructure.ToolServices;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Bmp;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Pbm;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats.Tga;
-using SixLabors.ImageSharp.Formats.Tiff;
-using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PasswordManager.Infrastructure.Services;
 
@@ -53,7 +36,7 @@ internal sealed class ImagesService : IImagesService
         try
         {
             using var img = await Image.LoadAsync(stream, _imageManipulationService.ImageDecoder, cancellationToken);
-            
+
             return img.ToBase64String(_imageManipulationService.ImageFormat);
         }
         finally
@@ -93,9 +76,9 @@ internal sealed class ImagesService : IImagesService
         var logoDbModelResult = await _sqlDbContext.PasswordLogos.AddAsync(new PasswordLogoDbModel
         {
             BulkStorageImageName = uploadedImage.FileName,
-            BulkStorageThumbnailName= uploadedThumbnail.FileName,
+            BulkStorageThumbnailName = uploadedThumbnail.FileName,
             ImageUrl = uploadedImage.PublicUrl,
-            ThumbnailUrl= uploadedThumbnail.PublicUrl,
+            ThumbnailUrl = uploadedThumbnail.PublicUrl,
             Title = imageName
         }, cancellationToken);
 

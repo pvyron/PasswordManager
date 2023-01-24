@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.Application.IServices;
 using PasswordManager.DataAccess;
-using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.Infrastructure.Services;
 using PasswordManager.Infrastructure.ServiceSettings;
 using PasswordManager.Infrastructure.ToolServices;

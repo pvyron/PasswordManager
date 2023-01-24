@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
@@ -23,7 +23,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
         _passwordService = passwordService;
     }
 
-    public async Task<Result<PasswordResponseModel>> Handle(CreatePasswordCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<PasswordResponseModel>> Handle(CreatePasswordCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -64,7 +64,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 ImageId = createdPassword.ImageId,
                 ImageTitle = createdPassword.Logo?.Title,
                 PublicUrl = createdPassword.Logo?.FileUrl,
-                ThumbnailUrl= createdPassword.Logo?.ThumbnailUrl,
+                ThumbnailUrl = createdPassword.Logo?.ThumbnailUrl,
             };
         }
         catch (Exception ex)

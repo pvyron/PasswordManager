@@ -1,8 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using PasswordManager.DataAccess.Interfaces;
 using PasswordManager.DataAccess.StorageModels;
-using System.IO;
-using System.IO.Compression;
 
 namespace PasswordManager.DataAccess.Implementations;
 

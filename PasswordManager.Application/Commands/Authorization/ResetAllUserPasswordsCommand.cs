@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using PasswordManager.Application.IServices;
 
 namespace PasswordManager.Application.Commands.Authorization;
@@ -15,7 +15,7 @@ public sealed class ResetAllUserPasswordsCommandHandler : IRequestHandler<ResetA
         _usersService = usersService;
     }
 
-    public async Task<Result<Unit>> Handle(ResetAllUserPasswordsCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<Unit>> Handle(ResetAllUserPasswordsCommand request, CancellationToken cancellationToken)
     {
         await _usersService.ResetAllUsersPassword(request.NewPassword, cancellationToken);
 

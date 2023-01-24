@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
@@ -32,7 +32,6 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
 
         await foreach (var password in _passwordService.GetAllUserPasswords(Guid.Parse(userId), cancellationToken))
         {
-
             yield return new PasswordResponseModel
             {
                 CategoryId = password.CategoryId,
@@ -42,7 +41,7 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
                 Username = password.Username,
                 Title = password.Title,
                 IsFavorite = password.IsFavorite,
-                ImageId= password.ImageId,
+                ImageId = password.ImageId,
                 ImageTitle = password.Logo?.Title,
                 PublicUrl = password.Logo?.FileUrl,
                 ThumbnailUrl = password.Logo?.ThumbnailUrl

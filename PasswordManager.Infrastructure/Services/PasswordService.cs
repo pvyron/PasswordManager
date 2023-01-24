@@ -87,7 +87,7 @@ internal sealed class PasswordService : IPasswordService
             IsFavorite = password.IsFavorite.GetValueOrDefault(false),
             ImageId = password.ImageId,
         }, cancellationToken);
-        
+
         await _context.SaveChangesAsync(cancellationToken);
 
         var passwordDbModel = addPasswordResult.Entity;

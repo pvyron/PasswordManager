@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using PasswordManager.Application.DtObjects.Authorization;
 using PasswordManager.Application.IServices;
 using PasswordManager.Domain.Models;
@@ -17,7 +17,7 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
         _usersService = usersService;
     }
 
-    public async Task<Result<UserRegistrationResponseModel>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<UserRegistrationResponseModel>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         try
         {

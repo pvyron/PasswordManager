@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.DtObjects.Reporting;
@@ -23,7 +23,7 @@ public sealed class PublicPasswordDataQueryHandler : IRequestHandler<PublicPassw
         _passwordService = passwordService;
     }
 
-    public async Task<Result<IEnumerable<PublicPasswordDataResponseModel>>> Handle(PublicPasswordDataQuery request, CancellationToken cancellationToken)
+    public async ValueTask<Result<IEnumerable<PublicPasswordDataResponseModel>>> Handle(PublicPasswordDataQuery request, CancellationToken cancellationToken)
     {
         try
         {

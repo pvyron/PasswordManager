@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
@@ -21,7 +21,7 @@ public sealed class AlternateFavorabilityCommandHandler : IRequestHandler<Altern
         _passwordService = passwordService;
     }
 
-    public async Task<Result<PasswordResponseModel>> Handle(AlternateFavorabilityCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<PasswordResponseModel>> Handle(AlternateFavorabilityCommand request, CancellationToken cancellationToken)
     {
         try
         {

@@ -1,5 +1,5 @@
 ﻿using LanguageExt.Common;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using PasswordManager.Application.DtObjects;
 using PasswordManager.Application.IServices;
@@ -20,7 +20,7 @@ public sealed class DeletePasswordCommandHandler : IRequestHandler<DeletePasswor
         _passwordService = passwordService;
     }
 
-    public async Task<Result<Unit>> Handle(DeletePasswordCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<Unit>> Handle(DeletePasswordCommand request, CancellationToken cancellationToken)
     {
         try
         {
