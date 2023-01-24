@@ -7,6 +7,7 @@ using PasswordManager.Infrastructure.ServiceSettings;
 using PasswordManager.Infrastructure.ToolServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.Runtime.CompilerServices;
 
 namespace PasswordManager.Infrastructure.Services;
 
@@ -94,5 +95,20 @@ internal sealed class ImagesService : IImagesService
             ThumbnailUrl = logoDbModel.ThumbnailUrl,
             ThumbnailExtension = "jpg"
         };
+    }
+
+    public async IAsyncEnumerable<PasswordLogoModel> GetAllPasswordLogos([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await foreach (var logoDbModel in _sqlDbContext.PasswordLogos.ToAsyncEnumerable().ConfigureAwait(true).WithCancellation(cancellationToken))
+        {
+            yield return new PasswordLogoModel
+            {
+                FileExtension = "jpg",
+                FileUrl = logoDbModel.ImageUrl,
+                ThumbnailExtension = "jpg",
+                ThumbnailUrl = logoDbModel.ThumbnailUrl,
+                Title = logoDbModel.Title
+            };
+        }
     }
 }
