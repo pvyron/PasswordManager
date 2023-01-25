@@ -35,11 +35,10 @@ internal sealed class PasswordService : IPasswordService
                 ImageId = passwordDbModel.ImageId,
                 Logo = new PasswordLogoModel
                 {
+                    LogoId = passwordDbModel.Image!.Id,
                     Title = passwordDbModel.Image!.Title,
                     FileExtension = "jpg",
-                    FileUrl = passwordDbModel.Image!.ImageUrl,
-                    ThumbnailExtension = "jpg",
-                    ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+                    FileUrl = passwordDbModel.Image!.ImageUrl
                 }
             };
         }
@@ -65,11 +64,10 @@ internal sealed class PasswordService : IPasswordService
             ImageId = passwordDbModel.ImageId,
             Logo = new PasswordLogoModel
             {
+                LogoId = passwordDbModel.Image!.Id,
                 Title = passwordDbModel.Image!.Title,
                 FileExtension = "jpg",
-                FileUrl = passwordDbModel.Image!.ImageUrl,
-                ThumbnailExtension = "jpg",
-                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+                FileUrl = passwordDbModel.Image!.ImageUrl
             }
         };
     }
@@ -106,11 +104,10 @@ internal sealed class PasswordService : IPasswordService
             ImageId = passwordDbModel.ImageId,
             Logo = new PasswordLogoModel
             {
+                LogoId = passwordDbModel.Image!.Id,
                 Title = passwordDbModel.Image!.Title,
                 FileExtension = "jpg",
-                FileUrl = passwordDbModel.Image!.ImageUrl,
-                ThumbnailExtension = "jpg",
-                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+                FileUrl = passwordDbModel.Image!.ImageUrl
             }
         };
     }
@@ -143,11 +140,10 @@ internal sealed class PasswordService : IPasswordService
             ImageId = passwordDbModel.ImageId,
             Logo = new PasswordLogoModel
             {
+                LogoId = passwordDbModel.Image!.Id,
                 Title = passwordDbModel.Image!.Title,
                 FileExtension = "jpg",
-                FileUrl = passwordDbModel.Image!.ImageUrl,
-                ThumbnailExtension = "jpg",
-                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
+                FileUrl = passwordDbModel.Image!.ImageUrl
             }
         };
     }
@@ -174,11 +170,10 @@ internal sealed class PasswordService : IPasswordService
             ImageId = passwordDbModel.ImageId,
             Logo = new PasswordLogoModel
             {
+                LogoId = passwordDbModel.Image!.Id,
                 Title = passwordDbModel.Image!.Title,
                 FileExtension = "jpg",
                 FileUrl = passwordDbModel.Image!.ImageUrl,
-                ThumbnailExtension = "jpg",
-                ThumbnailUrl = passwordDbModel.Image!.ThumbnailUrl
             }
         }; ;
     }

@@ -63,8 +63,7 @@ public sealed class CreatePasswordCommandHandler : IRequestHandler<CreatePasswor
                 IsFavorite = createdPassword.IsFavorite,
                 ImageId = createdPassword.ImageId,
                 ImageTitle = createdPassword.Logo?.Title,
-                PublicUrl = createdPassword.Logo?.FileUrl,
-                ThumbnailUrl = createdPassword.Logo?.ThumbnailUrl,
+                PublicUrl = createdPassword.Logo?.FileUrl
             };
         }
         catch (Exception ex)

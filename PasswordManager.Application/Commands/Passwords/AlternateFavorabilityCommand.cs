@@ -54,8 +54,8 @@ public sealed class AlternateFavorabilityCommandHandler : IRequestHandler<Altern
                 Title = updatedPassword.Title,
                 ImageId = updatedPassword.ImageId,
                 ImageTitle = updatedPassword.Logo?.Title,
-                PublicUrl = updatedPassword.Logo?.FileUrl,
-                ThumbnailUrl = updatedPassword.Logo?.ThumbnailUrl
+                PublicUrl = updatedPassword.Logo?.FileUrl
+                
             };
         }
         catch (Exception ex)

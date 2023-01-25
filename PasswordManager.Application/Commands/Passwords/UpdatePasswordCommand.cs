@@ -91,8 +91,7 @@ public sealed class UpdatePasswordCommandHandler : IRequestHandler<UpdatePasswor
                 IsFavorite = passwordModel.IsFavorite,
                 ImageId = passwordModel.ImageId,
                 ImageTitle = passwordModel.Logo?.Title,
-                PublicUrl = passwordModel.Logo?.FileUrl,
-                ThumbnailUrl = passwordModel.Logo?.ThumbnailUrl
+                PublicUrl = passwordModel.Logo?.FileUrl
             };
         }
         catch (Exception ex)

@@ -6,9 +6,9 @@ using PasswordManager.Shared.ResponseModels;
 
 namespace PasswordManager.Application.Commands.Images;
 
-public sealed record UploadPasswordLogoCommand(IFormFile File, string ImageTitle) : IRequest<Result<ImageLogoResponseModel>>;
+public sealed record UploadPasswordLogoCommand(IFormFile File, string ImageTitle) : IRequest<Result<LogoImageResponseModel>>;
 
-public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPasswordLogoCommand, Result<ImageLogoResponseModel>>
+public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPasswordLogoCommand, Result<LogoImageResponseModel>>
 {
     private readonly IImagesService _imagesService;
 
@@ -17,7 +17,7 @@ public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPas
         _imagesService = imagesService;
     }
 
-    public async ValueTask<Result<ImageLogoResponseModel>> Handle(UploadPasswordLogoCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Result<LogoImageResponseModel>> Handle(UploadPasswordLogoCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -29,15 +29,16 @@ public sealed class UploadPasswordLogoCommandHandler : IRequestHandler<UploadPas
 
             var uploadedImage = await _imagesService.UploadImage(memoryStream, request.ImageTitle, extension, cancellationToken);
 
-            return new ImageLogoResponseModel
+            return new LogoImageResponseModel
             {
-                PublicUrl = uploadedImage.FileUrl,
-                ThumbnailUrl = uploadedImage.ThumbnailUrl
+                LogoImageId = uploadedImage.LogoId,
+                Title = uploadedImage.Title,
+                PublicUrl = uploadedImage.FileUrl
             };
         }
         catch (Exception ex)
         {
-            return new Result<ImageLogoResponseModel>(ex);
+            return new Result<LogoImageResponseModel>(ex);
         }
     }
 }

@@ -30,7 +30,7 @@ public class ImagesController : MediatorControllerBase
     }
 
     [HttpGet]
-    public async IAsyncEnumerable<ImageLogoResponseModel> GetPasswordLogos([EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<LogoImageResponseModel> GetPasswordLogos([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var responseModel in Mediator.CreateStream(new GetPasswordLogosQuery(), cancellationToken))
         {

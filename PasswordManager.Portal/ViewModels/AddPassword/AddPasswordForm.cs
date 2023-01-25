@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PasswordManager.Portal.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PasswordManager.Portal.ViewModels.AddPassword;
 
@@ -24,6 +25,8 @@ public sealed class AddPasswordForm
     [Required(ErrorMessage = "Category is mandatory")]
     public AvailableCategory Category { get; set; } = null!;
 
+    [Required(ErrorMessage = "Image is mandatory")]
+    public LogoModel? PickedLogo { get; set; }
 
 
     public bool ShowPassword { get; set; } = false;

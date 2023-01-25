@@ -13,7 +13,7 @@ namespace PasswordManager.Infrastructure.ToolServices;
 
 internal sealed class ImageManipulationService
 {
-    private const int JPEG_COMPRESSION_FACTOR = 20;
+    private const int JPEG_COMPRESSION_FACTOR = 75;
 
     //jpeg, bmp, gif, pbm, png, tga, tiff, and webp
     private readonly Dictionary<string, IImageDecoder> _imageDecoders;

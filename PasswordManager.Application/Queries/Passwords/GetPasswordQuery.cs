@@ -52,8 +52,7 @@ public sealed class GetPasswordQueryHandler : IRequestHandler<GetPasswordQuery, 
                 IsFavorite = password.IsFavorite,
                 ImageId = password.ImageId,
                 ImageTitle = password.Logo?.Title,
-                PublicUrl = password.Logo?.FileUrl,
-                ThumbnailUrl = password.Logo?.ThumbnailUrl
+                PublicUrl = password.Logo?.FileUrl
             };
         }
         catch (Exception ex)

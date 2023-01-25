@@ -9,7 +9,5 @@ public class PasswordLogoDbModel
     public required string Title { get; set; }
     public required string BulkStorageImageName { get; set; }
     public required string ImageUrl { get; set; }
-    public required string BulkStorageThumbnailName { get; set; }
-    public required string ThumbnailUrl { get; set; }
     public ICollection<PasswordDbModel>? Passwords { get; set; }
 }

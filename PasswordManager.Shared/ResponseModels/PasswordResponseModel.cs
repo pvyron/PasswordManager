@@ -12,5 +12,4 @@ public sealed record PasswordResponseModel
     public bool? IsFavorite { get; set; }
     public string? ImageTitle { get; set; }
     public string? PublicUrl { get; set; }
-    public string? ThumbnailUrl { get; set; }
 }

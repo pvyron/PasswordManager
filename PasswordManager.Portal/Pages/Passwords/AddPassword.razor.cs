@@ -3,6 +3,7 @@ using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.DtObjects;
+using PasswordManager.Portal.Models;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
 
@@ -19,6 +20,7 @@ public partial class AddPassword
 
     AddPasswordForm AddPasswordForm { get; set; } = new();
     List<AvailableCategory> AvailableCategories { get; set; } = new();
+    List<LogoModel> PasswordLogos { get; set; } = new();
     bool FormComponentsDisabled => PasswordFetchingInProgress && AddingPasswordInProgress;
     bool AddingPasswordInProgress { get; set; } = false;
     bool PasswordFetchingInProgress { get; set; } = false;
@@ -29,9 +31,12 @@ public partial class AddPassword
         try
         {
             PasswordFetchingInProgress = true;
-            var result = await CategoriesService.GetAllCategories(CancellationToken.None);
+            var categoriesFetchingResult = await CategoriesService.GetAllCategories(CancellationToken.None);
 
-            result.IfSucc(CategoriesFetchingSuccess);
+            categoriesFetchingResult.IfSucc(CategoriesFetchingSuccess);
+
+            PasswordLogos = await PasswordsService.GetAllLogos(CancellationToken.None).ToListAsync(CancellationToken.None);
+            AddPasswordForm.PickedLogo = PasswordLogos[0];
         }
         finally
         {
@@ -49,6 +54,11 @@ public partial class AddPassword
     private void PickedCategoryChanged(AvailableCategory availableCategory)
     {
         AddPasswordForm.Category = availableCategory;
+    }
+
+    private void PickedLogoChanged(LogoModel logoModel)
+    {
+        AddPasswordForm.PickedLogo = logoModel;
     }
 
     private async Task AddNewPassword()

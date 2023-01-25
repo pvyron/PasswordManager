@@ -5,9 +5,9 @@ using System.Runtime.CompilerServices;
 
 namespace PasswordManager.Application.Queries.Images;
 
-public sealed record GetPasswordLogosQuery : IStreamQuery<ImageLogoResponseModel>;
+public sealed record GetPasswordLogosQuery : IStreamQuery<LogoImageResponseModel>;
 
-public sealed class GetPasswordLogosQueryHandler : IStreamQueryHandler<GetPasswordLogosQuery, ImageLogoResponseModel>
+public sealed class GetPasswordLogosQueryHandler : IStreamQueryHandler<GetPasswordLogosQuery, LogoImageResponseModel>
 {
     private readonly IImagesService _imagesService;
 
@@ -16,14 +16,15 @@ public sealed class GetPasswordLogosQueryHandler : IStreamQueryHandler<GetPasswo
         _imagesService = imagesService;
     }
 
-    public async IAsyncEnumerable<ImageLogoResponseModel> Handle(GetPasswordLogosQuery query, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<LogoImageResponseModel> Handle(GetPasswordLogosQuery query, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var logoModel in _imagesService.GetAllPasswordLogos(cancellationToken))
         {
-            yield return new ImageLogoResponseModel
+            yield return new LogoImageResponseModel
             {
-                PublicUrl = logoModel.FileUrl,
-                ThumbnailUrl = logoModel.ThumbnailUrl
+                LogoImageId = logoModel.LogoId,
+                Title = logoModel.Title,
+                PublicUrl = logoModel.FileUrl
             };
         }
     }

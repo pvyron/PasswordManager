@@ -43,8 +43,7 @@ public sealed class GetAllPasswordsQueryHandler : IStreamRequestHandler<GetAllPa
                 IsFavorite = password.IsFavorite,
                 ImageId = password.ImageId,
                 ImageTitle = password.Logo?.Title,
-                PublicUrl = password.Logo?.FileUrl,
-                ThumbnailUrl = password.Logo?.ThumbnailUrl
+                PublicUrl = password.Logo?.FileUrl
             };
         }
     }

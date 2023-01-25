@@ -1,7 +1,8 @@
 ﻿namespace PasswordManager.Shared.ResponseModels;
 
-public sealed class ImageLogoResponseModel
+public sealed class LogoImageResponseModel
 {
+    public Guid? LogoImageId {get; set; }
+    public string? Title { get; set; }
     public string? PublicUrl { get; set; }
-    public string? ThumbnailUrl { get; set; }
 }
