@@ -118,20 +118,30 @@ internal sealed class PasswordService : IPasswordService
     {
         var passwordDbModel = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == password.Id && p.IsActive, cancellationToken);
 
-        passwordDbModel!.CategoryId = password.CategoryId!.Value;
+        bool needToFetchAgain = false;
+        if (passwordDbModel!.ImageId != password.ImageId ||
+            passwordDbModel!.CategoryId != password.CategoryId!.Value)
+        {
+            passwordDbModel!.ImageId = password.ImageId;
+            passwordDbModel!.CategoryId = password.CategoryId!.Value;
+            needToFetchAgain = true;
+        }
+
         passwordDbModel!.Description = password.Description;
         passwordDbModel!.Title = password.Title;
         passwordDbModel!.Username = password.Username;
         passwordDbModel!.Password = password.Password;
         passwordDbModel!.IsFavorite = password.IsFavorite.GetValueOrDefault(false);
-        passwordDbModel!.ImageId = password.ImageId;
         passwordDbModel!.EditedAt = DateTimeOffset.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
 
+        if (needToFetchAgain)
+            passwordDbModel = await _context.Passwords.Include(p => p.Image).FirstOrDefaultAsync(p => p.Id == password.Id && p.IsActive, cancellationToken);
+
         return new PasswordModel
         {
-            CategoryId = passwordDbModel.CategoryId,
+            CategoryId = passwordDbModel!.CategoryId,
             Description = passwordDbModel.Description,
             Password = passwordDbModel.Password,
             Title = passwordDbModel.Title,

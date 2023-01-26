@@ -25,7 +25,8 @@ public sealed class EditPasswordForm
     public bool? Favorite { get; set; } = false;
 
     [Required(ErrorMessage = "Category is mandatory")]
-    public AvailableCategory Category { get; set; } = null!;
+    public AvailableCategory? Category { get; set; }
+    public LogoModel? Logo { get; set; }
 
     private PasswordModel? _password;
     public bool IsPasswordChanged
@@ -35,7 +36,9 @@ public sealed class EditPasswordForm
             return _password?.Title != Title
                 || _password?.Username != Username
                 || _password?.Password != Password
-                || _password?.Description != Description;
+                || _password?.Description != Description
+                || _password?.CategoryId != Category?.Id
+                || _password?.Logo?.ImageId != Logo?.ImageId;
         }
     }
     public bool ShowPassword { get; set; } = false;
@@ -51,5 +54,6 @@ public sealed class EditPasswordForm
         Password = password.Password!;
         Description = password.Description;
         Category = availableCategories.First();
+        Logo = password.Logo;
     }
 }

@@ -29,6 +29,7 @@ public partial class EditPassword
     bool FormComponentsDisabled => PasswordFetchingInProgress && SavingPasswordInProgress;
     bool SavingPasswordInProgress { get; set; } = false;
     bool PasswordFetchingInProgress { get; set; } = false;
+    bool IsDrawerOpen { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,14 +121,14 @@ public partial class EditPassword
 
             var result = await PasswordsService.UpdatePassword(Guid.Parse(PassId!), new PasswordModel
             {
-                CategoryId = EditPasswordForm.Category.Id!.Value,
+                CategoryId = EditPasswordForm.Category!.Id!.Value,
                 Title = EditPasswordForm.Title,
                 Username = EditPasswordForm.Username,
                 Description = EditPasswordForm.Description,
                 Password = EditPasswordForm.Password,
                 IsFavorite = EditPasswordForm.Favorite.GetValueOrDefault(false),
                 Id = Password.Id,
-                Logo = Password.Logo
+                Logo = EditPasswordForm.Logo!
             }, CancellationToken.None);
 
             result.IfSucc(async p => await SuccessfullUpdatePassword(p));
@@ -153,7 +154,20 @@ public partial class EditPassword
         StateHasChanged();
     }
 
-    async Task SuccessfullUpdatePassword(PasswordModel passwordViewModel)
+    private void ChangeImageButtonClicked()
+    {
+        IsDrawerOpen = !IsDrawerOpen;
+    }
+
+    private void LogoChanged(LogoModel logoModel)
+    {
+        IsDrawerOpen = false;
+        EditPasswordForm.Logo = logoModel;
+
+        StateHasChanged();
+    }
+
+    async Task SuccessfullUpdatePassword(PasswordModel passwordModel)
     {
         var options = new DialogOptions
         {
@@ -171,7 +185,7 @@ public partial class EditPassword
 
         await dialog.Result;
 
-        EditPasswordForm.LoadPassword(Password = passwordViewModel, AvailableCategories);
+        EditPasswordForm.LoadPassword(Password = passwordModel, AvailableCategories);
 
         StateHasChanged();
     }

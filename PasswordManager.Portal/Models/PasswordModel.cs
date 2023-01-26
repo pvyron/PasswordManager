@@ -9,5 +9,5 @@ public sealed class PasswordModel
     public required string Username { get; set; }
     public required string Password { get; set; }
     public required bool? IsFavorite { get; set; }
-    public required LogoModel? Logo { get; set; }
+    public required LogoModel Logo { get; set; }
 }
