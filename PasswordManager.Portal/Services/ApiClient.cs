@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
+﻿using LanguageExt.Pipes;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using PasswordManager.Portal.Constants;
 
 namespace PasswordManager.Portal.Services;
 
@@ -7,12 +10,13 @@ public sealed class ApiClient
     private readonly string _apiBaseAddress;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ClientStateData _clientStateData;
+    private readonly NavigationManager _navigationManager;
 
-    public ApiClient(IConfiguration configuration, IHttpClientFactory httpClientFactory, ClientStateData clientStateData)
+    public ApiClient(IConfiguration configuration, IHttpClientFactory httpClientFactory, ClientStateData clientStateData, NavigationManager navigationManager)
     {
         _httpClientFactory = httpClientFactory;
         _clientStateData = clientStateData;
-
+        _navigationManager = navigationManager;
         _apiBaseAddress = configuration.GetValue<string>("Api:BaseAddress")!;
     }
 
@@ -40,6 +44,12 @@ public sealed class ApiClient
 
         var response = await GetClient().SendAsync(requestMessage, httpCompletionOption, cancellationToken);
 
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            _clientStateData.Logout();
+            _navigationManager.NavigateTo(ApplicationRoutes.Login);
+        }
+
         return response;
     }
 
@@ -54,7 +64,15 @@ public sealed class ApiClient
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
         client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "https://localhost:7210");
 
-        return await client.GetAsync(GetUri(relativeUrl), httpCompletionOption, cancellationToken);
+        var response = await client.GetAsync(GetUri(relativeUrl), httpCompletionOption, cancellationToken);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            _clientStateData.Logout();
+            _navigationManager.NavigateTo(ApplicationRoutes.Login);
+        }
+
+        return response;
     }
 
     HttpClient GetClient()

@@ -74,6 +74,8 @@ internal sealed class PasswordService : IPasswordService
 
     public async Task<PasswordModel> SaveNewPassword(PasswordModel password, CancellationToken cancellationToken)
     {
+        var defaultLogo = await _context.PasswordLogos.FirstOrDefaultAsync(l => l.IsDefault);
+
         var addPasswordResult = await _context.Passwords.AddAsync(new PasswordDbModel
         {
             CategoryId = password.CategoryId!.Value,
@@ -83,13 +85,13 @@ internal sealed class PasswordService : IPasswordService
             Username = password.Username,
             UserId = password.UserId,
             IsFavorite = password.IsFavorite.GetValueOrDefault(false),
-            ImageId = password.ImageId,
+            ImageId = defaultLogo!.Id,
+            Image = defaultLogo!
         }, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
 
         var passwordDbModel = addPasswordResult.Entity;
-        passwordDbModel.Image = await _context.PasswordLogos.FindAsync(new object[] { passwordDbModel.ImageId.GetValueOrDefault() }, cancellationToken: cancellationToken);
 
         return new PasswordModel
         {

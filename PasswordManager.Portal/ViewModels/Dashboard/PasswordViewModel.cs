@@ -4,6 +4,11 @@ namespace PasswordManager.Portal.ViewModels.Dashboard;
 
 public sealed class PasswordCardViewModel
 {
+    private PasswordCardViewModel()
+    {
+
+    }
+
     public Guid? Id { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
@@ -25,6 +30,13 @@ public sealed class PasswordCardViewModel
             Favorite = passwordModel.IsFavorite,
             ImageUrl = passwordModel.Logo?.FileUrl,
             Title = passwordModel.Title,
+            _passwordModel = passwordModel,
         };
+    }
+
+    private PasswordModel _passwordModel = null!;
+    public PasswordModel GetPasswordModel()
+    {
+        return _passwordModel;
     }
 }

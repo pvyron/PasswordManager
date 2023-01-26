@@ -1,4 +1,5 @@
-﻿using PasswordManager.Portal.ViewModels.AddPassword;
+﻿using PasswordManager.Portal.Models;
+using PasswordManager.Portal.ViewModels.AddPassword;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using System.ComponentModel.DataAnnotations;
 
@@ -26,7 +27,7 @@ public sealed class EditPasswordForm
     [Required(ErrorMessage = "Category is mandatory")]
     public AvailableCategory Category { get; set; } = null!;
 
-    private PasswordCardViewModel? _password;
+    private PasswordModel? _password;
     public bool IsPasswordChanged
     {
         get
@@ -41,7 +42,7 @@ public sealed class EditPasswordForm
 
     public bool IsValid { get; set; }
 
-    public void LoadPassword(PasswordCardViewModel password, List<AvailableCategory> availableCategories)
+    public void LoadPassword(PasswordModel password, List<AvailableCategory> availableCategories)
     {
         _password = password;
 

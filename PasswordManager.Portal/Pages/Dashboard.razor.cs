@@ -47,7 +47,7 @@ public partial class Dashboard
 
         var parameters = new DialogParameters
         {
-            {"Password", passwordViewModel }
+            {"Password", passwordViewModel.GetPasswordModel() }
         };
 
         var dialog = DialogService.Show<PasswordCredentialsDialog>(passwordViewModel.Title, parameters, options);
@@ -67,7 +67,7 @@ public partial class Dashboard
                 if (outedatedPassword is null)
                     return;
 
-                Passwords[Passwords.IndexOf(outedatedPassword)].IsFavorite = pm.Favorite.GetValueOrDefault(false);
+                Passwords[Passwords.IndexOf(outedatedPassword)].IsFavorite = pm.IsFavorite.GetValueOrDefault(false);
 
                 StateHasChanged();
             });

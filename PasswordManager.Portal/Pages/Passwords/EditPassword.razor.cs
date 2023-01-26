@@ -3,6 +3,7 @@ using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Constants;
 using PasswordManager.Portal.DtObjects;
+using PasswordManager.Portal.Models;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.AddPassword;
 using PasswordManager.Portal.ViewModels.Dashboard;
@@ -22,7 +23,7 @@ public partial class EditPassword
     MudForm? UiForm { get; set; }
 
     EditPasswordForm EditPasswordForm { get; set; } = new();
-    PasswordCardViewModel Password { get; set; } = new();
+    PasswordModel Password { get; set; } = default!;
     List<AvailableCategory> AvailableCategories { get; set; } = new();
     bool SaveButtonDisabled => FormComponentsDisabled || !EditPasswordForm.IsPasswordChanged;
     bool FormComponentsDisabled => PasswordFetchingInProgress && SavingPasswordInProgress;
@@ -65,7 +66,7 @@ public partial class EditPassword
         categoriesResponse.IfFail(async ex => await FailedFetching(ex));
     }
 
-    void SuccessfullPasswordFetching(PasswordCardViewModel password)
+    void SuccessfullPasswordFetching(PasswordModel password)
     {
         Password = password;
     }
@@ -117,14 +118,16 @@ public partial class EditPassword
         {
             SavingPasswordInProgress = true;
 
-            var result = await PasswordsService.UpdatePassword(Guid.Parse(PassId!), new NewPassword
+            var result = await PasswordsService.UpdatePassword(Guid.Parse(PassId!), new PasswordModel
             {
                 CategoryId = EditPasswordForm.Category.Id!.Value,
                 Title = EditPasswordForm.Title,
                 Username = EditPasswordForm.Username,
                 Description = EditPasswordForm.Description,
                 Password = EditPasswordForm.Password,
-                IsFavorite = EditPasswordForm.Favorite.GetValueOrDefault(false)
+                IsFavorite = EditPasswordForm.Favorite.GetValueOrDefault(false),
+                Id = Password.Id,
+                Logo = Password.Logo
             }, CancellationToken.None);
 
             result.IfSucc(async p => await SuccessfullUpdatePassword(p));
@@ -150,7 +153,7 @@ public partial class EditPassword
         StateHasChanged();
     }
 
-    async Task SuccessfullUpdatePassword(PasswordCardViewModel passwordViewModel)
+    async Task SuccessfullUpdatePassword(PasswordModel passwordViewModel)
     {
         var options = new DialogOptions
         {

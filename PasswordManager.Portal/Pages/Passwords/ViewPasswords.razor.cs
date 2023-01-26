@@ -2,6 +2,7 @@
 using MudBlazor;
 using PasswordManager.Portal.Components;
 using PasswordManager.Portal.Constants;
+using PasswordManager.Portal.Models;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.Dashboard;
 using PasswordManager.Portal.ViewModels.ViewPasswords;
@@ -64,7 +65,7 @@ public partial class ViewPasswords
 
     }
 
-    async Task SuccessfullPasswordFetching(PasswordCardViewModel password)
+    async Task SuccessfullPasswordFetching(PasswordModel password)
     {
         var options = new DialogOptions
         {

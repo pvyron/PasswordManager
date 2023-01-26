@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PasswordManager.DataAccess.Implementations;
 
@@ -11,9 +12,11 @@ using PasswordManager.DataAccess.Implementations;
 namespace PasswordManager.DataAccess.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    partial class SqlDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230125231602_setup_for_default_logo_20230126")]
+    partial class setupfordefaultlogo20230126
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

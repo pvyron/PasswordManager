@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using PasswordManager.Portal.Constants;
+using PasswordManager.Portal.Models;
 using PasswordManager.Portal.Services;
 using PasswordManager.Portal.ViewModels.Dashboard;
 
@@ -11,7 +12,7 @@ public partial class PasswordCredentialsDialog
     [Inject] ClipboardService _clipboardService { get; set; } = default!;
     [Inject] ISnackbar _snackbarService { get; set; } = default!;
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
-    [Parameter] public PasswordCardViewModel? Password { get; set; } = default!;
+    [Parameter] public PasswordModel? Password { get; set; } = default!;
 
     void OkButtonClicked() => MudDialog?.Close(DialogResult.Ok(true));
 

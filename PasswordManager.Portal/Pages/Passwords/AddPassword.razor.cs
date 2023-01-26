@@ -20,7 +20,6 @@ public partial class AddPassword
 
     AddPasswordForm AddPasswordForm { get; set; } = new();
     List<AvailableCategory> AvailableCategories { get; set; } = new();
-    List<LogoModel> PasswordLogos { get; set; } = new();
     bool FormComponentsDisabled => PasswordFetchingInProgress && AddingPasswordInProgress;
     bool AddingPasswordInProgress { get; set; } = false;
     bool PasswordFetchingInProgress { get; set; } = false;
@@ -34,9 +33,6 @@ public partial class AddPassword
             var categoriesFetchingResult = await CategoriesService.GetAllCategories(CancellationToken.None);
 
             categoriesFetchingResult.IfSucc(CategoriesFetchingSuccess);
-
-            PasswordLogos = await PasswordsService.GetAllLogos(CancellationToken.None).ToListAsync(CancellationToken.None);
-            AddPasswordForm.PickedLogo = PasswordLogos[0];
         }
         finally
         {
@@ -54,11 +50,6 @@ public partial class AddPassword
     private void PickedCategoryChanged(AvailableCategory availableCategory)
     {
         AddPasswordForm.Category = availableCategory;
-    }
-
-    private void PickedLogoChanged(LogoModel logoModel)
-    {
-        AddPasswordForm.PickedLogo = logoModel;
     }
 
     private async Task AddNewPassword()
