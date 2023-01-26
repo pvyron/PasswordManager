@@ -23,7 +23,7 @@ public sealed class ApiClient
     public async Task<HttpResponseMessage> SendAnonymous(HttpRequestMessage requestMessage, string relativeUrl, CancellationToken cancellationToken)
     {
         requestMessage.RequestUri = GetUri(relativeUrl);
-        requestMessage.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7210");
+        requestMessage.Headers.Add("Access-Control-Allow-Origin", "https://thunder-portal.azurewebsites.net");
 
         var response = await GetClient().SendAsync(requestMessage, cancellationToken);
 
@@ -39,7 +39,7 @@ public sealed class ApiClient
     {
         requestMessage.RequestUri = GetUri(relativeUrl);
         requestMessage.Headers.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
-        requestMessage.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7210");
+        requestMessage.Headers.Add("Access-Control-Allow-Origin", "https://thunder-portal.azurewebsites.net");
         requestMessage.SetBrowserResponseStreamingEnabled(true);
 
         var response = await GetClient().SendAsync(requestMessage, httpCompletionOption, cancellationToken);
@@ -62,7 +62,7 @@ public sealed class ApiClient
     {
         var client = GetClient();
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_clientStateData.User?.AccessToken}");
-        client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "https://localhost:7210");
+        client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "https://thunder-portal.azurewebsites.net");
 
         var response = await client.GetAsync(GetUri(relativeUrl), httpCompletionOption, cancellationToken);
 
