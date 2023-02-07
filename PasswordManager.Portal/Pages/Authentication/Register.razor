@@ -14,7 +14,7 @@
             </MudText>
         </MudItem>
         <MudItem xl="8" lg="8" md="8" sm="10" xs="12">
-            <MudForm Model="@RegisterForm" @bind-IsValid="@RegisterForm.IsValid" >
+            <MudForm @ref="_mudForm" Model="@RegisterForm" @bind-IsValid="@RegisterForm.IsValid" >
                 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" >
                     <MudGrid Spacing="5" Justify="Justify.SpaceBetween" Style="margin-left:3%; margin-right:3%" >
                         <MudItem lg="6" md="12" sm="12" xs="12">

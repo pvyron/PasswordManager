@@ -14,14 +14,20 @@ public partial class Register
     [Inject] NavigationManager NavManager { get; set; } = default!;
     [Inject] IDialogService DialogService { get; set; } = default!;
 
-    private RegisterForm RegisterForm = new();
+    private MudForm _mudForm { get; set; }
+    private RegisterForm RegisterForm { get; set; } = new();
     private bool RegistrationInProgress = false;
 
     private async Task RegisterUser()
     {
+        
+
+
         try
         {
             RegistrationInProgress = true;
+
+            await _mudForm.Validate();
 
             if (!RegisterForm.IsValid)
             {

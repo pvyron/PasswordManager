@@ -6,7 +6,7 @@ public sealed class PasswordCardViewModel
 {
     private PasswordCardViewModel()
     {
-
+        IsDescriptionExpanded = false;
     }
 
     public Guid? Id { get; set; }
@@ -17,7 +17,7 @@ public sealed class PasswordCardViewModel
     public bool? Favorite { get; set; }
     public string? ImageUrl { get; set; }
 
-    public bool IsDesciptionExpanded { get; set; } = false;
+    public bool IsDescriptionExpanded { get; set; }
 
     public static PasswordCardViewModel FromPassword(PasswordModel passwordModel)
     {
