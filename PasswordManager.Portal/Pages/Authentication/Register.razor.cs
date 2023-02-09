@@ -14,7 +14,7 @@ public partial class Register
     [Inject] NavigationManager NavManager { get; set; } = default!;
     [Inject] IDialogService DialogService { get; set; } = default!;
 
-    private MudForm _mudForm { get; set; }
+    private MudForm? MudForm { get; set; }
     private RegisterForm RegisterForm { get; set; } = new();
     private bool RegistrationInProgress = false;
 
@@ -27,7 +27,7 @@ public partial class Register
         {
             RegistrationInProgress = true;
 
-            await _mudForm.Validate();
+            await MudForm?.Validate();
 
             if (!RegisterForm.IsValid)
             {
