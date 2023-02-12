@@ -3,6 +3,8 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using LanguageExt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.Infrastructure;
 using System.Text;
@@ -86,6 +88,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/heartbeat", () =>
+{
+    return "Awake";
+});
 
 app.MapControllers();
 
