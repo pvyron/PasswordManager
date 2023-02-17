@@ -2,5 +2,5 @@
 
 public interface IServiceSettings
 {
-    void Validate();
+    bool Validate();
 }

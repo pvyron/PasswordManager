@@ -14,7 +14,7 @@ public static class IServiceCollectionEx
         where TImplementation : class, TService
         where TSettings : class, IServiceSettings
     {
-        services.Configure<TSettings>(configuration.GetSection(typeof(TImplementation).Name));
+        services.AddOptions<TSettings, TImplementation>(configuration);
 
         return services.AddSingleton<TService, TImplementation>();
     }
@@ -26,7 +26,7 @@ public static class IServiceCollectionEx
         where TImplementation : class, TService
         where TSettings : class, IServiceSettings
     {
-        services.Configure<TSettings>(configuration.GetSection(typeof(TImplementation).Name));
+        services.AddOptions<TSettings, TImplementation>(configuration);
 
         return services.AddScoped<TService, TImplementation>();
     }
@@ -38,8 +38,17 @@ public static class IServiceCollectionEx
         where TImplementation : class, TService
         where TSettings : class, IServiceSettings
     {
-        services.Configure<TSettings>(configuration.GetSection(typeof(TImplementation).Name));
+        services.AddOptions<TSettings, TImplementation>(configuration);
 
         return services.AddTransient<TService, TImplementation>();
+    }
+
+    private static void AddOptions<TSettings, TService>(this IServiceCollection services, IConfiguration configuration)
+        where TService : class
+        where TSettings: class, IServiceSettings
+    {
+        services.AddOptions<TSettings>()
+            .Bind(configuration.GetRequiredSection(typeof(TService).Name))
+            .Validate(x => x.Validate()).ValidateOnStart();
     }
 }
