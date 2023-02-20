@@ -1,6 +1,9 @@
-﻿namespace PasswordManager.Portal.Components;
+﻿using PasswordManager.Portal.ViewModels.PasswordData;
+
+namespace PasswordManager.Portal.Components;
 
 public partial class PasswordDataForm
 {
-    private string? _title { get; set; }
+    private PasswordDataFormViewModel _viewModel = new();
+
 }
