@@ -65,35 +65,6 @@ public sealed class PasswordsService
         }
     }
 
-    public async IAsyncEnumerable<LogoModel> GetAllLogos([EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        var request = new HttpRequestMessage { Method = HttpMethod.Get };
-
-        var response = await _apiClient.SendAuthorized(request, "/api/Images/GetPasswordLogos", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-        response.EnsureSuccessStatusCode();
-
-        var responseContent = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-        await foreach (var logoImageResponse in JsonSerializer.DeserializeAsyncEnumerable<LogoImageResponseModel>(responseContent, _jsonSerializerOptions, cancellationToken))
-        {
-            if (logoImageResponse is null)
-                continue;
-
-            var logoModel = new LogoModel
-            {
-                Title = logoImageResponse.Title ?? "",
-                FileUrl = logoImageResponse.PublicUrl ?? "",
-                ImageId = logoImageResponse.LogoImageId.GetValueOrDefault()
-            };
-
-            if (!logoModel.IsValid)
-                continue;
-
-            yield return logoModel;
-        }
-    }
-
     public async Task<Result<List<PasswordRowViewModel>>> GetPasswordRows(CancellationToken cancellationToken)
     {
         try

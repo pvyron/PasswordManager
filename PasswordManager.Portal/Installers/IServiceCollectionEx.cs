@@ -14,6 +14,7 @@ public static class IServiceCollectionEx
             .AddScoped<AuthenticationService>()
             .AddScoped<PasswordsService>()
             .AddScoped<CategoriesService>()
+            .AddScoped<PasswordLogoService>()
             .AddSingleton<ClipboardService>();
     }
 
