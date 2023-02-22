@@ -353,3 +353,4 @@ MigrationBackup/
 /PasswordManager.DataAccess/Certificates
 /PasswordManager.Api/appsettings.Production.json
 /PasswordManager.DataAccess.Mongo/Certificates
+PasswordManager.LocalTools/target/
