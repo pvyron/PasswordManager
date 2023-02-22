@@ -49,6 +49,7 @@ public static class IServiceCollectionEx
     {
         services.AddOptions<TSettings>()
             .Bind(configuration.GetRequiredSection(typeof(TService).Name))
-            .Validate(x => x.Validate()).ValidateOnStart();
+            .Validate(x => x.Validate(), $"Settings validation failed for {typeof(TService).Name}.")
+            .ValidateOnStart();
     }
 }
