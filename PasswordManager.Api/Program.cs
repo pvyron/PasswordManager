@@ -89,10 +89,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/heartbeat", () =>
-{
-    return "Awake";
-});
+app.MapGet("/heartbeat", () => "Awake");
 
 app.MapControllers();
 

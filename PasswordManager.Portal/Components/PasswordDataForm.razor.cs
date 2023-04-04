@@ -12,7 +12,7 @@ public partial class PasswordDataForm
 
     private PasswordDataFormViewModel _viewModel = new();
 
-    bool SaveButtonDisabled => FormComponentsDisabled || !EditPasswordForm.IsPasswordChanged;
+    bool SaveButtonDisabled => FormComponentsDisabled;// || !EditPasswordForm.IsPasswordChanged;
     bool FormComponentsDisabled => PasswordFetchingInProgress && SavingPasswordInProgress;
     bool SavingPasswordInProgress { get; set; } = false;
     bool PasswordFetchingInProgress { get; set; } = false;

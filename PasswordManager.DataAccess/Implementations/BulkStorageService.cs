@@ -44,7 +44,8 @@ internal sealed class BulkStorageService : IBulkStorageService
         }
         finally
         {
-            compressedStream?.Dispose();
+            if (compressedStream is not null)
+                await compressedStream.DisposeAsync();
         }
     }
 
