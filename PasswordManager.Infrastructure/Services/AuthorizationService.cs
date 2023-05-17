@@ -37,7 +37,7 @@ internal sealed class AuthorizationService : IAuthorizationService
     {
         var userDbModel = await _context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
-        if (userDbModel is null || !ValidatePassword(HashedPassword(password, userDbModel.PasswordSalt), userDbModel.Password)) { throw new AuthenticationException("Invalid credentials"); }
+        if (userDbModel is null || !await ValidatePassword(HashedPassword(password, userDbModel.PasswordSalt), userDbModel.Password)) { throw new AuthenticationException("Invalid credentials"); }
 
         return new UserModel
         {
@@ -105,8 +105,10 @@ internal sealed class AuthorizationService : IAuthorizationService
         return hashedPasword;
     }
 
-    public static bool ValidatePassword(string inputPassword, string savedPassword)
+    public async static Task<bool> ValidatePassword(string inputPassword, string savedPassword)
     {
+        await Task.Delay(RandomNumberGenerator.GetInt32(50, 1000));
+
         if (inputPassword.Length != savedPassword.Length)
         {
             return false;
